@@ -1,24 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AggregationApiModule } from './../src/AggregationApi.module';
+import { AggregationApiModule } from '../src/aggregation-api.module';
+import * as superagent from 'superagent';
 
-describe('AggregationApiController (e2e)', () => {
-  let app: INestApplication;
+const SUCCESS_CODE: number = 200;
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AggregationApiModule],
-    }).compile();
+describe('AggregationApiController (e2e)', (): void => {
+    let app: INestApplication;
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
-  });
+    beforeEach(
+        async (): Promise<void> => {
+            const moduleFixture: TestingModule = await Test.createTestingModule({
+                imports: [AggregationApiModule],
+            }).compile();
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
-  });
+            app = moduleFixture.createNestApplication();
+            await app.init();
+        },
+    );
+
+    it('/ (GET)', (): superagent.SuperAgentRequest => {
+        return request(app.getHttpServer()).get('/').expect(SUCCESS_CODE).expect('Hello World!');
+    });
 });
