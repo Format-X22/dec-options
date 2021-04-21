@@ -1,0 +1,39 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/options-aggregator/src",
+  "monorepo": true,
+  "root": "apps/options-aggregator",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/options-aggregator/tsconfig.app.json"
+  },
+  "projects": {
+    "options-aggregator": {
+      "type": "application",
+      "root": "apps/options-aggregator",
+      "entryFile": "main",
+      "sourceRoot": "apps/options-aggregator/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/options-aggregator/tsconfig.app.json"
+      }
+    },
+    "aggregation-api": {
+      "type": "application",
+      "root": "apps/aggregation-api",
+      "entryFile": "main",
+      "sourceRoot": "apps/aggregation-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/aggregation-api/tsconfig.app.json"
+      }
+    },
+    "shared": {
+      "type": "library",
+      "root": "libs/shared",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
+      }
+    }
+  }
+}
