@@ -19,7 +19,6 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/options-aggregator/test/jest-e2e.json",
-
     "build:all": "nest build options-aggregator && nest build aggregation-api && nest build shared",
     "start:api": "nest start aggregation-api",
     "start:agg": "nest start opnions-aggregator",
@@ -29,11 +28,17 @@
   "dependencies": {
     "@nestjs/common": "^7.6.15",
     "@nestjs/core": "^7.6.15",
+    "@nestjs/mongoose": "^7.2.4",
     "@nestjs/platform-express": "^7.6.15",
+    "@nestjs/swagger": "^4.8.0",
     "ccxt": "^1.48.32",
+    "class-transformer": "^0.4.0",
+    "class-validator": "^0.13.1",
+    "mongoose": "^5.12.5",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.6.6"
+    "rxjs": "^6.6.6",
+    "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.6.0",
