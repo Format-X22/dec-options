@@ -1,12 +1,73 @@
-import { Controller, Get } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { AggregationApiService } from './aggregation-api.service';
+import { ApiExtraModels, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
+import { ListDto, makeListDtoApi } from '@app/shared/list.dto';
+import { EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET, EFilterDirection, OptionsQueryDto } from './options-query.dto';
+import { validateOrReject, ValidationError } from 'class-validator';
+import { plainToClass } from 'class-transformer';
 
 @Controller()
+@ApiExtraModels(ListDto, OptionsData)
 export class AggregationApiController {
     constructor(private readonly aggregationApiService: AggregationApiService) {}
 
     @Get()
-    getHello(): string {
-        return this.aggregationApiService.getHello();
+    @ApiQuery({ name: 'filterByMarket', type: String, required: false })
+    @ApiQuery({ name: 'filterByMarketType', enum: EMarketType, required: false })
+    @ApiQuery({ name: 'filterByType', enum: EOptionType, required: false })
+    @ApiQuery({ name: 'sortByMarket', enum: EFilterDirection, required: false })
+    @ApiQuery({ name: 'sortByMarketType', enum: EFilterDirection, required: false })
+    @ApiQuery({ name: 'sortByType', enum: EFilterDirection, required: false })
+    @ApiQuery({ name: 'sortBySize', enum: EFilterDirection, required: false })
+    @ApiQuery({ name: 'sortByStrike', enum: EFilterDirection, required: false })
+    @ApiQuery({ name: 'sortByExpirationDate', enum: EFilterDirection, required: false })
+    @ApiQuery({ name: 'offset', type: Number, required: false })
+    @ApiQuery({ name: 'limit', type: Number, required: false })
+    @ApiOkResponse(makeListDtoApi(OptionsData))
+    async getOptions(
+        @Query('filterByMarket') filterByMarket: unknown,
+        @Query('filterByMarketType') filterByMarketType: unknown,
+        @Query('filterByType') filterByType: unknown,
+        @Query('sortByMarket') sortByMarket: unknown,
+        @Query('sortByMarketType') sortByMarketType: unknown,
+        @Query('sortByType') sortByType: unknown,
+        @Query('sortBySize') sortBySize: unknown,
+        @Query('sortByStrike') sortByStrike: unknown,
+        @Query('sortByExpirationDate') sortByExpirationDate: unknown,
+        @Query('offset') offset: unknown,
+        @Query('limit') limit: unknown,
+    ): Promise<ListDto<OptionsData>> {
+        const paramsClassInstance: OptionsQueryDto = plainToClass(OptionsQueryDto, {
+            filterByMarket,
+            filterByMarketType,
+            filterByType,
+            sortByMarket,
+            sortByMarketType,
+            sortByType,
+            sortBySize,
+            sortByStrike,
+            sortByExpirationDate,
+            offset: offset || DEFAULT_OFFSET,
+            limit: limit || DEFAULT_LIMIT,
+        });
+
+        try {
+            await validateOrReject(paramsClassInstance);
+        } catch (error) {
+            if (Array.isArray(error) && error[0] instanceof ValidationError) {
+                throw new BadRequestException({
+                    errors: error.map(
+                        (validation: ValidationError): Record<string, Record<string, string>> => {
+                            return { [validation.property]: validation.constraints };
+                        },
+                    ),
+                });
+            }
+
+            throw error;
+        }
+
+        return this.aggregationApiService.getOptions(paramsClassInstance);
     }
 }
