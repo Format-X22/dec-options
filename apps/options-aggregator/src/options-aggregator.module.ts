@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { OptionsAggregatorController } from './options-aggregator.controller';
 import { OptionsAggregatorService } from './options-aggregator.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -19,7 +18,6 @@ import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose
             inject: [ConfigService],
         }),
     ],
-    controllers: [OptionsAggregatorController],
     providers: [OptionsAggregatorService],
 })
 export class OptionsAggregatorModule {}
