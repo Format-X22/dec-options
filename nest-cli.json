@@ -14,7 +14,8 @@
       "entryFile": "main",
       "sourceRoot": "apps/options-aggregator/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/options-aggregator/tsconfig.app.json"
+        "tsConfigPath": "apps/options-aggregator/tsconfig.app.json",
+        "assets": [".env"]
       }
     },
     "aggregation-api": {
@@ -23,7 +24,8 @@
       "entryFile": "main",
       "sourceRoot": "apps/aggregation-api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/aggregation-api/tsconfig.app.json"
+        "tsConfigPath": "apps/aggregation-api/tsconfig.app.json",
+        "assets": [".env"]
       }
     },
     "shared": {
