@@ -28,7 +28,7 @@ Create .env file like .env.example
 
 Variables:
 
-`OA_MONGO_CONNECT` - Mongo connection path.
+`OA_MONGO_CONNECT` - Mongo connection path.  
 `OA_AGG_API_PORT` - Aggregation api port.
 
 In dev mode use vars from example file.
