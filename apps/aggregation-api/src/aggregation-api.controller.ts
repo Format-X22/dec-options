@@ -3,7 +3,7 @@ import { AggregationApiService } from './aggregation-api.service';
 import { ApiExtraModels, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { ListDto, makeListDtoApi } from '@app/shared/list.dto';
 import { EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
-import { DEFAULT_LIMIT, DEFAULT_OFFSET, EFilterDirection, OptionsQueryDto } from './options-query.dto';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET, ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { validateOrReject, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
@@ -16,12 +16,12 @@ export class AggregationApiController {
     @ApiQuery({ name: 'filterByMarket', type: String, required: false })
     @ApiQuery({ name: 'filterByMarketType', enum: EMarketType, required: false })
     @ApiQuery({ name: 'filterByType', enum: EOptionType, required: false })
-    @ApiQuery({ name: 'sortByMarket', enum: EFilterDirection, required: false })
-    @ApiQuery({ name: 'sortByMarketType', enum: EFilterDirection, required: false })
-    @ApiQuery({ name: 'sortByType', enum: EFilterDirection, required: false })
-    @ApiQuery({ name: 'sortBySize', enum: EFilterDirection, required: false })
-    @ApiQuery({ name: 'sortByStrike', enum: EFilterDirection, required: false })
-    @ApiQuery({ name: 'sortByExpirationDate', enum: EFilterDirection, required: false })
+    @ApiQuery({ name: 'sortByMarket', enum: ESortDirection, required: false })
+    @ApiQuery({ name: 'sortByMarketType', enum: ESortDirection, required: false })
+    @ApiQuery({ name: 'sortByType', enum: ESortDirection, required: false })
+    @ApiQuery({ name: 'sortBySize', enum: ESortDirection, required: false })
+    @ApiQuery({ name: 'sortByStrike', enum: ESortDirection, required: false })
+    @ApiQuery({ name: 'sortByExpirationDate', enum: ESortDirection, required: false })
     @ApiQuery({ name: 'offset', type: Number, required: false })
     @ApiQuery({ name: 'limit', type: Number, required: false })
     @ApiOkResponse(makeListDtoApi(OptionsData))

@@ -1,7 +1,7 @@
 import { EMarketType, EOptionType } from '@app/shared/options-data.schema';
 import { IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
-export enum EFilterDirection {
+export enum ESortDirection {
     ASC = 'ASC',
     DESC = 'DESC',
 }
@@ -23,35 +23,33 @@ export class OptionsQueryDto {
     filterByType: EOptionType;
 
     @IsOptional()
-    @IsEnum(EFilterDirection)
-    sortByMarket: EFilterDirection;
+    @IsEnum(ESortDirection)
+    sortByMarket: ESortDirection;
 
     @IsOptional()
-    @IsEnum(EFilterDirection)
-    sortByMarketType: EFilterDirection;
+    @IsEnum(ESortDirection)
+    sortByMarketType: ESortDirection;
 
     @IsOptional()
-    @IsEnum(EFilterDirection)
-    sortByType: EFilterDirection;
+    @IsEnum(ESortDirection)
+    sortByType: ESortDirection;
 
     @IsOptional()
-    @IsEnum(EFilterDirection)
-    sortBySize: EFilterDirection;
+    @IsEnum(ESortDirection)
+    sortBySize: ESortDirection;
 
     @IsOptional()
-    @IsEnum(EFilterDirection)
-    sortByStrike: EFilterDirection;
+    @IsEnum(ESortDirection)
+    sortByStrike: ESortDirection;
 
     @IsOptional()
-    @IsEnum(EFilterDirection)
-    sortByExpirationDate: EFilterDirection;
+    @IsEnum(ESortDirection)
+    sortByExpirationDate: ESortDirection;
 
-    @IsOptional()
     @IsNumber()
     @Min(0)
     offset: number;
 
-    @IsOptional()
     @IsNumber()
     @Min(1)
     @Max(100)
