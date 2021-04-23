@@ -20,6 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/options-aggregator/test/jest-e2e.json",
     "build:all": "nest build options-aggregator && nest build aggregation-api && nest build shared",
+    "start:db": "docker compose up",
     "start:api": "nest start aggregation-api",
     "start:agg": "nest start opnions-aggregator",
     "start:prod:api": "node dist/apps/aggregation-api/main.js",
