@@ -3,11 +3,12 @@ import { AggregationApiModule } from './aggregation-api.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { OpenAPIObject } from '@nestjs/swagger/dist/interfaces';
-
-const PORT: number = 3000;
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap(): Promise<void> {
     const app: INestApplication = await NestFactory.create(AggregationApiModule);
+    const configService: ConfigService = app.get(ConfigService);
+    const port: number = Number(configService.get<string>('OA_AGG_API_PORT'));
 
     app.useGlobalPipes(
         new ValidationPipe({
@@ -26,6 +27,6 @@ async function bootstrap(): Promise<void> {
 
     SwaggerModule.setup('api', app, documentation);
 
-    await app.listen(PORT);
+    await app.listen(port);
 }
 bootstrap();
