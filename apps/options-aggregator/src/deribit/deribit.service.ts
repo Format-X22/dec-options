@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EMarketType, OptionsData } from '@app/shared/options-data.schema';
+import { EMarket, EMarketType, OptionsData } from '@app/shared/options-data.schema';
 import { IAggregator } from '../options-aggregator.service';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market } from 'ccxt';
@@ -19,7 +19,7 @@ export class DeribitService implements IAggregator {
 
             result.push({
                 id,
-                market: 'DERIBIT',
+                market: EMarket.DERIBIT,
                 marketType: EMarketType.CEX,
                 type: data.info.option_type.toUpperCase(),
                 size: Number(data.info.contract_size),

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
 import { IAggregator } from '../options-aggregator.service';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market } from 'ccxt';
@@ -23,7 +23,7 @@ export class OkexService implements IAggregator {
 
             result.push({
                 id,
-                market: 'OKEX',
+                market: EMarket.OKEX,
                 marketType: EMarketType.CEX,
                 type: this.determinateType(data),
                 size: Number(data.info.lot_size),

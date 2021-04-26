@@ -13,6 +13,26 @@ export enum EOptionType {
     CALL = 'CALL',
 }
 
+export enum EMarket {
+    DERIBIT = 'DERIBIT',
+    BINANCE = 'BINANCE',
+    FTX = 'FTX',
+    OKEX = 'OKEX',
+    AUCTUS = 'AUCTUS',
+    CHARM = 'CHARM',
+    FINNEXUS = 'FINNEXUS',
+    HEGIC = 'HEGIC',
+    LIEN = 'LIEN',
+    OPIUM = 'OPIUM',
+    OPYN = 'OPYN',
+    PLOTX = 'PLOTX',
+    PODS = 'PODS',
+    PRIMITIVE = 'PRIMITIVE',
+    PROSPER = 'PROSPER',
+    SIREN = 'SIREN',
+    XOPTS = 'XOPTS',
+}
+
 @Schema({ versionKey: false })
 export class OptionsData {
     @Prop()
@@ -20,8 +40,8 @@ export class OptionsData {
     id: string;
 
     @Prop()
-    @ApiProperty()
-    market: string;
+    @ApiProperty({ enum: EMarket })
+    market: EMarket;
 
     @Prop()
     @ApiProperty({ enum: EMarketType })

@@ -1,5 +1,5 @@
-import { EMarketType, EOptionType } from '@app/shared/options-data.schema';
-import { IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { EMarket, EMarketType, EOptionType } from '@app/shared/options-data.schema';
+import { IsEnum, IsNumber, IsOptional, Max, Min } from 'class-validator';
 
 export enum ESortDirection {
     ASC = 'ASC',
@@ -11,8 +11,8 @@ export const DEFAULT_LIMIT: number = 20;
 
 export class OptionsQueryDto {
     @IsOptional()
-    @IsString()
-    filterByMarket: string;
+    @IsEnum(EMarket)
+    filterByMarket: EMarket;
 
     @IsOptional()
     @IsEnum(EMarketType)

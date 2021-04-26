@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
 import { IAggregator } from '../options-aggregator.service';
 import { Exchange } from 'ccxt';
 import * as ccxt from 'ccxt';
@@ -33,7 +33,7 @@ export class FtxService implements IAggregator {
             (data: TOptionsResponse['result'][0]): OptionsData => {
                 return {
                     id: data.id,
-                    market: 'FTX',
+                    market: EMarket.FTX,
                     marketType: EMarketType.CEX,
                     type: data.option.type.toUpperCase() as EOptionType,
                     size: Number(data.size),

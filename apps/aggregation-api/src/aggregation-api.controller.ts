@@ -2,7 +2,7 @@ import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { AggregationApiService } from './aggregation-api.service';
 import { ApiExtraModels, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { ListDto, makeListDtoApi } from '@app/shared/list.dto';
-import { EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET, ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { validateOrReject, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
@@ -13,7 +13,7 @@ export class AggregationApiController {
     constructor(private readonly aggregationApiService: AggregationApiService) {}
 
     @Get()
-    @ApiQuery({ name: 'filterByMarket', type: String, required: false })
+    @ApiQuery({ name: 'filterByMarket', enum: EMarket, required: false })
     @ApiQuery({ name: 'filterByMarketType', enum: EMarketType, required: false })
     @ApiQuery({ name: 'filterByType', enum: EOptionType, required: false })
     @ApiQuery({ name: 'sortByMarket', enum: ESortDirection, required: false })

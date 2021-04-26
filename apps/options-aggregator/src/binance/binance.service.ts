@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
 import { IAggregator } from '../options-aggregator.service';
 import { Exchange } from 'ccxt';
 import * as ccxt from 'ccxt';
@@ -34,7 +34,7 @@ export class BinanceService implements IAggregator {
             (data: TOptionsResponse['data'][0]): OptionsData => {
                 return {
                     id: data.id,
-                    market: 'BINANCE',
+                    market: EMarket.BINANCE,
                     marketType: EMarketType.CEX,
                     type: data.side.toUpperCase() as EOptionType,
                     size: Number(data.unit),
