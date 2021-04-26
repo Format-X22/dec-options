@@ -42,7 +42,7 @@ export class AggregationApiService {
         const dbQuery: TOptionsQuery = {};
 
         if (requestQuery.filterByMarket) {
-            dbQuery.market = requestQuery.filterByMarket;
+            dbQuery.market = requestQuery.filterByMarket.toUpperCase();
         }
 
         if (requestQuery.filterByMarketType) {

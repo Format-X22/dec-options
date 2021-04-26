@@ -64,7 +64,7 @@ export class OptionsAggregatorService {
     }
 
     private doSyncAll(): void {
-        this.logger.verbose('Start sync...');
+        this.logger.verbose('Sync started');
 
         [
             this.auctusService,
@@ -85,8 +85,6 @@ export class OptionsAggregatorService {
             this.sirenService,
             this.xoptsService,
         ].forEach(this.doSync.bind(this));
-
-        this.logger.verbose('Sync done!');
     }
 
     private doSync(service: AggregatorAbstract): void {
