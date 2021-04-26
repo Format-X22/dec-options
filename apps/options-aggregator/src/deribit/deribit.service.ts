@@ -13,7 +13,7 @@ export class DeribitService implements IAggregator {
         const result: Array<OptionsData> = [];
 
         for (const [id, data] of Object.entries(markets)) {
-            if (data.type === 'option') {
+            if (data.type === 'option' && data.active) {
                 result.push({
                     id,
                     market: 'Deribit',

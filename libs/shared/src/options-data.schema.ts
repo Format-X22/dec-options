@@ -13,7 +13,7 @@ export enum EOptionType {
     CALL = 'CALL',
 }
 
-@Schema()
+@Schema({ versionKey: false })
 export class OptionsData {
     @Prop()
     @ApiProperty()
