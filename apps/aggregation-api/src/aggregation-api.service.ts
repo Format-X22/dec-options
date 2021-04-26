@@ -27,8 +27,8 @@ export class AggregationApiService {
     constructor(@InjectModel(OptionsData.name) private optionsDataModel: Model<OptionsDataDocument>) {}
 
     async getOptions(requestQuery: OptionsQueryDto): Promise<ListDto<OptionsData>> {
-        const dbQuery: TOptionsQuery = this._makeOptionsQuery(requestQuery);
-        const dbSort: TOptionsSort = this._makeOptionsSort(requestQuery);
+        const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
+        const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
         const data: Array<OptionsDataDocument> = await this.optionsDataModel.find(dbQuery, null, {
             sort: dbSort,
             skip: requestQuery.offset,
@@ -38,7 +38,7 @@ export class AggregationApiService {
         return { data };
     }
 
-    private _makeOptionsQuery(requestQuery: OptionsQueryDto): TOptionsQuery {
+    private makeOptionsQuery(requestQuery: OptionsQueryDto): TOptionsQuery {
         const dbQuery: TOptionsQuery = {};
 
         if (requestQuery.filterByMarket) {
@@ -56,37 +56,37 @@ export class AggregationApiService {
         return dbQuery;
     }
 
-    private _makeOptionsSort(requestQuery: OptionsQueryDto): TOptionsSort {
+    private makeOptionsSort(requestQuery: OptionsQueryDto): TOptionsSort {
         const dbSort: TOptionsSort = {};
 
         if (requestQuery.sortByMarket) {
-            dbSort.market = this._querySortToDbSort(requestQuery.sortByMarket);
+            dbSort.market = this.querySortToDbSort(requestQuery.sortByMarket);
         }
 
         if (requestQuery.sortByMarketType) {
-            dbSort.marketType = this._querySortToDbSort(requestQuery.sortByMarketType);
+            dbSort.marketType = this.querySortToDbSort(requestQuery.sortByMarketType);
         }
 
         if (requestQuery.sortByType) {
-            dbSort.type = this._querySortToDbSort(requestQuery.sortByType);
+            dbSort.type = this.querySortToDbSort(requestQuery.sortByType);
         }
 
         if (requestQuery.sortBySize) {
-            dbSort.size = this._querySortToDbSort(requestQuery.sortBySize);
+            dbSort.size = this.querySortToDbSort(requestQuery.sortBySize);
         }
 
         if (requestQuery.sortByStrike) {
-            dbSort.strike = this._querySortToDbSort(requestQuery.sortByStrike);
+            dbSort.strike = this.querySortToDbSort(requestQuery.sortByStrike);
         }
 
         if (requestQuery.sortByExpirationDate) {
-            dbSort.expirationDate = this._querySortToDbSort(requestQuery.sortByExpirationDate);
+            dbSort.expirationDate = this.querySortToDbSort(requestQuery.sortByExpirationDate);
         }
 
         return dbSort;
     }
 
-    private _querySortToDbSort(direction: ESortDirection): TSortDirection {
+    private querySortToDbSort(direction: ESortDirection): TSortDirection {
         if (direction === ESortDirection.ASC) {
             return 1;
         } else {
