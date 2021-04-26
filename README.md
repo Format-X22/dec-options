@@ -30,6 +30,7 @@ Variables:
 
 `OA_MONGO_CONNECT` - Mongo connection path.  
 `OA_AGG_API_PORT` - Aggregation api port.
+`OA_SYNC_INTERVAL_MS` - Aggregation sync interval in milliseconds.
 
 In dev mode use vars from example file.
 

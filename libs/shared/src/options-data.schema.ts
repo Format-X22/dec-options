@@ -17,6 +17,10 @@ export enum EOptionType {
 export class OptionsData {
     @Prop()
     @ApiProperty()
+    id: string;
+
+    @Prop()
+    @ApiProperty()
     market: string;
 
     @Prop()
@@ -38,6 +42,14 @@ export class OptionsData {
     @Prop()
     @ApiProperty()
     expirationDate: Date;
+
+    @Prop()
+    @ApiProperty()
+    base: string;
+
+    @Prop()
+    @ApiProperty()
+    quote: string;
 }
 
 export type OptionsDataDocument = OptionsData & Document;
