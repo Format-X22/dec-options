@@ -2,7 +2,7 @@ import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 
 export class ListDto<TItem> {
-    @ApiProperty({ type: Object, isArray: true })
+    @ApiProperty({ type: Object, isArray: true, description: 'Any data object' })
     data: Array<TItem>;
 }
 

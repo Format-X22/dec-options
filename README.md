@@ -50,7 +50,11 @@ $ npm run start:api
 $ npm run start:agg
 
 # production bare metal mode
-# (configure db before in .env)
+# (configure .env)
 $ npm run start:prod:api
 $ npm run start:prod:agg
 ```
+              
+## Api
+  
+Swagger - http://localhost:3000/api/
