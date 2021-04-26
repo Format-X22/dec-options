@@ -12,13 +12,7 @@ describe('AggregationApiController', (): void => {
                 providers: [AggregationApiService],
             }).compile();
 
-            aggregationApiController = app.get<AggregationApiController>(AggregationApiController);
+            app.get<AggregationApiController>(AggregationApiController);
         },
     );
-
-    describe('root', (): void => {
-        it('should return "Hello World!"', (): void => {
-            expect(aggregationApiController.getHello()).toBe('Hello World!');
-        });
-    });
 });
