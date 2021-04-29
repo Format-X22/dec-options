@@ -36,6 +36,7 @@
     "ccxt": "^1.48.32",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
+    "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
     "i": "^0.3.6",
     "mongoose": "^5.12.5",
