@@ -8,15 +8,21 @@ Options aggregator with api.
 
 ## Installation
                 
-1 - Install NodeJS
+1 - Install NodeJS (LTS)
 
 https://nodejs.org/
 
-2 - Install Docker
+2 - Update npm to v7+
+
+```bash
+$ sudo npm install npm -g
+```
+
+3 - Install Docker
 
 https://www.docker.com/get-started
 
-3 - Install packages
+4 - Install packages
 
 ```bash
 $ npm install
