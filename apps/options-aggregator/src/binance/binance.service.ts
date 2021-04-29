@@ -10,6 +10,7 @@ type TOptionsResponse = {
     msg: string;
     data: Array<{
         id: string;
+        symbol: string;
         side: string;
         unit: string;
         strikePrice: string;
@@ -34,6 +35,7 @@ export class BinanceService implements IAggregator {
             (data: TOptionsResponse['data'][0]): OptionsData => {
                 return {
                     id: data.id,
+                    name: data.symbol,
                     market: EMarket.BINANCE,
                     marketType: EMarketType.CEX,
                     type: data.side.toUpperCase() as EOptionType,
@@ -42,6 +44,7 @@ export class BinanceService implements IAggregator {
                     expirationDate: new Date(Number(data.expiryDate)),
                     base: data.underlying.replace(data.quoteAsset, ''),
                     quote: data.quoteAsset,
+                    strikeAsset: data.underlying.replace(data.quoteAsset, ''),
                 };
             },
         );

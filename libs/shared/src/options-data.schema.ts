@@ -40,6 +40,10 @@ export class OptionsData {
     id: string;
 
     @Prop()
+    @ApiProperty()
+    name: string;
+
+    @Prop()
     @ApiProperty({ enum: EMarket })
     market: EMarket;
 
@@ -58,6 +62,10 @@ export class OptionsData {
     @Prop()
     @ApiProperty()
     strike: number;
+
+    @Prop()
+    @ApiProperty()
+    strikeAsset: string;
 
     @Prop()
     @ApiProperty()

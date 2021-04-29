@@ -23,6 +23,7 @@ export class OkexService implements IAggregator {
 
             result.push({
                 id,
+                name: data.symbol,
                 market: EMarket.OKEX,
                 marketType: EMarketType.CEX,
                 type: this.determinateType(data),
@@ -31,6 +32,7 @@ export class OkexService implements IAggregator {
                 expirationDate: new Date(data.info.delivery),
                 base: data.base,
                 quote: data.quote,
+                strikeAsset: data.base,
             });
         }
 

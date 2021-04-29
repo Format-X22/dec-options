@@ -19,6 +19,7 @@ export class DeribitService implements IAggregator {
 
             result.push({
                 id,
+                name: data.symbol,
                 market: EMarket.DERIBIT,
                 marketType: EMarketType.CEX,
                 type: data.info.option_type.toUpperCase(),
@@ -27,6 +28,7 @@ export class DeribitService implements IAggregator {
                 expirationDate: new Date(Number(data.info.expiration_timestamp)),
                 base: data.base,
                 quote: data.quote,
+                strikeAsset: data.base,
             });
         }
 

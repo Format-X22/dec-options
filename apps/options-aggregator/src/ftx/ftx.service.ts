@@ -33,6 +33,7 @@ export class FtxService implements IAggregator {
             (data: TOptionsResponse['result'][0]): OptionsData => {
                 return {
                     id: data.id,
+                    name: data.id,
                     market: EMarket.FTX,
                     marketType: EMarketType.CEX,
                     type: data.option.type.toUpperCase() as EOptionType,
@@ -41,6 +42,7 @@ export class FtxService implements IAggregator {
                     expirationDate: new Date(data.option.expiry),
                     base: data.option.underlying,
                     quote: 'USD',
+                    strikeAsset: data.option.underlying,
                 };
             },
         );
