@@ -29,11 +29,15 @@ export class AggregationApiService {
     async getOptions(requestQuery: OptionsQueryDto): Promise<ListDto<OptionsData>> {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
-        const data: Array<OptionsDataDocument> = await this.optionsDataModel.find(dbQuery, null, {
-            sort: dbSort,
-            skip: requestQuery.offset,
-            limit: requestQuery.limit,
-        });
+        const data: Array<OptionsDataDocument> = await this.optionsDataModel.find(
+            { ...dbQuery, expirationDate: { $gt: new Date() } },
+            null,
+            {
+                sort: dbSort,
+                skip: requestQuery.offset,
+                limit: requestQuery.limit,
+            },
+        );
 
         return { data };
     }
