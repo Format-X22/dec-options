@@ -46,7 +46,7 @@ export class HegicService implements IAggregator {
         const now: number = Math.floor(Date.now() / MS_MULTIPLY);
 
         return gql`{  
-            hegicOptions(where: {state: Active expiration_lt: ${now}}) {
+            hegicOptions(where: {state: Active expiration_gt: ${now}}) {
                 id
                 underlying {
                     symbol
