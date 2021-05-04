@@ -24,7 +24,6 @@ export enum EMarket {
     OPYN = 'OPYN',
     PRIMITIVE = 'PRIMITIVE',
     SIREN = 'SIREN',
-    XOPTS = 'XOPTS',
 }
 
 @Schema({ versionKey: false })
