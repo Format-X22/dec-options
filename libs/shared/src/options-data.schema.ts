@@ -22,9 +22,7 @@ export enum EMarket {
     FINNEXUS = 'FINNEXUS',
     HEGIC = 'HEGIC',
     OPYN = 'OPYN',
-    PODS = 'PODS',
     PRIMITIVE = 'PRIMITIVE',
-    PROSPER = 'PROSPER',
     SIREN = 'SIREN',
     XOPTS = 'XOPTS',
 }
