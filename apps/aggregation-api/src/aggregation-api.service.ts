@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { OptionsData, OptionsDataDocument } from '@app/shared/options-data.schema';
-import { ListDto } from '@app/shared/list.dto';
+import { OptionsData, OptionsDataDocument, OptionsParamsList } from '@app/shared/options-data.schema';
+import { ListDto, Pagination } from '@app/shared/list.dto';
 import { ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -26,6 +26,16 @@ type TOptionsSort = {
 export class AggregationApiService {
     constructor(@InjectModel(OptionsData.name) private optionsDataModel: Model<OptionsDataDocument>) {}
 
+    async getOptionsParamsList(): Promise<OptionsParamsList> {
+        const base: Array<OptionsDataDocument> = await this.optionsDataModel.distinct('base');
+        const quote: Array<OptionsDataDocument> = await this.optionsDataModel.distinct('quote');
+        const market: Array<OptionsDataDocument> = await this.optionsDataModel.distinct('market');
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return { base, quote, market, };
+    }
+
     async getOptions(requestQuery: OptionsQueryDto): Promise<ListDto<OptionsData>> {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
@@ -39,7 +49,18 @@ export class AggregationApiService {
             },
         );
 
-        return { data };
+        const total: number = await this.optionsDataModel.count(
+            { ...dbQuery, expirationDate: { $gt: new Date() } },
+            null,
+        );
+
+        const pagination: Pagination = {
+            offset: requestQuery.offset + 1,
+            limit: requestQuery.limit,
+            total,
+        };
+
+        return { data, pagination };
     }
 
     private makeOptionsQuery(requestQuery: OptionsQueryDto): TOptionsQuery {

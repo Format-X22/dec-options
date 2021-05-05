@@ -34,6 +34,21 @@ export enum EMarket {
 }
 
 @Schema({ versionKey: false })
+export class OptionsParamsList {
+    @Prop()
+    @ApiProperty()
+    market: string[];
+
+    @Prop()
+    @ApiProperty()
+    base: string[];
+
+    @Prop()
+    @ApiProperty()
+    quote: string[];
+}
+
+@Schema({ versionKey: false })
 export class OptionsData {
     @Prop()
     @ApiProperty()
