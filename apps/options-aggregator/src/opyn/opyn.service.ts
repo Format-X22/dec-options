@@ -66,6 +66,7 @@ export class OpynService implements IAggregator {
                     base: data.underlyingAsset.symbol,
                     quote: data.collateralAsset.symbol,
                     strikeAsset: data.strikeAsset.symbol,
+                    marketUrl: null,
                 };
             },
         );

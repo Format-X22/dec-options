@@ -64,6 +64,7 @@ export class AuctusService implements IAggregator {
                     base: data.underlying.symbol,
                     quote: data.collateral.symbol,
                     strikeAsset: data.strikeAsset.symbol,
+                    marketUrl: null,
                 };
             },
         );

@@ -33,6 +33,7 @@ export class OkexService implements IAggregator {
                 base: data.base,
                 quote: data.quote,
                 strikeAsset: data.base,
+                marketUrl: null,
             });
         }
 

@@ -54,6 +54,7 @@ export class SirenService implements IAggregator {
                     base: data.paymentToken.symbol,
                     quote: data.collateralToken.symbol,
                     strikeAsset: data.paymentToken.symbol,
+                    marketUrl: null,
                 };
             },
         );

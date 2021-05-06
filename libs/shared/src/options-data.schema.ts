@@ -71,6 +71,10 @@ export class OptionsData {
     @Prop()
     @ApiProperty()
     quote: string;
+
+    @Prop()
+    @ApiProperty()
+    marketUrl: string;
 }
 
 export type OptionsDataDocument = OptionsData & Document;
