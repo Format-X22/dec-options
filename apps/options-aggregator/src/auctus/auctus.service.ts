@@ -23,37 +23,22 @@ type TOptionsResponse = {
 };
 
 const API: string = 'https://api.thegraph.com/subgraphs/name/auctusproject/auctus-options';
-const QUERY: string = gql`
-    {
-        acotokens {
-            id
-            underlying {
-                symbol
-            }
-            strikeAsset {
-                symbol
-            }
-            collateral {
-                symbol
-            }
-            name
-            isCall
-            strikePrice
-            expiryTime
-        }
-    }
-`;
 const MS_MULTIPLY: number = 1000;
 
 @Injectable()
 export class AuctusService implements IAggregator {
     async getCurrentData(): Promise<Array<OptionsData>> {
-        const rawOptionsResponse: TOptionsResponse = await request(API, QUERY);
+        const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
 
         return rawOptionsResponse.acotokens.map(
             (data: TOptionsResponse['acotokens'][0]): OptionsData => {
+                const id: string = data.id;
+                const base: string = data.underlying.symbol;
+                const quote: string = data.collateral.symbol;
+                const strikeAsset: string = data.strikeAsset.symbol;
+
                 return {
-                    id: data.id,
+                    id,
                     name: data.name,
                     market: EMarket.AUCTUS,
                     marketType: EMarketType.DEX,
@@ -61,12 +46,37 @@ export class AuctusService implements IAggregator {
                     size: 1,
                     strike: Number(data.strikePrice),
                     expirationDate: new Date(Number(data.expiryTime) * MS_MULTIPLY),
-                    base: data.underlying.symbol,
-                    quote: data.collateral.symbol,
-                    strikeAsset: data.strikeAsset.symbol,
-                    marketUrl: null,
+                    base,
+                    quote,
+                    strikeAsset,
+                    marketUrl: `https://app.auctus.org/advanced/trade/${base}_${strikeAsset}/${id}`,
                 };
             },
         );
+    }
+
+    private getQuery(): string {
+        const now: number = Math.floor(Date.now() / MS_MULTIPLY);
+
+        return gql`
+            {
+                acotokens(where: { expiryTime_gt: ${now} }) {
+                    id
+                    underlying {
+                        symbol
+                    }
+                    strikeAsset {
+                        symbol
+                    }
+                    collateral {
+                        symbol
+                    }
+                    name
+                    isCall
+                    strikePrice
+                    expiryTime
+                }
+            }
+        `;
     }
 }
