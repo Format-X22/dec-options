@@ -24,33 +24,12 @@ type TOptionsResponse = {
 };
 
 const API: string = 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet';
-const QUERY: string = gql`
-    {
-        otokens {
-            id
-            underlyingAsset {
-                symbol
-            }
-            strikeAsset {
-                symbol
-            }
-            collateralAsset {
-                symbol
-            }
-            name
-            isPut
-            strikePrice
-            decimals
-            expiryTimestamp
-        }
-    }
-`;
 const MS_MULTIPLY: number = 1000;
 
 @Injectable()
 export class OpynService implements IAggregator {
     async getCurrentData(): Promise<Array<OptionsData>> {
-        const rawOptionsResponse: TOptionsResponse = await request(API, QUERY);
+        const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
 
         return rawOptionsResponse.otokens.map(
             (data: TOptionsResponse['otokens'][0]): OptionsData => {
@@ -66,9 +45,35 @@ export class OpynService implements IAggregator {
                     base: data.underlyingAsset.symbol,
                     quote: data.collateralAsset.symbol,
                     strikeAsset: data.strikeAsset.symbol,
-                    marketUrl: null,
+                    marketUrl: 'https://www.opyn.co/#/trade',
                 };
             },
         );
+    }
+
+    private getQuery(): string {
+        const now: number = Math.floor(Date.now() / MS_MULTIPLY);
+
+        return gql`
+            {
+                otokens(where: { expiryTimestamp_gt: ${now} }) {
+                    id
+                    underlyingAsset {
+                        symbol
+                    }
+                    strikeAsset {
+                        symbol
+                    }
+                    collateralAsset {
+                        symbol
+                    }
+                    name
+                    isPut
+                    strikePrice
+                    decimals
+                    expiryTimestamp
+                }
+            }
+        `;
     }
 }
