@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { OptionsData, OptionsDataDocument, OptionsParamsList } from '@app/shared/options-data.schema';
-import { ListDto, Pagination } from '@app/shared/list.dto';
+import { OptionsData, OptionsDataDocument } from '@app/shared/options-data.schema';
+import { ListDto } from '@app/shared/list.dto';
 import { ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
+
+export type TOptionsParams = {
+    base: Array<OptionsData['base']>;
+    quote: Array<OptionsData['quote']>;
+    market: Array<OptionsData['market']>;
+};
 
 type TOptionsQuery = {
     market?: OptionsData['market'];
@@ -26,36 +32,26 @@ type TOptionsSort = {
 export class AggregationApiService {
     constructor(@InjectModel(OptionsData.name) private optionsDataModel: Model<OptionsDataDocument>) {}
 
-    async getOptionsParamsList(): Promise<OptionsParamsList> {
-        const base: Array<OptionsDataDocument> = await this.optionsDataModel.distinct('base');
-        const quote: Array<OptionsDataDocument> = await this.optionsDataModel.distinct('quote');
-        const market: Array<OptionsDataDocument> = await this.optionsDataModel.distinct('market');
+    async getOptionsParamsList(): Promise<TOptionsParams> {
+        const base: TOptionsParams['base'] = await this.optionsDataModel.distinct('base');
+        const quote: TOptionsParams['quote'] = await this.optionsDataModel.distinct('quote');
+        const market: TOptionsParams['market'] = await this.optionsDataModel.distinct('market');
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        return { base, quote, market, };
+        return { base, quote, market };
     }
 
     async getOptions(requestQuery: OptionsQueryDto): Promise<ListDto<OptionsData>> {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
-        const data: Array<OptionsDataDocument> = await this.optionsDataModel.find(
-            { ...dbQuery, expirationDate: { $gt: new Date() } },
-            null,
-            {
-                sort: dbSort,
-                skip: requestQuery.offset,
-                limit: requestQuery.limit,
-            },
-        );
-
-        const total: number = await this.optionsDataModel.count(
-            { ...dbQuery, expirationDate: { $gt: new Date() } },
-            null,
-        );
-
-        const pagination: Pagination = {
-            offset: requestQuery.offset + 1,
+        const query: FilterQuery<OptionsDataDocument> = { ...dbQuery, expirationDate: { $gt: new Date() } };
+        const data: Array<OptionsDataDocument> = await this.optionsDataModel.find(query, null, {
+            sort: dbSort,
+            skip: requestQuery.offset,
+            limit: requestQuery.limit,
+        });
+        const total: number = await this.optionsDataModel.countDocuments(query);
+        const pagination: ListDto<OptionsData>['pagination'] = {
+            offset: requestQuery.offset,
             limit: requestQuery.limit,
             total,
         };

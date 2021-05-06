@@ -1,5 +1,5 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
-import { AggregationApiService } from './aggregation-api.service';
+import { AggregationApiService, TOptionsParams } from './aggregation-api.service';
 import { ApiExtraModels, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { ListDto, makeListDtoApi } from '@app/shared/list.dto';
 import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
@@ -12,9 +12,8 @@ import { plainToClass } from 'class-transformer';
 export class AggregationApiController {
     constructor(private readonly aggregationApiService: AggregationApiService) {}
 
-    @Get('/options_data_list')
-    // tslint:disable-next-line:typedef
-    async getOptionsParamsList() {
+    @Get('/options-params')
+    async getOptionsParamsList(): Promise<TOptionsParams> {
         return this.aggregationApiService.getOptionsParamsList();
     }
 

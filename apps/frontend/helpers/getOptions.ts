@@ -1,17 +1,27 @@
 import { Pagination } from '@app/shared/list.dto';
+import { Filters } from '../pages';
+import { OptionsData } from '@app/shared/options-data.schema';
 
-type RequestParams = {
-    [key: string]: string;
+type TRequestParams = {
+    limit: number;
+    offset: number;
+} & Filters;
+
+type TResponseData = {
+    data: Array<OptionsData>;
+    pagination: Pagination;
 };
 
-export default async function getOptions(params: RequestParams): Promise<{ data: []; pagination: Pagination }> {
-    const url: URL = new URL(process.env.REACT_APP_API_URL || window.location.origin);
-    url.search = new URLSearchParams(params).toString();
-    // tslint:disable-next-line:typedef
-    const res = await fetch(url.toString());
-    // tslint:disable-next-line:typedef
-    const options = await res.json();
-    // tslint:disable-next-line:typedef
-    const { data, pagination } = options;
-    return { data, pagination };
+export default async function getOptions(params: TRequestParams): Promise<TResponseData> {
+    const url: URL = new URL(
+        process.env.REACT_APP_API_URL || process.env.OA_FRONTEND_API_URL || window.location.origin,
+    );
+
+    url.search = new URLSearchParams({
+        ...params,
+        limit: String(params.limit),
+        offset: String(params.offset),
+    }).toString();
+
+    return (await fetch(url.toString())).json();
 }

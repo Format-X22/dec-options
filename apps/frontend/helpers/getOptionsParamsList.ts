@@ -1,17 +1,12 @@
 export type OptionsParamsList = {
-    market: string[];
-    base: string[];
-    quote: string[];
+    market: Array<string>;
+    base: Array<string>;
+    quote: Array<string>;
 };
 
-// tslint:disable-next-line:typedef
-export const getOptionsParamsList = async (): Promise<OptionsParamsList> => {
-    const url: URL = new URL(`${(process.env.REACT_APP_API_URL || window.location.origin)}/options_data_list`);
-    // tslint:disable-next-line:typedef
-    const res = await fetch(url.toString());
-    // tslint:disable-next-line:typedef
-    const options = await res.json();
-    // tslint:disable-next-line:typedef
-    const { market, base, quote } = options;
-    return { market, base, quote };
-};
+export async function getOptionsParamsList(): Promise<OptionsParamsList> {
+    const base: string = process.env.REACT_APP_API_URL || process.env.OA_FRONTEND_API_URL || window.location.origin;
+    const url: URL = new URL(`${base}/options-params`);
+
+    return (await fetch(url.toString())).json();
+}
