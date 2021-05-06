@@ -12,6 +12,12 @@ import { plainToClass } from 'class-transformer';
 export class AggregationApiController {
     constructor(private readonly aggregationApiService: AggregationApiService) {}
 
+    @Get('/options_data_list')
+    // tslint:disable-next-line:typedef
+    async getOptionsParamsList() {
+        return this.aggregationApiService.getOptionsParamsList();
+    }
+
     @Get()
     @ApiQuery({ name: 'filterByMarket', enum: EMarket, required: false })
     @ApiQuery({ name: 'filterByMarketType', enum: EMarketType, required: false })
@@ -48,8 +54,8 @@ export class AggregationApiController {
             sortBySize,
             sortByStrike,
             sortByExpirationDate,
-            offset: offset || DEFAULT_OFFSET,
-            limit: limit || DEFAULT_LIMIT,
+            offset: +offset || DEFAULT_OFFSET,
+            limit: +limit || DEFAULT_LIMIT,
         });
 
         try {
