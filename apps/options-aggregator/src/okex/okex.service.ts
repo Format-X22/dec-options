@@ -33,7 +33,7 @@ export class OkexService implements IAggregator {
                 base: data.base,
                 quote: data.quote,
                 strikeAsset: data.base,
-                marketUrl: null,
+                marketUrl: 'https://www.okex.com/en/trade-option/' + id,
             });
         }
 
