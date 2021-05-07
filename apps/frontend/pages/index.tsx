@@ -1,7 +1,7 @@
 import React, { useEffect, Dispatch, SetStateAction } from 'react';
 import getOptions from '../helpers/getOptions';
 import { OptionsData } from '@app/shared/options-data.schema';
-import { Col, Row, Table, Layout, Select } from 'antd';
+import { Col, Row, Table, Layout } from 'antd';
 import format from 'date-fns/format';
 import { Pagination } from '@app/shared/list.dto';
 import { getOptionsParamsList, OptionsParamsList } from '../helpers/getOptionsParamsList';
@@ -244,49 +244,6 @@ const Home: ({
     return (
         <Layout>
             <Content>
-                {/*<Row gutter={[8, 8]} style={{ width: '100%', padding: 20 }}>*/}
-                {/*    <Col span={6}>*/}
-                {/*        <label>Market type</label>*/}
-                {/*        <Select*/}
-                {/*            onChange={onChangeFilter('filterByMarketType')}*/}
-                {/*            value={filters.filterByMarketType}*/}
-                {/*            style={{ width: '100%' }}*/}
-                {/*        >*/}
-                {/*            <Select.Option value=''>All</Select.Option>*/}
-                {/*            <Select.Option value='DEX'>DEX</Select.Option>*/}
-                {/*            <Select.Option value='CEX'>CEX</Select.Option>*/}
-                {/*        </Select>*/}
-                {/*    </Col>*/}
-                {/*    <Col span={6}>*/}
-                {/*        <label>Market</label>*/}
-                {/*        <Select*/}
-                {/*            onChange={onChangeFilter('filterByMarket')}*/}
-                {/*            value={filters.filterByMarket}*/}
-                {/*            style={{ width: '100%' }}*/}
-                {/*        >*/}
-                {/*            <Select.Option value=''>All</Select.Option>*/}
-                {/*            {markets.map(*/}
-                {/*                (market: string): JSX.Element => (*/}
-                {/*                    <Select.Option value={market} key={market}>*/}
-                {/*                        {market}*/}
-                {/*                    </Select.Option>*/}
-                {/*                ),*/}
-                {/*            )}*/}
-                {/*        </Select>*/}
-                {/*    </Col>*/}
-                {/*    <Col span={6}>*/}
-                {/*        <label>Option type</label>*/}
-                {/*        <Select*/}
-                {/*            onChange={onChangeFilter('filterByType')}*/}
-                {/*            value={filters.filterByType}*/}
-                {/*            style={{ width: '100%' }}*/}
-                {/*        >*/}
-                {/*            <Select.Option value=''>All</Select.Option>*/}
-                {/*            <Select.Option value='PUT'>PUT</Select.Option>*/}
-                {/*            <Select.Option value='CALL'>CALL</Select.Option>*/}
-                {/*        </Select>*/}
-                {/*    </Col>*/}
-                {/*</Row>*/}
                 <Row gutter={[8, 8]} style={{ width: '100%', padding: 20 }}>
                     <Col span={24}>
                         <Table
