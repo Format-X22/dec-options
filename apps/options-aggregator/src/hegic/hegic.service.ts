@@ -38,7 +38,7 @@ export class HegicService implements IAggregator {
                     base: data.underlying.symbol,
                     quote: 'USD',
                     strikeAsset: data.underlying.symbol,
-                    marketUrl: null,
+                    marketUrl: 'https://www.hegic.co/',
                 };
             },
         );
