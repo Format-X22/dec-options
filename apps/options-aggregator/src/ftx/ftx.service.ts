@@ -43,7 +43,7 @@ export class FtxService implements IAggregator {
                     base: data.option.underlying,
                     quote: 'USD',
                     strikeAsset: data.option.underlying,
-                    marketUrl: null,
+                    marketUrl: 'https://ftx.com/options',
                 };
             },
         );
