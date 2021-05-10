@@ -1,9 +1,16 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 
+export type Pagination = {
+    offset: number;
+    limit: number;
+    total: number;
+};
+
 export class ListDto<TItem> {
     @ApiProperty({ type: Object, isArray: true, description: 'Any data object' })
     data: Array<TItem>;
+    pagination: Pagination;
 }
 
 export function makeListDtoApi(itemsType: Parameters<typeof getSchemaPath>[0]): { schema: SchemaObject } {

@@ -28,6 +28,8 @@ export enum EMarket {
 
 @Schema({ versionKey: false })
 export class OptionsData {
+    _id?: string;
+
     @Prop()
     @ApiProperty()
     id: string;

@@ -3,7 +3,13 @@ import { OptionsData, OptionsDataDocument } from '@app/shared/options-data.schem
 import { ListDto } from '@app/shared/list.dto';
 import { ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
+
+export type TOptionsParams = {
+    base: Array<OptionsData['base']>;
+    quote: Array<OptionsData['quote']>;
+    market: Array<OptionsData['market']>;
+};
 
 type TOptionsQuery = {
     market?: OptionsData['market'];
@@ -26,20 +32,31 @@ type TOptionsSort = {
 export class AggregationApiService {
     constructor(@InjectModel(OptionsData.name) private optionsDataModel: Model<OptionsDataDocument>) {}
 
+    async getOptionsParamsList(): Promise<TOptionsParams> {
+        const base: TOptionsParams['base'] = await this.optionsDataModel.distinct('base');
+        const quote: TOptionsParams['quote'] = await this.optionsDataModel.distinct('quote');
+        const market: TOptionsParams['market'] = await this.optionsDataModel.distinct('market');
+
+        return { base, quote, market };
+    }
+
     async getOptions(requestQuery: OptionsQueryDto): Promise<ListDto<OptionsData>> {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
-        const data: Array<OptionsDataDocument> = await this.optionsDataModel.find(
-            { ...dbQuery, expirationDate: { $gt: new Date() } },
-            null,
-            {
-                sort: dbSort,
-                skip: requestQuery.offset,
-                limit: requestQuery.limit,
-            },
-        );
+        const query: FilterQuery<OptionsDataDocument> = { ...dbQuery, expirationDate: { $gt: new Date() } };
+        const data: Array<OptionsDataDocument> = await this.optionsDataModel.find(query, null, {
+            sort: dbSort,
+            skip: requestQuery.offset,
+            limit: requestQuery.limit,
+        });
+        const total: number = await this.optionsDataModel.countDocuments(query);
+        const pagination: ListDto<OptionsData>['pagination'] = {
+            offset: requestQuery.offset,
+            limit: requestQuery.limit,
+            total,
+        };
 
-        return { data };
+        return { data, pagination };
     }
 
     private makeOptionsQuery(requestQuery: OptionsQueryDto): TOptionsQuery {
