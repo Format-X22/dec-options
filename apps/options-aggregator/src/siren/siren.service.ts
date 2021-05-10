@@ -42,19 +42,25 @@ export class SirenService implements IAggregator {
 
         return rawOptionsResponse.markets.map(
             (data: TOptionsResponse['markets'][0]): OptionsData => {
+                const base: string = data.paymentToken.symbol;
+                const quote: string = data.collateralToken.symbol;
+                const type: EOptionType = this.tryExtractType(data.marketName);
+                const isPut: boolean = type === EOptionType.PUT;
+                const urlFinalPath: string = isPut ? `${base}-${quote}` : `${quote}-${base}`;
+
                 return {
                     id: data.id,
                     name: data.marketName,
                     market: EMarket.SIREN,
                     marketType: EMarketType.DEX,
-                    type: this.tryExtractType(data.marketName),
+                    type,
                     size: 1,
                     strike: this.tryExtractStrike(data.marketName),
                     expirationDate: new Date(Number(data.expirationDate) * MS_MULTIPLY),
-                    base: data.paymentToken.symbol,
-                    quote: data.collateralToken.symbol,
+                    base,
+                    quote,
                     strikeAsset: data.paymentToken.symbol,
-                    marketUrl: null,
+                    marketUrl: 'https://app.sirenmarkets.com/trade/' + urlFinalPath,
                 };
             },
         );
