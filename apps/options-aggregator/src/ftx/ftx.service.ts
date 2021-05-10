@@ -7,14 +7,12 @@ import * as ccxt from 'ccxt';
 type TOptionsResponse = {
     success: boolean;
     result?: Array<{
-        id: string;
         option: {
             underlying: string;
             type: string;
             strike: string;
             expiry: string;
         };
-        size: string;
     }>;
 };
 
@@ -32,12 +30,12 @@ export class FtxService implements IAggregator {
         return rawOptionsResponse.result.map(
             (data: TOptionsResponse['result'][0]): OptionsData => {
                 return {
-                    id: data.id,
-                    name: data.id,
+                    id: data.option.expiry,
+                    name: data.option.expiry,
                     market: EMarket.FTX,
                     marketType: EMarketType.CEX,
                     type: data.option.type.toUpperCase() as EOptionType,
-                    size: Number(data.size),
+                    size: 0.0001,
                     strike: Number(data.option.strike),
                     expirationDate: new Date(data.option.expiry),
                     base: data.option.underlying,
