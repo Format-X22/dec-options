@@ -29,7 +29,7 @@ export class DeribitService implements IAggregator {
                 base: data.base,
                 quote: data.quote,
                 strikeAsset: data.base,
-                marketUrl: null,
+                marketUrl: 'https://www.deribit.com/main#/options',
             });
         }
 
