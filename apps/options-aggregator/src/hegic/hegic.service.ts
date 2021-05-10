@@ -17,6 +17,7 @@ type TOptionsResponse = {
 
 const API: string = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
 const MS_MULTIPLY: number = 1000;
+const DECIMAL_DELIMITER: number = 100_000_000;
 
 @Injectable()
 export class HegicService implements IAggregator {
@@ -32,7 +33,7 @@ export class HegicService implements IAggregator {
                     marketType: EMarketType.DEX,
                     type: data.type.toUpperCase() as EOptionType,
                     size: 1,
-                    strike: Number(data.strike),
+                    strike: Number(data.strike) / DECIMAL_DELIMITER,
                     expirationDate: new Date(Number(data.expiration) * MS_MULTIPLY),
                     base: data.underlying.symbol,
                     quote: 'USD',
