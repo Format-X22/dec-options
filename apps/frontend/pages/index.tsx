@@ -1,28 +1,35 @@
 import React, { useEffect, Dispatch, SetStateAction } from 'react';
-import getOptions from '../helpers/getOptions';
+import getOptions, { TResponseData } from '../helpers/getOptions';
 import { OptionsData } from '@app/shared/options-data.schema';
 import { Col, Row, Table, Layout } from 'antd';
 import format from 'date-fns/format';
 import { Pagination } from '@app/shared/list.dto';
 import { getOptionsParamsList, OptionsParamsList } from '../helpers/getOptionsParamsList';
 import { BasicProps } from 'antd/lib/layout/layout';
-import { FilterValue, SorterResult, SortOrder, TablePaginationConfig } from 'antd/lib/table/interface';
+import { FilterValue, SortOrder, TablePaginationConfig } from 'antd/lib/table/interface';
 import upperFirst from 'lodash/upperFirst';
 
-type Filter = {
+export type TFilters = {
+    filterByMarket?: string;
+    filterByMarketType?: string;
+    filterByType?: string;
+};
+export type TSorter = {
+    columnKey: string | number;
+    order: SortOrder;
+};
+type TFilter = {
     text: string;
     value: string;
 };
-
 type TColumnBinding = {
     title: string;
     dataIndex: string;
     key?: string;
     render?: (_: unknown, r: OptionsData) => string;
-    sortDirections?: SortOrder[];
-    // tslint:disable-next-line:no-any
-    sorter?: any;
-    filters?: Filter[];
+    sortDirections?: Array<SortOrder>;
+    sorter?: boolean;
+    filters?: Array<TFilter>;
     filterMultiple?: boolean;
 };
 type TDataSource = OptionsData & { key: OptionsData['_id'] };
@@ -34,6 +41,11 @@ type TProps = {
     };
 };
 type TSetter<T> = Dispatch<SetStateAction<T>>;
+type TInitialArgs = {
+    options: Array<OptionsData>;
+    initialPagination: Pagination;
+    optionsParamsList: OptionsParamsList;
+};
 
 const { Content }: { Content: React.FC<BasicProps> } = Layout;
 const columns: Array<TColumnBinding> = [
@@ -116,61 +128,33 @@ const columns: Array<TColumnBinding> = [
     },
 ];
 
-export type Filters = {
-    filterByMarket?: string;
-    filterByMarketType?: string;
-    filterByType?: string;
-};
-
-export type Sorter = {
-    columnKey: string | number;
-    order: SortOrder;
-};
-
-const Home: ({
-    options,
-    initialPagination,
-    optionsParamsList,
-}: {
-    options: Array<OptionsData>;
-    initialPagination: Pagination;
-    optionsParamsList: OptionsParamsList;
-}) => JSX.Element = ({
-    options = [],
-    initialPagination,
-    optionsParamsList,
-}: {
-    options: Array<OptionsData>;
-    initialPagination: Pagination;
-    optionsParamsList: OptionsParamsList;
-}): JSX.Element => {
+function Home({ options = [], initialPagination, optionsParamsList }: TInitialArgs): JSX.Element {
     const [optionsList, setOptionsList]: [Array<OptionsData>, TSetter<Array<OptionsData>>] = React.useState<
         Array<OptionsData>
     >(options);
     const [pagination, setPagination]: [Pagination, TSetter<Pagination>] = React.useState<Pagination>(
         initialPagination,
     );
-    const [markets]: [OptionsParamsList['market'], TSetter<OptionsParamsList['market']>] = React.useState<string[]>(
-        optionsParamsList.market,
-    );
-    const [filters, setFilters]: [Filters, TSetter<Filters>] = React.useState<Filters>({
+    const [markets]: [OptionsParamsList['market'], TSetter<OptionsParamsList['market']>] = React.useState<
+        Array<string>
+    >(optionsParamsList.market);
+    const [filters, setFilters]: [TFilters, TSetter<TFilters>] = React.useState<TFilters>({
         filterByMarket: '',
         filterByMarketType: '',
         filterByType: '',
     });
-    const [sorter, setSorter]: [Sorter, TSetter<Sorter>] = React.useState<Sorter>({
+    const [sorter, setSorter]: [TSorter, TSetter<TSorter>] = React.useState<TSorter>({
         columnKey: '',
         order: null,
     });
 
     async function requestData(): Promise<void> {
         try {
-            const _filters: Filters = Object.fromEntries(
+            const _filters: TFilters = Object.fromEntries(
                 Object.entries(filters).filter(([_, value]: [string, string]): boolean => !!value),
             );
-            // tslint:disable-next-line:typedef
-            const { order, columnKey } = sorter;
-            const _sorter: { [key: string]: string } = order
+            const { order, columnKey }: TSorter = sorter;
+            const _sorter: Record<string, string> = order
                 ? {
                       [`sortBy${upperFirst(`${columnKey}`)}`]: order === 'ascend' ? 'ASC' : 'DESC',
                   }
@@ -178,7 +162,7 @@ const Home: ({
             const {
                 data,
                 pagination: incPagination,
-            }: { data: OptionsData[]; pagination: Pagination } = await getOptions({
+            }: { data: Array<OptionsData>; pagination: Pagination } = await getOptions({
                 limit: pagination.limit,
                 offset: pagination.offset,
                 ..._filters,
@@ -191,30 +175,28 @@ const Home: ({
         }
     }
 
-    // tslint:disable-next-line:typedef
     function onTableSortFilterChange(
         _pagination: TablePaginationConfig,
         _filters: FilterValue,
-        // tslint:disable-next-line:no-any
-        _sorter: SorterResult<any>,
-    ) {
-        // tslint:disable-next-line:typedef
-        const { current: page, pageSize } = _pagination;
+        _sorter: TSorter,
+    ): void {
+        const { current: page, pageSize }: TablePaginationConfig = _pagination;
         setPagination({
             ...pagination,
             offset: (page - 1) * pageSize,
             limit: pageSize,
         });
-        // tslint:disable-next-line:typedef
-        const { columnKey, order } = _sorter;
+        const { columnKey, order }: TSorter = _sorter;
         setSorter({
             columnKey,
             order,
         });
 
-        const nextFilters: Filters = { ...filters };
+        const nextFilters: TFilters = { ...filters };
+
         Object.keys(_filters).map((key: string): void => {
             const value: string = _filters[key]?.[0] || '';
+
             nextFilters[`filterBy${upperFirst(key)}`] = value && value !== 'all' ? value : '';
         });
         setFilters(nextFilters);
@@ -229,16 +211,11 @@ const Home: ({
     );
 
     columns.forEach((column: TColumnBinding): void => {
-        if (column.key === 'market') {
-            column.filters = [
-                ...markets.map(
-                    (value: string): Filter => ({
-                        value,
-                        text: value,
-                    }),
-                ),
-            ];
+        if (column.key !== 'market') {
+            return;
         }
+
+        column.filters = markets.map((value: string): TFilter => ({ value, text: value }));
     });
 
     return (
@@ -253,9 +230,9 @@ const Home: ({
                                 pageSize: pagination.limit,
                                 total: pagination.total,
                                 showSizeChanger: true,
-                                // onChange: onPaginationChange,
                             }}
                             sticky
+                            // @ts-ignore
                             onChange={onTableSortFilterChange}
                         />
                     </Col>
@@ -263,13 +240,10 @@ const Home: ({
             </Content>
         </Layout>
     );
-};
+}
 
 export async function getServerSideProps(): Promise<TProps> {
-    const { data, pagination }: { data: OptionsData[]; pagination: Pagination } = await getOptions({
-        offset: 0,
-        limit: 20,
-    });
+    const { data, pagination }: TResponseData = await getOptions({ offset: 0, limit: 20 });
     const optionsParamsList: OptionsParamsList = await getOptionsParamsList();
 
     return { props: { options: data, initialPagination: pagination, optionsParamsList } };

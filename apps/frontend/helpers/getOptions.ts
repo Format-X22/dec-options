@@ -1,20 +1,20 @@
 import { Pagination } from '@app/shared/list.dto';
-import { Filters } from '../pages';
+import { TFilters } from '../pages';
 import { OptionsData } from '@app/shared/options-data.schema';
 
 type TRequestParams = {
     limit: number;
     offset: number;
-} & Filters;
+} & TFilters;
 
-type TResponseData = {
+export type TResponseData = {
     data: Array<OptionsData>;
     pagination: Pagination;
 };
 
 export default async function getOptions(params: TRequestParams): Promise<TResponseData> {
     const url: URL = new URL(
-        process.env.REACT_APP_API_URL || process.env.OA_FRONTEND_API_URL || window.location.origin,
+        (process.env.REACT_APP_API_URL || process.env.OA_FRONTEND_API_URL || window.location.origin) + '/api',
     );
 
     url.search = new URLSearchParams({

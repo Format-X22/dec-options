@@ -5,7 +5,8 @@ export type OptionsParamsList = {
 };
 
 export async function getOptionsParamsList(): Promise<OptionsParamsList> {
-    const base: string = process.env.REACT_APP_API_URL || process.env.OA_FRONTEND_API_URL || window.location.origin;
+    const base: string =
+        (process.env.REACT_APP_API_URL || process.env.OA_FRONTEND_API_URL || window.location.origin) + '/api';
     const url: URL = new URL(`${base}/options-params`);
 
     return (await fetch(url.toString())).json();
