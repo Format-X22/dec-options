@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AggregationApiController } from './aggregation-api.controller';
-import { AggregationApiService } from './aggregation-api.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
-import { OptionsData, OptionsDataSchema } from '@app/shared/options-data.schema';
-import { ViewModule } from './view.module';
+import { ApiModule } from './api/api.module';
+import { ViewModule } from './view/view.module';
 
 @Module({
     imports: [
+        ApiModule,
         ViewModule,
         ConfigModule.forRoot({
             isGlobal: true,
@@ -21,9 +20,8 @@ import { ViewModule } from './view.module';
             }),
             inject: [ConfigService],
         }),
-        MongooseModule.forFeature([{ name: OptionsData.name, schema: OptionsDataSchema }]),
     ],
-    controllers: [AggregationApiController],
-    providers: [AggregationApiService],
+    controllers: [],
+    providers: [],
 })
-export class AggregationApiModule {}
+export class AppModule {}

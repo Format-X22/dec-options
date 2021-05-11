@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { AggregationApiModule } from './aggregation-api.module';
+import { AppModule } from './app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { OpenAPIObject } from '@nestjs/swagger/dist/interfaces';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap(): Promise<void> {
-    const app: INestApplication = await NestFactory.create(AggregationApiModule);
+    const app: INestApplication = await NestFactory.create(AppModule);
     const configService: ConfigService = app.get(ConfigService);
     const port: number = Number(configService.get<string>('OA_AGG_API_PORT'));
 
@@ -25,7 +25,7 @@ async function bootstrap(): Promise<void> {
 
     const documentation: OpenAPIObject = SwaggerModule.createDocument(app, swaggerConfig);
 
-    SwaggerModule.setup('api', app, documentation);
+    SwaggerModule.setup('swagger', app, documentation);
 
     await app.listen(port);
 }

@@ -62,5 +62,7 @@ $ npm run start:prod:agg
 ```
               
 ## Api
-  
-Swagger - http://localhost:3000/api/
+                               
+App - http://localhost:3000/  
+Api - http://localhost:3000/api/  
+Swagger - http://localhost:3000/swagger/

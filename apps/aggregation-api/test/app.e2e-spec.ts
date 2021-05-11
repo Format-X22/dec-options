@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AggregationApiModule } from '../src/aggregation-api.module';
+import { AppModule } from '../src/app.module';
 import * as superagent from 'superagent';
 
 const SUCCESS_CODE: number = 200;
@@ -12,7 +12,7 @@ describe('AggregationApiController (e2e)', (): void => {
     beforeEach(
         async (): Promise<void> => {
             const moduleFixture: TestingModule = await Test.createTestingModule({
-                imports: [AggregationApiModule],
+                imports: [AppModule],
             }).compile();
 
             app = moduleFixture.createNestApplication();

@@ -1,21 +1,15 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
-import { AggregationApiService, TOptionsParams } from './aggregation-api.service';
-import { ApiExtraModels, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { ListDto, makeListDtoApi } from '@app/shared/list.dto';
+import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET, ESortDirection, OptionsQueryDto } from './options-query.dto';
-import { validateOrReject, ValidationError } from 'class-validator';
+import { ListDto, makeListDtoApi } from '@app/shared/list.dto';
 import { plainToClass } from 'class-transformer';
+import { validateOrReject, ValidationError } from 'class-validator';
+import { ApiService, TOptionsParams } from './api.service';
 
-@Controller()
-@ApiExtraModels(ListDto, OptionsData)
-export class AggregationApiController {
-    constructor(private readonly aggregationApiService: AggregationApiService) {}
-
-    @Get('/options-params')
-    async getOptionsParamsList(): Promise<TOptionsParams> {
-        return this.aggregationApiService.getOptionsParamsList();
-    }
+@Controller('api')
+export class ApiController {
+    constructor(private readonly apiService: ApiService) {}
 
     @Get()
     @ApiQuery({ name: 'filterByMarket', enum: EMarket, required: false })
@@ -73,6 +67,11 @@ export class AggregationApiController {
             throw error;
         }
 
-        return this.aggregationApiService.getOptions(paramsClassInstance);
+        return this.apiService.getOptions(paramsClassInstance);
+    }
+
+    @Get('/options-params')
+    async getOptionsParamsList(): Promise<TOptionsParams> {
+        return this.apiService.getOptionsParamsList();
     }
 }

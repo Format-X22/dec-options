@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { OptionsData, OptionsDataDocument } from '@app/shared/options-data.schema';
-import { ListDto } from '@app/shared/list.dto';
-import { ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
+import { ESortDirection, OptionsQueryDto } from './options-query.dto';
+import { ListDto } from '@app/shared/list.dto';
 
 export type TOptionsParams = {
     base: Array<OptionsData['base']>;
@@ -29,7 +29,7 @@ type TOptionsSort = {
 };
 
 @Injectable()
-export class AggregationApiService {
+export class ApiService {
     constructor(@InjectModel(OptionsData.name) private optionsDataModel: Model<OptionsDataDocument>) {}
 
     async getOptionsParamsList(): Promise<TOptionsParams> {
