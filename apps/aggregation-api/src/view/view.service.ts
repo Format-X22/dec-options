@@ -1,9 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { NextServer } from 'next/dist/server/next';
 import next from 'next';
 
 @Injectable()
-export class ViewService implements OnModuleInit {
+export class ViewService implements OnModuleInit, OnModuleDestroy {
     private readonly logger: Logger = new Logger(ViewService.name);
     private server: NextServer;
 
@@ -15,6 +15,10 @@ export class ViewService implements OnModuleInit {
         } catch (error) {
             this.logger.error(error);
         }
+    }
+
+    async onModuleDestroy(): Promise<void> {
+        await this.server.close();
     }
 
     getNextServer(): NextServer {
