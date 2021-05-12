@@ -5,7 +5,7 @@ import { IAggregator } from '../options-aggregator.service';
 @Injectable()
 export class PrimitiveService implements IAggregator {
     async getCurrentData(): Promise<Array<OptionsData>> {
-        // TODO -
+        // TODO Suspended
         return;
     }
 }

@@ -60,7 +60,17 @@ $ npm run start:agg
 $ npm run start:prod:api
 $ npm run start:prod:agg
 ```
-              
+                        
+# Tests
+
+```bash
+# units
+$ npm run test
+
+# e2e
+$ npm run test:e2e:api 
+```
+
 ## Api
                                
 App - http://localhost:3000/  
