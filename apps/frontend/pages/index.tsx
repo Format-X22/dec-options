@@ -155,11 +155,18 @@ function Home({ options = [], initialPagination, optionsParamsList }: TInitialAr
                 Object.entries(filters).filter(([_, value]: [string, string]): boolean => !!value),
             );
             const { order, columnKey }: TSorter = sorter;
-            const _sorter: Record<string, string> = order
-                ? {
-                      [`sortBy${upperFirst(`${columnKey}`)}`]: order === 'ascend' ? 'ASC' : 'DESC',
-                  }
-                : {};
+            const _sorter: Record<string, string> = {};
+
+            if (order) {
+                const sortKey: string = `sortBy${upperFirst(`${columnKey}`)}`;
+
+                if (order === 'ascend') {
+                    _sorter[sortKey] = 'ASC';
+                } else {
+                    _sorter[sortKey] = 'DESC';
+                }
+            }
+
             const {
                 data,
                 pagination: incPagination,

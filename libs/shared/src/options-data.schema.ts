@@ -19,10 +19,8 @@ export enum EMarket {
     FTX = 'FTX',
     OKEX = 'OKEX',
     AUCTUS = 'AUCTUS',
-    FINNEXUS = 'FINNEXUS',
     HEGIC = 'HEGIC',
     OPYN = 'OPYN',
-    PRIMITIVE = 'PRIMITIVE',
     SIREN = 'SIREN',
 }
 
