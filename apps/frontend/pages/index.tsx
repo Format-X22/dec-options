@@ -8,6 +8,7 @@ import { getOptionsParamsList, OptionsParamsList } from '../helpers/getOptionsPa
 import { BasicProps } from 'antd/lib/layout/layout';
 import { FilterValue, SortOrder, TablePaginationConfig } from 'antd/lib/table/interface';
 import upperFirst from 'lodash/upperFirst';
+import { market } from '../helpers/market';
 
 export type TFilters = {
     filterByMarket?: string;
