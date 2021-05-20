@@ -5,7 +5,7 @@ import { BinanceService } from './binance/binance.service';
 import { CharmService } from './_charm/charm.service';
 import { DeribitService } from './deribit/deribit.service';
 import { FinnexusService } from './_finnexus/finnexus.service';
-import { FtxService } from './ftx/ftx.service';
+import { FtxService } from './_ftx/ftx.service';
 import { HegicService } from './hegic/hegic.service';
 import { LienService } from './_lien/lien.service';
 import { OkexService } from './okex/okex.service';
@@ -69,21 +69,11 @@ export class OptionsAggregatorService {
         [
             this.auctusService,
             this.binanceService,
-            this.charmService,
             this.deribitService,
-            this.finnexusService,
-            this.ftxService,
             this.hegicService,
-            this.lienService,
             this.okexService,
-            this.opiumService,
             this.opynService,
-            this.plotxService,
-            this.podsService,
-            this.primitiveService,
-            this.prosperService,
             this.sirenService,
-            this.xoptsService,
         ].forEach(this.doSync.bind(this));
     }
 

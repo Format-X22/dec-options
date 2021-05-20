@@ -16,7 +16,6 @@ export enum EOptionType {
 export enum EMarket {
     DERIBIT = 'DERIBIT',
     BINANCE = 'BINANCE',
-    FTX = 'FTX',
     OKEX = 'OKEX',
     AUCTUS = 'AUCTUS',
     HEGIC = 'HEGIC',

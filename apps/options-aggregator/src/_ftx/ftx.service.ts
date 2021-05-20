@@ -32,7 +32,7 @@ export class FtxService implements IAggregator {
                 return {
                     id: data.option.expiry,
                     name: data.option.expiry,
-                    market: EMarket.FTX,
+                    market: null, // EMarket.FTX
                     marketType: EMarketType.CEX,
                     type: data.option.type.toUpperCase() as EOptionType,
                     size: 0.0001,

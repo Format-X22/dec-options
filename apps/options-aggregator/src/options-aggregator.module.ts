@@ -17,7 +17,7 @@ import { PodsService } from './_pods/pods.service';
 import { XoptsService } from './_xopts/xopts.service';
 import { SirenService } from './siren/siren.service';
 import { DeribitService } from './deribit/deribit.service';
-import { FtxService } from './ftx/ftx.service';
+import { FtxService } from './_ftx/ftx.service';
 import { BinanceService } from './binance/binance.service';
 import { OkexService } from './okex/okex.service';
 import { OptionsData, OptionsDataSchema } from '@app/shared/options-data.schema';
