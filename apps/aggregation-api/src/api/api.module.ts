@@ -3,10 +3,11 @@ import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { OptionsData, OptionsDataSchema } from '@app/shared/options-data.schema';
+import { ApiResolver } from './api.resolver';
 
 @Module({
     imports: [MongooseModule.forFeature([{ name: OptionsData.name, schema: OptionsDataSchema }])],
     controllers: [ApiController],
-    providers: [ApiService],
+    providers: [ApiService, ApiResolver],
 })
 export class ApiModule {}

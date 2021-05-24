@@ -32,6 +32,10 @@ type TOptionsSort = {
 export class ApiService {
     constructor(@InjectModel(OptionsData.name) private optionsDataModel: Model<OptionsDataDocument>) {}
 
+    async getOption(_id: OptionsData['_id']): Promise<OptionsData> {
+        return this.optionsDataModel.findById(_id);
+    }
+
     async getOptionsParamsList(): Promise<TOptionsParams> {
         const base: TOptionsParams['base'] = await this.optionsDataModel.distinct('base');
         const quote: TOptionsParams['quote'] = await this.optionsDataModel.distinct('quote');

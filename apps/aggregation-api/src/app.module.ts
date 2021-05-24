@@ -5,7 +5,6 @@ import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose
 import { ApiModule } from './api/api.module';
 import { ViewModule } from './view/view.module';
 import { GraphQLModule } from '@nestjs/graphql';
-import { AppResolver } from './app.resolver';
 
 @Module({
     imports: [
@@ -28,6 +27,6 @@ import { AppResolver } from './app.resolver';
         }),
     ],
     controllers: [],
-    providers: [AppResolver],
+    providers: [],
 })
 export class AppModule {}
