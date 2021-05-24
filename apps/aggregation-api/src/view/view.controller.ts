@@ -1,14 +1,21 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Next, Req, Res } from '@nestjs/common';
 import { ViewService } from './view.service';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { NextServer } from 'next/dist/server/next';
+
+const EXCLUDE_PATH: Array<string> = ['/api', '/graphql'];
 
 @Controller()
 export class ViewController {
     constructor(private viewService: ViewService) {}
 
     @Get('*')
-    async getFrontend(@Req() req: Request, @Res() res: Response): Promise<void> {
+    async getFrontend(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction): Promise<void> {
+        if (EXCLUDE_PATH.includes(req.path)) {
+            next();
+            return;
+        }
+
         const handle: ReturnType<
             NextServer['getRequestHandler']
         > = this.viewService.getNextServer().getRequestHandler();

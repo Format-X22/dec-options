@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
 import { ApiModule } from './api/api.module';
 import { ViewModule } from './view/view.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { AppResolver } from './app.resolver';
 
 @Module({
     imports: [
@@ -20,8 +22,12 @@ import { ViewModule } from './view/view.module';
             }),
             inject: [ConfigService],
         }),
+        GraphQLModule.forRoot({
+            installSubscriptionHandlers: true,
+            autoSchemaFile: true,
+        }),
     ],
     controllers: [],
-    providers: [],
+    providers: [AppResolver],
 })
 export class AppModule {}
