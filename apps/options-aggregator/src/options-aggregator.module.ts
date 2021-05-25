@@ -20,7 +20,7 @@ import { DeribitService } from './deribit/deribit.service';
 import { FtxService } from './_ftx/ftx.service';
 import { BinanceService } from './binance/binance.service';
 import { OkexService } from './okex/okex.service';
-import { OptionsData, OptionsDataSchema } from '@app/shared/options-data.schema';
+import { Option, OptionSchema } from '@app/shared/option.schema';
 
 @Module({
     imports: [
@@ -35,7 +35,7 @@ import { OptionsData, OptionsDataSchema } from '@app/shared/options-data.schema'
             }),
             inject: [ConfigService],
         }),
-        MongooseModule.forFeature([{ name: OptionsData.name, schema: OptionsDataSchema }]),
+        MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
     ],
     providers: [
         OptionsAggregatorService,

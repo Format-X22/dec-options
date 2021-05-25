@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EOptionType, Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 import { gql, request } from 'graphql-request';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 type TOptionsResponse = {
     hegicOptions: Array<{
@@ -21,15 +22,15 @@ const DECIMAL_DELIMITER: number = 100_000_000;
 
 @Injectable()
 export class HegicService implements IAggregator {
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
 
         return rawOptionsResponse.hegicOptions.map(
-            (data: TOptionsResponse['hegicOptions'][0]): OptionsData => {
+            (data: TOptionsResponse['hegicOptions'][0]): Option => {
                 return {
                     id: data.id,
                     name: data.id,
-                    market: EMarket.HEGIC,
+                    marketKey: EMarketKey.HEGIC,
                     marketType: EMarketType.DEX,
                     type: data.type.toUpperCase() as EOptionType,
                     size: 1,

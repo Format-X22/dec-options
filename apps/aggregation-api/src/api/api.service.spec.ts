@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ApiModule } from './api.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
-import { OptionsData, OptionsDataSchema } from '@app/shared/options-data.schema';
+import { Option, OptionSchema } from '@app/shared/option.schema';
 import { ApiController } from './api.controller';
 
 describe('ApiService', (): void => {
@@ -27,7 +27,7 @@ describe('ApiService', (): void => {
                         }),
                         inject: [ConfigService],
                     }),
-                    MongooseModule.forFeature([{ name: OptionsData.name, schema: OptionsDataSchema }]),
+                    MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
                 ],
                 controllers: [ApiController],
                 providers: [ApiService],

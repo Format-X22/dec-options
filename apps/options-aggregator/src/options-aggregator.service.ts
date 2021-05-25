@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { OptionsData, OptionsDataDocument } from '@app/shared/options-data.schema';
+import { Option, OptionDocument } from '@app/shared/option.schema';
 import { AuctusService } from './auctus/auctus.service';
 import { BinanceService } from './binance/binance.service';
 import { CharmService } from './_charm/charm.service';
@@ -22,11 +22,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 export interface IAggregator {
-    getCurrentData: () => Promise<Array<OptionsData>>;
+    getCurrentData: () => Promise<Array<Option>>;
 }
 
 abstract class AggregatorAbstract implements IAggregator {
-    getCurrentData: () => Promise<Array<OptionsData>>;
+    getCurrentData: () => Promise<Array<Option>>;
 }
 
 @Injectable()
@@ -34,7 +34,7 @@ export class OptionsAggregatorService {
     private readonly logger: Logger = new Logger(OptionsAggregatorService.name);
 
     constructor(
-        @InjectModel(OptionsData.name) private optionsDataModel: Model<OptionsDataDocument>,
+        @InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>,
         private readonly configService: ConfigService,
 
         private readonly auctusService: AuctusService,
@@ -84,7 +84,7 @@ export class OptionsAggregatorService {
             .catch(this.makeErrorHandlerSyncError(Object.getPrototypeOf(service).constructor));
     }
 
-    private async handleSyncResult(result: Array<OptionsData> | null): Promise<void> {
+    private async handleSyncResult(result: Array<Option> | null): Promise<void> {
         for (const data of result || []) {
             await this.optionsDataModel.updateOne({ id: data.id }, data, { upsert: true });
         }

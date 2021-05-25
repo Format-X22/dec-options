@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EOptionType, Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market } from 'ccxt';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 type TOptionMarket = Market & {
     option: boolean;
@@ -12,9 +13,9 @@ type TOptionMarket = Market & {
 export class OkexService implements IAggregator {
     private readonly exchange: Exchange = new ccxt.okex();
 
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         const markets: Dictionary<TOptionMarket> = (await this.exchange.loadMarkets()) as Dictionary<TOptionMarket>;
-        const result: Array<OptionsData> = [];
+        const result: Array<Option> = [];
 
         for (const [id, data] of Object.entries(markets)) {
             if (!data.active || !data.option) {
@@ -24,7 +25,7 @@ export class OkexService implements IAggregator {
             result.push({
                 id,
                 name: data.symbol,
-                market: EMarket.OKEX,
+                marketKey: EMarketKey.OKEX,
                 marketType: EMarketType.CEX,
                 type: this.determinateType(data),
                 size: Number(data.info.lot_size),

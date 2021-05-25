@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { IAggregator } from '../options-aggregator.service';
-import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EOptionType, Option } from '@app/shared/option.schema';
 import { gql, request } from 'graphql-request';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 type TOptionsResponse = {
     acotokens: Array<{
@@ -27,11 +28,11 @@ const MS_MULTIPLY: number = 1000;
 
 @Injectable()
 export class AuctusService implements IAggregator {
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
 
         return rawOptionsResponse.acotokens.map(
-            (data: TOptionsResponse['acotokens'][0]): OptionsData => {
+            (data: TOptionsResponse['acotokens'][0]): Option => {
                 const id: string = data.id;
                 const base: string = data.underlying.symbol;
                 const quote: string = data.collateral.symbol;
@@ -40,7 +41,7 @@ export class AuctusService implements IAggregator {
                 return {
                     id,
                     name: data.name,
-                    market: EMarket.AUCTUS,
+                    marketKey: EMarketKey.AUCTUS,
                     marketType: EMarketType.DEX,
                     type: data.isCall ? EOptionType.CALL : EOptionType.PUT,
                     size: 1,

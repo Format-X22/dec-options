@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EOptionType, Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 import { Exchange } from 'ccxt';
 import * as ccxt from 'ccxt';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 const GetOptionsApiUrl: string = 'https://vapi.binance.com/vapi/v1/optionInfo';
 
@@ -24,7 +25,7 @@ type TOptionsResponse = {
 export class BinanceService implements IAggregator {
     private readonly exchange: Exchange = new ccxt.binance();
 
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         const rawOptionsResponse: TOptionsResponse = await this.exchange.fetch(GetOptionsApiUrl, 'GET');
 
         if (rawOptionsResponse.msg !== 'success') {
@@ -32,11 +33,11 @@ export class BinanceService implements IAggregator {
         }
 
         return rawOptionsResponse.data.map(
-            (data: TOptionsResponse['data'][0]): OptionsData => {
+            (data: TOptionsResponse['data'][0]): Option => {
                 return {
                     id: data.id,
                     name: data.symbol,
-                    market: EMarket.BINANCE,
+                    marketKey: EMarketKey.BINANCE,
                     marketType: EMarketType.CEX,
                     type: data.side.toUpperCase() as EOptionType,
                     size: Number(data.unit),

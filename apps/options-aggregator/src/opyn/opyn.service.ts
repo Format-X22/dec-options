@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EOptionType, Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 import { gql, request } from 'graphql-request';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 type TOptionsResponse = {
     otokens: Array<{
@@ -28,15 +29,15 @@ const MS_MULTIPLY: number = 1000;
 
 @Injectable()
 export class OpynService implements IAggregator {
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
 
         return rawOptionsResponse.otokens.map(
-            (data: TOptionsResponse['otokens'][0]): OptionsData => {
+            (data: TOptionsResponse['otokens'][0]): Option => {
                 return {
                     id: data.id,
                     name: data.name,
-                    market: EMarket.OPYN,
+                    marketKey: EMarketKey.OPYN,
                     marketType: EMarketType.DEX,
                     type: data.isPut ? EOptionType.PUT : EOptionType.CALL,
                     size: 1,

@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ApiResolver } from './api.resolver';
+import { OptionResolver } from './option.resolver';
 
-describe('ApiResolver', (): void => {
-    let resolver: ApiResolver;
+describe('OptionResolver', (): void => {
+    let resolver: OptionResolver;
 
     beforeEach(
         async (): Promise<void> => {
             const module: TestingModule = await Test.createTestingModule({
-                providers: [ApiResolver],
+                providers: [OptionResolver],
             }).compile();
 
-            resolver = module.get<ApiResolver>(ApiResolver);
+            resolver = module.get<OptionResolver>(OptionResolver);
         },
     );
 

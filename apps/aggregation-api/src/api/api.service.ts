@@ -1,20 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { OptionsData, OptionsDataDocument } from '@app/shared/options-data.schema';
+import { Option, OptionDocument } from '@app/shared/option.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { ListDto } from '@app/shared/list.dto';
+import { Market, markets } from '@app/shared/market.schema';
 
 export type TOptionsParams = {
-    base: Array<OptionsData['base']>;
-    quote: Array<OptionsData['quote']>;
-    market: Array<OptionsData['market']>;
+    base: Array<Option['base']>;
+    quote: Array<Option['quote']>;
+    market: Array<Option['marketKey']>;
 };
 
 type TOptionsQuery = {
-    market?: OptionsData['market'];
-    marketType?: OptionsData['marketType'];
-    type?: OptionsData['type'];
+    market?: Option['marketKey'];
+    marketType?: Option['marketType'];
+    type?: Option['type'];
 };
 
 type TSortDirection = 1 | -1;
@@ -30,9 +31,9 @@ type TOptionsSort = {
 
 @Injectable()
 export class ApiService {
-    constructor(@InjectModel(OptionsData.name) private optionsDataModel: Model<OptionsDataDocument>) {}
+    constructor(@InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>) {}
 
-    async getOption(_id: OptionsData['_id']): Promise<OptionsData> {
+    async getOption(_id: Option['_id']): Promise<Option> {
         return this.optionsDataModel.findById(_id);
     }
 
@@ -44,23 +45,27 @@ export class ApiService {
         return { base, quote, market };
     }
 
-    async getOptions(requestQuery: OptionsQueryDto): Promise<ListDto<OptionsData>> {
+    async getOptions(requestQuery: OptionsQueryDto): Promise<ListDto<Option>> {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
-        const query: FilterQuery<OptionsDataDocument> = { ...dbQuery, expirationDate: { $gt: new Date() } };
-        const data: Array<OptionsDataDocument> = await this.optionsDataModel.find(query, null, {
+        const query: FilterQuery<OptionDocument> = { ...dbQuery, expirationDate: { $gt: new Date() } };
+        const data: Array<OptionDocument> = await this.optionsDataModel.find(query, null, {
             sort: dbSort,
             skip: requestQuery.offset,
             limit: requestQuery.limit,
         });
         const total: number = await this.optionsDataModel.countDocuments(query);
-        const pagination: ListDto<OptionsData>['pagination'] = {
+        const pagination: ListDto<Option>['pagination'] = {
             offset: requestQuery.offset,
             limit: requestQuery.limit,
             total,
         };
 
         return { data, pagination };
+    }
+
+    getMarkets(): Array<Market> {
+        return markets;
     }
 
     private makeOptionsQuery(requestQuery: OptionsQueryDto): TOptionsQuery {

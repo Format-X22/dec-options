@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EOptionType, Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 import { Exchange } from 'ccxt';
 import * as ccxt from 'ccxt';
+import { EMarketType } from '@app/shared/market.schema';
 
 type TOptionsResponse = {
     success: boolean;
@@ -20,7 +21,7 @@ type TOptionsResponse = {
 export class FtxService implements IAggregator {
     private readonly exchange: Exchange = new ccxt.ftx();
 
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         const rawOptionsResponse: TOptionsResponse = await this.exchange.publicGetOptionsRequests();
 
         if (!rawOptionsResponse.success) {
@@ -28,11 +29,11 @@ export class FtxService implements IAggregator {
         }
 
         return rawOptionsResponse.result.map(
-            (data: TOptionsResponse['result'][0]): OptionsData => {
+            (data: TOptionsResponse['result'][0]): Option => {
                 return {
                     id: data.option.expiry,
                     name: data.option.expiry,
-                    market: null, // EMarket.FTX
+                    marketKey: null, // EMarket.FTX
                     marketType: EMarketType.CEX,
                     type: data.option.type.toUpperCase() as EOptionType,
                     size: 0.0001,

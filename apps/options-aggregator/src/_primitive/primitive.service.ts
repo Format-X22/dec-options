@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { OptionsData } from '@app/shared/options-data.schema';
+import { Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 
 @Injectable()
 export class PrimitiveService implements IAggregator {
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         // TODO Suspended
         return;
     }

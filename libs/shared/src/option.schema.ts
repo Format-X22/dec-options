@@ -3,12 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import mongoose from 'mongoose';
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-
-export enum EMarketType {
-    DEX = 'DEX',
-    CEX = 'CEX',
-}
-registerEnumType(EMarketType, { name: 'MarketType' });
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 export enum EOptionType {
     PUT = 'PUT',
@@ -16,20 +11,9 @@ export enum EOptionType {
 }
 registerEnumType(EOptionType, { name: 'OptionType' });
 
-export enum EMarket {
-    DERIBIT = 'DERIBIT',
-    BINANCE = 'BINANCE',
-    OKEX = 'OKEX',
-    AUCTUS = 'AUCTUS',
-    HEGIC = 'HEGIC',
-    OPYN = 'OPYN',
-    SIREN = 'SIREN',
-}
-registerEnumType(EMarket, { name: 'Market' });
-
 @Schema({ versionKey: false })
 @ObjectType()
-export class OptionsData {
+export class Option {
     @Field((): typeof String => String)
     _id?: mongoose.Schema.Types.ObjectId | string;
 
@@ -43,17 +27,17 @@ export class OptionsData {
     @Field()
     name: string;
 
-    @Prop()
-    @ApiProperty({ enum: EMarket })
-    @Field((): typeof EMarket => EMarket)
-    market: EMarket;
+    @Prop({ enum: EMarketKey, type: String })
+    @ApiProperty({ enum: EMarketKey })
+    @Field((): typeof EMarketKey => EMarketKey)
+    marketKey: EMarketKey;
 
-    @Prop()
+    @Prop({ enum: EMarketType, type: String })
     @ApiProperty({ enum: EMarketType })
     @Field((): typeof EMarketType => EMarketType)
     marketType: EMarketType;
 
-    @Prop()
+    @Prop({ enum: EOptionType, type: String })
     @ApiProperty({ enum: EOptionType })
     @Field((): typeof EOptionType => EOptionType)
     type: EOptionType;
@@ -94,8 +78,7 @@ export class OptionsData {
     marketUrl: string;
 }
 
-export type OptionsDataDocument = OptionsData & Document;
-export const OptionsDataSchema: mongoose.Schema<OptionsDataDocument> = SchemaFactory.createForClass<
-    OptionsData,
-    OptionsDataDocument
->(OptionsData);
+export type OptionDocument = Option & Document;
+export const OptionSchema: mongoose.Schema<OptionDocument> = SchemaFactory.createForClass<Option, OptionDocument>(
+    Option,
+);

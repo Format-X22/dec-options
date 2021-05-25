@@ -1,18 +1,19 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EOptionType, Option } from '@app/shared/option.schema';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET, ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { ListDto, makeListDtoApi } from '@app/shared/list.dto';
 import { plainToClass } from 'class-transformer';
 import { validateOrReject, ValidationError } from 'class-validator';
 import { ApiService, TOptionsParams } from './api.service';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 @Controller('api')
 export class ApiController {
     constructor(private readonly apiService: ApiService) {}
 
     @Get()
-    @ApiQuery({ name: 'filterByMarket', enum: EMarket, required: false })
+    @ApiQuery({ name: 'filterByMarket', enum: EMarketKey, required: false })
     @ApiQuery({ name: 'filterByMarketType', enum: EMarketType, required: false })
     @ApiQuery({ name: 'filterByType', enum: EOptionType, required: false })
     @ApiQuery({ name: 'sortByMarket', enum: ESortDirection, required: false })
@@ -23,7 +24,7 @@ export class ApiController {
     @ApiQuery({ name: 'sortByExpirationDate', enum: ESortDirection, required: false })
     @ApiQuery({ name: 'offset', type: Number, required: false })
     @ApiQuery({ name: 'limit', type: Number, required: false })
-    @ApiOkResponse(makeListDtoApi(OptionsData))
+    @ApiOkResponse(makeListDtoApi(Option))
     async getOptions(
         @Query('filterByMarket') filterByMarket: unknown,
         @Query('filterByMarketType') filterByMarketType: unknown,
@@ -36,7 +37,7 @@ export class ApiController {
         @Query('sortByExpirationDate') sortByExpirationDate: unknown,
         @Query('offset') offset: unknown,
         @Query('limit') limit: unknown,
-    ): Promise<ListDto<OptionsData>> {
+    ): Promise<ListDto<Option>> {
         const paramsClassInstance: OptionsQueryDto = plainToClass(OptionsQueryDto, {
             filterByMarket,
             filterByMarketType,

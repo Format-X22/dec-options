@@ -1,6 +1,6 @@
 import { Pagination } from '@app/shared/list.dto';
 import { TFilters } from '../pages';
-import { OptionsData } from '@app/shared/options-data.schema';
+import { Option } from '@app/shared/option.schema';
 
 type TRequestParams = {
     limit: number;
@@ -8,7 +8,7 @@ type TRequestParams = {
 } & TFilters;
 
 export type TResponseData = {
-    data: Array<OptionsData>;
+    data: Array<Option>;
     pagination: Pagination;
 };
 

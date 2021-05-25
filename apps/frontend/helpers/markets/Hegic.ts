@@ -1,16 +1,16 @@
 import { IMarket } from '../market';
-import { OptionsData } from '@app/shared/options-data.schema';
+import { Option } from '@app/shared/option.schema';
 
 export class Hegic implements IMarket {
     async auth(): Promise<boolean> {
         // TODO -
         return true;
     }
-    async buy(option: OptionsData, amount: number): Promise<boolean> {
+    async buy(option: Option, amount: number): Promise<boolean> {
         // TODO -
         return true;
     }
-    async sell(option: OptionsData, amount: number): Promise<boolean> {
+    async sell(option: Option, amount: number): Promise<boolean> {
         // TODO -
         return true;
     }

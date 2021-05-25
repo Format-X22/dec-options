@@ -1,6 +1,6 @@
 import React, { useEffect, Dispatch, SetStateAction } from 'react';
 import getOptions, { TResponseData } from '../helpers/getOptions';
-import { OptionsData } from '@app/shared/options-data.schema';
+import { Option } from '@app/shared/option.schema';
 import { Col, Row, Table, Layout } from 'antd';
 import format from 'date-fns/format';
 import { Pagination } from '@app/shared/list.dto';
@@ -27,23 +27,23 @@ type TColumnBinding = {
     title: string;
     dataIndex: string;
     key?: string;
-    render?: (_: unknown, r: OptionsData) => string;
+    render?: (_: unknown, r: Option) => string;
     sortDirections?: Array<SortOrder>;
     sorter?: boolean;
     filters?: Array<TFilter>;
     filterMultiple?: boolean;
 };
-type TDataSource = OptionsData & { key: OptionsData['_id'] };
+type TDataSource = Option & { key: Option['_id'] };
 type TProps = {
     props: {
-        options: Array<OptionsData>;
+        options: Array<Option>;
         initialPagination: Pagination;
         optionsParamsList: OptionsParamsList;
     };
 };
 type TSetter<T> = Dispatch<SetStateAction<T>>;
 type TInitialArgs = {
-    options: Array<OptionsData>;
+    options: Array<Option>;
     initialPagination: Pagination;
     optionsParamsList: OptionsParamsList;
 };
@@ -110,14 +110,14 @@ const columns: Array<TColumnBinding> = [
         title: 'Size',
         dataIndex: 'size',
         key: 'size',
-        render: (_: unknown, r: OptionsData): string => `${r.size} ${r.base}`,
+        render: (_: unknown, r: Option): string => `${r.size} ${r.base}`,
         sorter: true,
     },
     {
         title: 'Strike',
         dataIndex: 'strike',
         key: 'strike',
-        render: (_: unknown, r: OptionsData): string => `${r.strike} ${r.quote}`,
+        render: (_: unknown, r: Option): string => `${r.strike} ${r.quote}`,
         sorter: true,
     },
     {
@@ -130,8 +130,8 @@ const columns: Array<TColumnBinding> = [
 ];
 
 function Home({ options = [], initialPagination, optionsParamsList }: TInitialArgs): JSX.Element {
-    const [optionsList, setOptionsList]: [Array<OptionsData>, TSetter<Array<OptionsData>>] = React.useState<
-        Array<OptionsData>
+    const [optionsList, setOptionsList]: [Array<Option>, TSetter<Array<Option>>] = React.useState<
+        Array<Option>
     >(options);
     const [pagination, setPagination]: [Pagination, TSetter<Pagination>] = React.useState<Pagination>(
         initialPagination,
@@ -170,7 +170,7 @@ function Home({ options = [], initialPagination, optionsParamsList }: TInitialAr
             const {
                 data,
                 pagination: incPagination,
-            }: { data: Array<OptionsData>; pagination: Pagination } = await getOptions({
+            }: { data: Array<Option>; pagination: Pagination } = await getOptions({
                 limit: pagination.limit,
                 offset: pagination.offset,
                 ..._filters,
@@ -215,7 +215,7 @@ function Home({ options = [], initialPagination, optionsParamsList }: TInitialAr
     }, [pagination.offset, pagination.limit, filters, sorter]);
 
     const dataSource: Array<TDataSource> = optionsList.map(
-        (optionsData: OptionsData): TDataSource => ({ ...optionsData, key: optionsData._id }),
+        (optionsData: Option): TDataSource => ({ ...optionsData, key: optionsData._id }),
     );
 
     columns.forEach((column: TColumnBinding): void => {

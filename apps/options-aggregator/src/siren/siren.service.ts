@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { EMarket, EMarketType, EOptionType, OptionsData } from '@app/shared/options-data.schema';
+import { EOptionType, Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 import { gql, request } from 'graphql-request';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 type TOptionsResponse = {
     markets: Array<{
@@ -37,11 +38,11 @@ const MS_MULTIPLY: number = 1000;
 
 @Injectable()
 export class SirenService implements IAggregator {
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         const rawOptionsResponse: TOptionsResponse = await request(API, QUERY);
 
         return rawOptionsResponse.markets.map(
-            (data: TOptionsResponse['markets'][0]): OptionsData => {
+            (data: TOptionsResponse['markets'][0]): Option => {
                 const base: string = data.paymentToken.symbol;
                 const quote: string = data.collateralToken.symbol;
                 const type: EOptionType = this.tryExtractType(data.marketName);
@@ -51,7 +52,7 @@ export class SirenService implements IAggregator {
                 return {
                     id: data.id,
                     name: data.marketName,
-                    market: EMarket.SIREN,
+                    marketKey: EMarketKey.SIREN,
                     marketType: EMarketType.DEX,
                     type,
                     size: 1,
@@ -75,7 +76,7 @@ export class SirenService implements IAggregator {
         } else if (typeLiteral === 'P') {
             return EOptionType.PUT;
         } else {
-            throw new Error(`${EMarket.SIREN} - Option type parsing error - ${marketName}`);
+            throw new Error(`${EMarketKey.SIREN} - Option type parsing error - ${marketName}`);
         }
     }
 
@@ -85,7 +86,7 @@ export class SirenService implements IAggregator {
         const strike: number = Number(strikeString);
 
         if (isNaN(strike)) {
-            throw new Error(`${EMarket.SIREN} - Option strike parsing error - ${marketName}`);
+            throw new Error(`${EMarketKey.SIREN} - Option strike parsing error - ${marketName}`);
         }
 
         return strike;

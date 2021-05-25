@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { EMarket, EMarketType, OptionsData } from '@app/shared/options-data.schema';
+import { Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market } from 'ccxt';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 @Injectable()
 export class DeribitService implements IAggregator {
     private readonly exchange: Exchange = new ccxt.deribit();
 
-    async getCurrentData(): Promise<Array<OptionsData>> {
+    async getCurrentData(): Promise<Array<Option>> {
         const markets: Dictionary<Market> = await this.exchange.loadMarkets();
-        const result: Array<OptionsData> = [];
+        const result: Array<Option> = [];
 
         for (const [id, data] of Object.entries(markets)) {
             if (!data.active || data.type !== 'option') {
@@ -20,7 +21,7 @@ export class DeribitService implements IAggregator {
             result.push({
                 id,
                 name: data.symbol,
-                market: EMarket.DERIBIT,
+                marketKey: EMarketKey.DERIBIT,
                 marketType: EMarketType.CEX,
                 type: data.info.option_type.toUpperCase(),
                 size: Number(data.info.contract_size),
