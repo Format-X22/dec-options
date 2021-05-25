@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Option, OptionDocument } from '@app/shared/option.schema';
+import { Option, OptionDocument, Expiration } from '@app/shared/option.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { ESortDirection, OptionsQueryDto } from './options-query.dto';
 import { ListDto } from '@app/shared/list.dto';
-import { Market, markets } from '@app/shared/market.schema';
+import { EMarketKey, Market, markets, marketsMapByKey } from '@app/shared/market.schema';
 
 export type TOptionsParams = {
     base: Array<Option['base']>;
@@ -27,6 +27,11 @@ type TOptionsSort = {
     size?: TSortDirection;
     strike?: TSortDirection;
     expirationDate?: TSortDirection;
+};
+
+type TRawExpiration = {
+    date: Date;
+    marketKeys: Array<EMarketKey>;
 };
 
 @Injectable()
@@ -66,6 +71,45 @@ export class ApiService {
 
     getMarkets(): Array<Market> {
         return markets;
+    }
+
+    async getExpirations(): Promise<Array<Expiration>> {
+        const data: Array<TRawExpiration> = await this.optionsDataModel.aggregate([
+            {
+                $match: {
+                    expirationDate: {
+                        $gt: new Date(),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: '$expirationDate',
+                    marketKeys: {
+                        $addToSet: '$marketKey',
+                    },
+                },
+            },
+            {
+                $sort: {
+                    _id: 1,
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: '$_id',
+                    marketKeys: 1,
+                },
+            },
+        ]);
+
+        return data.map(
+            (raw: TRawExpiration): Expiration => ({
+                date: raw.date,
+                markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
+            }),
+        );
     }
 
     private makeOptionsQuery(requestQuery: OptionsQueryDto): TOptionsQuery {

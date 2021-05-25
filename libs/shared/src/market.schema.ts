@@ -66,3 +66,9 @@ export const markets: Array<Market> = [
         name: 'Siren',
     },
 ];
+
+export const marketsMapByKey: Map<EMarketKey, Market> = new Map();
+
+for (const market of markets) {
+    marketsMapByKey.set(market.key, market);
+}

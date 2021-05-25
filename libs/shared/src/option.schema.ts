@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import mongoose from 'mongoose';
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import { EMarketKey, EMarketType, Market } from '@app/shared/market.schema';
 
 export enum EOptionType {
     PUT = 'PUT',
@@ -76,6 +76,15 @@ export class Option {
     @ApiProperty()
     @Field()
     marketUrl: string;
+}
+
+@ObjectType()
+export class Expiration {
+    @Field()
+    date: Date;
+
+    @Field((): Array<typeof Market> => [Market])
+    markets: Array<Market>;
 }
 
 export type OptionDocument = Option & Document;

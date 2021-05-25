@@ -1,5 +1,5 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { Option } from '@app/shared/option.schema';
+import { Expiration, Option } from '@app/shared/option.schema';
 import { ApiService } from './api.service';
 
 @Resolver((): typeof Option => Option)
@@ -9,5 +9,10 @@ export class OptionResolver {
     @Query((): typeof Option => Option)
     async option(@Args('_id') _id: string): Promise<Option> {
         return this.apiService.getOption(_id);
+    }
+
+    @Query((): Array<typeof Expiration> => [Expiration])
+    async expirations(): Promise<Array<Expiration>> {
+        return await this.apiService.getExpirations();
     }
 }
