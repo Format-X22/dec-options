@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import mongoose from 'mongoose';
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, Float, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { EMarketKey, EMarketType, Market } from '@app/shared/market.schema';
 import { makePaginated } from '@app/shared/list.dto';
 
@@ -88,12 +88,30 @@ export class OptionGQL extends Option {
 export class OptionList extends makePaginated<Option>(OptionGQL) {}
 
 @ObjectType()
-export class Expiration {
-    @Field()
-    date: Date;
+export class ExpirationGroup {
+    @Field((): typeof Date => Date)
+    expirationDate: Option['expirationDate'];
 
     @Field((): Array<typeof Market> => [Market])
     markets: Array<Market>;
+}
+
+@ObjectType()
+export class StrikeGroup {
+    @Field((): typeof Float => Float)
+    strike: Option['strike'];
+
+    @Field((): Array<typeof Market> => [Market])
+    markets: Array<Market>;
+
+    @Field((): typeof EOptionType => EOptionType)
+    type: Option['type'];
+
+    @Field((): typeof String => String)
+    base: Option['base'];
+
+    @Field((): typeof Date => Date)
+    expirationDate: Option['expirationDate'];
 }
 
 export type OptionDocument = Option & Document;

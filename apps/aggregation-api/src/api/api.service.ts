@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Option, OptionDocument, Expiration } from '@app/shared/option.schema';
+import { Option, OptionDocument, ExpirationGroup, StrikeGroup } from '@app/shared/option.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { OptionsQueryDto } from './options-query.dto';
 import { ListDto } from '@app/shared/list.dto';
 import { EMarketKey, Market, markets, marketsMapByKey } from '@app/shared/market.schema';
-import { ESortDirection, OptionListArgs } from './option.args';
+import { ESortDirection, OptionListArgs, StrikeGroupArgs } from './option.args';
 
 export type TOptionsParams = {
     base: Array<Option['base']>;
@@ -30,8 +30,13 @@ type TOptionsSort = {
     expirationDate?: TSortDirection;
 };
 
-type TRawExpiration = {
-    date: Date;
+type TRawExpirationGroup = {
+    expirationDate: Date;
+    marketKeys: Array<EMarketKey>;
+};
+
+type TRawStrikeGroup = {
+    strike: number;
     marketKeys: Array<EMarketKey>;
 };
 
@@ -74,8 +79,8 @@ export class ApiService {
         return markets;
     }
 
-    async getExpirations(): Promise<Array<Expiration>> {
-        const data: Array<TRawExpiration> = await this.optionsDataModel.aggregate([
+    async getExpirations(): Promise<Array<ExpirationGroup>> {
+        const data: Array<TRawExpirationGroup> = await this.optionsDataModel.aggregate([
             {
                 $match: {
                     expirationDate: {
@@ -99,16 +104,58 @@ export class ApiService {
             {
                 $project: {
                     _id: 0,
-                    date: '$_id',
+                    expirationDate: '$_id',
                     marketKeys: 1,
                 },
             },
         ]);
 
         return data.map(
-            (raw: TRawExpiration): Expiration => ({
-                date: raw.date,
+            (raw: TRawExpirationGroup): ExpirationGroup => ({
+                expirationDate: raw.expirationDate,
                 markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
+            }),
+        );
+    }
+
+    async getStrikes(args: StrikeGroupArgs): Promise<Array<StrikeGroup>> {
+        const data: Array<TRawStrikeGroup> = await this.optionsDataModel.aggregate([
+            {
+                $match: {
+                    expirationDate: args.expirationDate,
+                    type: args.type,
+                    base: args.base,
+                },
+            },
+            {
+                $group: {
+                    _id: '$strike',
+                    marketKeys: {
+                        $addToSet: '$marketKey',
+                    },
+                },
+            },
+            {
+                $sort: {
+                    _id: 1,
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    strike: '$_id',
+                    marketKeys: 1,
+                },
+            },
+        ]);
+
+        return data.map(
+            (raw: TRawStrikeGroup): StrikeGroup => ({
+                strike: raw.strike,
+                markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
+                expirationDate: args.expirationDate,
+                type: args.type,
+                base: args.base,
             }),
         );
     }
