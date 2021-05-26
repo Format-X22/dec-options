@@ -5,7 +5,7 @@ import { FilterQuery, Model } from 'mongoose';
 import { OptionsQueryDto } from './options-query.dto';
 import { ListDto } from '@app/shared/list.dto';
 import { EMarketKey, Market, markets, marketsMapByKey } from '@app/shared/market.schema';
-import { ESortDirection } from './option.args';
+import { ESortDirection, OptionListArgs } from './option.args';
 
 export type TOptionsParams = {
     base: Array<Option['base']>;
@@ -51,7 +51,7 @@ export class ApiService {
         return { base, quote, market };
     }
 
-    async getOptions(requestQuery: OptionsQueryDto): Promise<ListDto<Option>> {
+    async getOptions(requestQuery: OptionsQueryDto | OptionListArgs): Promise<ListDto<Option>> {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
         const query: FilterQuery<OptionDocument> = { ...dbQuery, expirationDate: { $gt: new Date() } };
@@ -113,7 +113,7 @@ export class ApiService {
         );
     }
 
-    private makeOptionsQuery(requestQuery: OptionsQueryDto): TOptionsQuery {
+    private makeOptionsQuery(requestQuery: OptionsQueryDto | OptionListArgs): TOptionsQuery {
         const dbQuery: TOptionsQuery = {};
 
         if (requestQuery.filterByMarket) {
@@ -131,7 +131,7 @@ export class ApiService {
         return dbQuery;
     }
 
-    private makeOptionsSort(requestQuery: OptionsQueryDto): TOptionsSort {
+    private makeOptionsSort(requestQuery: OptionsQueryDto | OptionListArgs): TOptionsSort {
         const dbSort: TOptionsSort = {};
 
         if (requestQuery.sortByMarket) {

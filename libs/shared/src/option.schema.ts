@@ -13,7 +13,7 @@ export enum EOptionType {
 registerEnumType(EOptionType, { name: 'OptionType' });
 
 @Schema({ versionKey: false })
-@ObjectType()
+@ObjectType({ isAbstract: true })
 export class Option {
     @Field((): typeof String => String)
     _id?: mongoose.Schema.Types.ObjectId | string;
@@ -30,7 +30,6 @@ export class Option {
 
     @Prop({ enum: EMarketKey, type: String })
     @ApiProperty({ enum: EMarketKey })
-    @Field((): typeof EMarketKey => EMarketKey)
     marketKey: EMarketKey;
 
     @Prop({ enum: EMarketType, type: String })
@@ -79,8 +78,14 @@ export class Option {
     marketUrl: string;
 }
 
+@ObjectType('Option')
+export class OptionGQL extends Option {
+    @Field((): typeof Market => Market)
+    market: Market;
+}
+
 @ObjectType()
-export class OptionList extends makePaginated<Option>(Option) {}
+export class OptionList extends makePaginated<Option>(OptionGQL) {}
 
 @ObjectType()
 export class Expiration {

@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Query, Resolver } from '@nestjs/graphql';
 import { Market } from '@app/shared/market.schema';
 import { ApiService } from './api.service';
 
