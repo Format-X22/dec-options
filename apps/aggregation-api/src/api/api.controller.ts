@@ -1,12 +1,13 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { EOptionType, Option } from '@app/shared/option.schema';
-import { DEFAULT_LIMIT, DEFAULT_OFFSET, ESortDirection, OptionsQueryDto } from './options-query.dto';
-import { ListDto, makeListDtoApi } from '@app/shared/list.dto';
+import { OptionsQueryDto } from './options-query.dto';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET, ListDto, makeListDtoApi } from '@app/shared/list.dto';
 import { plainToClass } from 'class-transformer';
 import { validateOrReject, ValidationError } from 'class-validator';
 import { ApiService, TOptionsParams } from './api.service';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import { ESortDirection } from './option.args';
 
 @Controller('api')
 export class ApiController {

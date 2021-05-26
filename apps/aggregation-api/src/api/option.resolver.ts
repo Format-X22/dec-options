@@ -2,6 +2,7 @@ import { Args, Query, Resolver } from '@nestjs/graphql';
 import { EOptionType, Expiration, Option, OptionList } from '@app/shared/option.schema';
 import { ApiService } from './api.service';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import { OptionListArgs } from './option.args';
 
 @Resolver((): typeof Option => Option)
 export class OptionResolver {
@@ -14,7 +15,7 @@ export class OptionResolver {
 
     // TODO Draft
     @Query((): typeof OptionList => OptionList)
-    async options(): Promise<OptionList> {
+    async options(@Args() args: OptionListArgs): Promise<OptionList> {
         return {
             data: [
                 {

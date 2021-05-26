@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Option, OptionDocument, Expiration } from '@app/shared/option.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { ESortDirection, OptionsQueryDto } from './options-query.dto';
+import { OptionsQueryDto } from './options-query.dto';
 import { ListDto } from '@app/shared/list.dto';
 import { EMarketKey, Market, markets, marketsMapByKey } from '@app/shared/market.schema';
+import { ESortDirection } from './option.args';
 
 export type TOptionsParams = {
     base: Array<Option['base']>;

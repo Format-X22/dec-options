@@ -1,7 +1,11 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { ArgsType, Field, Int, ObjectType } from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
+import { Max, Min } from 'class-validator';
+
+export const DEFAULT_OFFSET: number = 0;
+export const DEFAULT_LIMIT: number = 20;
 
 @ObjectType()
 export class Pagination {
@@ -55,4 +59,16 @@ export function makePaginated<T>(classRef: Type<T>): Type<Paginated<T>> {
     }
 
     return GQLPaginatedType;
+}
+
+@ArgsType()
+export class PaginationArgs {
+    @Field((): typeof Int => Int)
+    @Min(0)
+    offset: number = DEFAULT_OFFSET;
+
+    @Field((): typeof Int => Int)
+    @Min(1)
+    @Max(100)
+    limit: number = DEFAULT_LIMIT;
 }
