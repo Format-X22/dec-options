@@ -4,6 +4,7 @@ import { Document } from 'mongoose';
 import mongoose from 'mongoose';
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { EMarketKey, EMarketType, Market } from '@app/shared/market.schema';
+import { makePaginated } from '@app/shared/list.dto';
 
 export enum EOptionType {
     PUT = 'PUT',
@@ -77,6 +78,9 @@ export class Option {
     @Field()
     marketUrl: string;
 }
+
+@ObjectType()
+export class OptionList extends makePaginated<Option>(Option) {}
 
 @ObjectType()
 export class Expiration {
