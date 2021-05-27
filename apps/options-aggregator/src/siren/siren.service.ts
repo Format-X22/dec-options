@@ -62,7 +62,8 @@ export class SirenService implements IAggregator {
                     quote,
                     strikeAsset: data.paymentToken.symbol,
                     marketUrl: 'https://app.sirenmarkets.com/trade/' + urlFinalPath,
-                    price: null, // TODO -
+                    ask: null, // TODO -
+                    bid: null, // TODO -
                 };
             },
         );

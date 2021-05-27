@@ -79,7 +79,11 @@ export class Option {
 
     @Prop()
     @Field()
-    price: number;
+    ask: number;
+
+    @Prop()
+    @Field()
+    bid: number;
 }
 
 @ObjectType('Option')

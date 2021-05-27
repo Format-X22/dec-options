@@ -5,7 +5,8 @@ import { Exchange } from 'ccxt';
 import * as ccxt from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
-const GetOptionsApiUrl: string = 'https://vapi.binance.com/vapi/v1/optionInfo';
+const getOptionsApiUrl: string = 'https://vapi.binance.com/vapi/v1/optionInfo';
+const getOptionDepthApiUrl: string = 'https://vapi.binance.com/vapi/v1/depth';
 
 type TOptionsResponse = {
     msg: string;
@@ -21,35 +22,57 @@ type TOptionsResponse = {
     }>;
 };
 
+type TOptionsDepthResponse = {
+    msg: string;
+    data: {
+        bids: [[number]];
+        asks: [[number]];
+    };
+};
+
 @Injectable()
 export class BinanceService implements IAggregator {
     private readonly exchange: Exchange = new ccxt.binance();
 
     async getCurrentData(): Promise<Array<Option>> {
-        const rawOptionsResponse: TOptionsResponse = await this.exchange.fetch(GetOptionsApiUrl, 'GET');
+        const rawOptionsResponse: TOptionsResponse = await this.exchange.fetch(getOptionsApiUrl, 'GET');
 
         if (rawOptionsResponse.msg !== 'success') {
-            throw new Error(`Invalid BINANCE response - ${JSON.stringify(rawOptionsResponse, null, 2)}`);
+            this.throwRequestError('options', rawOptionsResponse);
         }
 
-        return rawOptionsResponse.data.map(
-            (data: TOptionsResponse['data'][0]): Option => {
-                return {
-                    id: data.id,
-                    name: data.symbol,
-                    marketKey: EMarketKey.BINANCE,
-                    marketType: EMarketType.CEX,
-                    type: data.side.toUpperCase() as EOptionType,
-                    size: Number(data.unit),
-                    strike: Number(data.strikePrice),
-                    expirationDate: new Date(Number(data.expiryDate)),
-                    base: data.underlying.replace(data.quoteAsset, ''),
-                    quote: data.quoteAsset,
-                    strikeAsset: data.underlying.replace(data.quoteAsset, ''),
-                    marketUrl: 'https://voptions.binance.com/en',
-                    price: null, // TODO -
-                };
-            },
-        );
+        const result: Array<Option> = [];
+
+        for await (const raw of rawOptionsResponse.data) {
+            const depthUrl: string = `${getOptionDepthApiUrl}?symbol=${raw.symbol}`;
+            const rawDepthResponse: TOptionsDepthResponse = await this.exchange.fetch(depthUrl, 'GET');
+
+            if (rawDepthResponse.msg !== 'success') {
+                this.throwRequestError('depth', rawDepthResponse);
+            }
+
+            result.push({
+                id: raw.id,
+                name: raw.symbol,
+                marketKey: EMarketKey.BINANCE,
+                marketType: EMarketType.CEX,
+                type: raw.side.toUpperCase() as EOptionType,
+                size: Number(raw.unit),
+                strike: Number(raw.strikePrice),
+                expirationDate: new Date(Number(raw.expiryDate)),
+                base: raw.underlying.replace(raw.quoteAsset, ''),
+                quote: raw.quoteAsset,
+                strikeAsset: raw.underlying.replace(raw.quoteAsset, ''),
+                marketUrl: 'https://voptions.binance.com/en',
+                ask: rawDepthResponse.data.asks?.[0]?.[0] || 0,
+                bid: rawDepthResponse.data.bids?.[0]?.[0] || 0,
+            });
+        }
+
+        return result;
+    }
+
+    throwRequestError(source: string, data: Object): never {
+        throw new Error(`Invalid BINANCE response - ${source} - ${JSON.stringify(data, null, 2)}`);
     }
 }

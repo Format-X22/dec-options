@@ -31,7 +31,8 @@ export class DeribitService implements IAggregator {
                 quote: data.quote,
                 strikeAsset: data.base,
                 marketUrl: 'https://www.deribit.com/main#/options',
-                price: null, // TODO -
+                ask: null, // TODO -
+                bid: null, // TODO -
             });
         }
 
