@@ -43,7 +43,7 @@ export class BinanceService implements IAggregator {
 
         const result: Array<Option> = [];
 
-        for await (const raw of rawOptionsResponse.data) {
+        for (const raw of rawOptionsResponse.data) {
             const depthUrl: string = `${getOptionDepthApiUrl}?symbol=${raw.symbol}`;
             const rawDepthResponse: TOptionsDepthResponse = await this.exchange.fetch(depthUrl, 'GET');
 

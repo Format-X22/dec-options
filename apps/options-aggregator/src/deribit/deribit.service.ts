@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Option } from '@app/shared/option.schema';
 import { IAggregator } from '../options-aggregator.service';
 import * as ccxt from 'ccxt';
-import { Dictionary, Exchange, Market } from 'ccxt';
+import { Dictionary, Exchange, Market, OrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 @Injectable()
@@ -18,6 +18,8 @@ export class DeribitService implements IAggregator {
                 continue;
             }
 
+            const orderBook: OrderBook = await this.exchange.fetchOrderBook(data.symbol);
+
             result.push({
                 id,
                 name: data.symbol,
@@ -31,8 +33,8 @@ export class DeribitService implements IAggregator {
                 quote: data.quote,
                 strikeAsset: data.base,
                 marketUrl: 'https://www.deribit.com/main#/options',
-                ask: null, // TODO -
-                bid: null, // TODO -
+                ask: orderBook.asks?.[0]?.[0] || 0,
+                bid: orderBook.bids?.[0]?.[0] || 0,
             });
         }
 
