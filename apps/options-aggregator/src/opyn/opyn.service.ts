@@ -47,6 +47,7 @@ export class OpynService implements IAggregator {
                     quote: data.collateralAsset.symbol,
                     strikeAsset: data.strikeAsset.symbol,
                     marketUrl: 'https://www.opyn.co/#/trade',
+                    price: null, // TODO -
                 };
             },
         );

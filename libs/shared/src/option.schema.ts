@@ -76,6 +76,10 @@ export class Option {
     @ApiProperty()
     @Field()
     marketUrl: string;
+
+    @Prop()
+    @Field()
+    price: number;
 }
 
 @ObjectType('Option')

@@ -47,6 +47,7 @@ export class BinanceService implements IAggregator {
                     quote: data.quoteAsset,
                     strikeAsset: data.underlying.replace(data.quoteAsset, ''),
                     marketUrl: 'https://voptions.binance.com/en',
+                    price: null, // TODO -
                 };
             },
         );

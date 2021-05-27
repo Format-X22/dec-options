@@ -51,6 +51,7 @@ export class AuctusService implements IAggregator {
                     quote,
                     strikeAsset,
                     marketUrl: `https://app.auctus.org/advanced/trade/${base}_${strikeAsset}/${id}`,
+                    price: null, // TODO -
                 };
             },
         );
