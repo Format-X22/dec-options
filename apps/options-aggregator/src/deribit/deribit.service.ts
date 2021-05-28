@@ -1,43 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Option } from '@app/shared/option.schema';
-import { IAggregator } from '../options-aggregator.service';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market, OrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import { AggregatorAbstract } from '../aggregator.abstract';
+
+type TRawOption = Dictionary<Market>[0];
+type TDepth = OrderBook;
 
 @Injectable()
-export class DeribitService implements IAggregator {
+export class DeribitService extends AggregatorAbstract<TRawOption, TDepth> {
+    protected readonly logger: Logger = new Logger(DeribitService.name);
     private readonly exchange: Exchange = new ccxt.deribit();
 
-    async getCurrentData(): Promise<Array<Option>> {
+    protected get rateLimit(): number {
+        return this.exchange.rateLimit;
+    }
+
+    protected async getRawOptions(): Promise<Array<TRawOption>> {
         const markets: Dictionary<Market> = await this.exchange.loadMarkets();
-        const result: Array<Option> = [];
 
-        for (const [id, data] of Object.entries(markets)) {
-            if (!data.active || data.type !== 'option') {
-                continue;
-            }
+        return Object.values(markets).filter((raw: TRawOption): boolean => raw.type === 'option' && raw.active);
+    }
 
-            const orderBook: OrderBook = await this.exchange.fetchOrderBook(data.symbol);
+    protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
+        return await this.exchange.fetchOrderBook(rawOption.symbol);
+    }
 
-            result.push({
-                id,
-                name: data.symbol,
-                marketKey: EMarketKey.DERIBIT,
-                marketType: EMarketType.CEX,
-                type: data.info.option_type.toUpperCase(),
-                size: Number(data.info.contract_size),
-                strike: Number(data.info.strike),
-                expirationDate: new Date(Number(data.info.expiration_timestamp)),
-                base: data.base,
-                quote: data.quote,
-                strikeAsset: data.base,
-                marketUrl: 'https://www.deribit.com/main#/options',
-                ask: orderBook.asks?.[0]?.[0] || 0,
-                bid: orderBook.bids?.[0]?.[0] || 0,
-            });
-        }
-
-        return result;
+    protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
+        return {
+            id: rawOption.id,
+            name: rawOption.symbol,
+            marketKey: EMarketKey.DERIBIT,
+            marketType: EMarketType.CEX,
+            type: rawOption.info.option_type.toUpperCase(),
+            size: Number(rawOption.info.contract_size),
+            strike: Number(rawOption.info.strike),
+            expirationDate: new Date(Number(rawOption.info.expiration_timestamp)),
+            base: rawOption.base,
+            quote: rawOption.quote,
+            strikeAsset: rawOption.base,
+            marketUrl: 'https://www.deribit.com/main#/options',
+            ask: depth.asks?.[0]?.[0] || 0,
+            bid: depth.bids?.[0]?.[0] || 0,
+        };
     }
 }

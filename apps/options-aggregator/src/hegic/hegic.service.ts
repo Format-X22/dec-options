@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EOptionType, Option } from '@app/shared/option.schema';
-import { IAggregator } from '../options-aggregator.service';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import { AggregatorAbstract } from '../aggregator.abstract';
 
 type TOptionsResponse = {
     hegicOptions: Array<{
@@ -16,35 +16,48 @@ type TOptionsResponse = {
     }>;
 };
 
+type TRawOption = TOptionsResponse['hegicOptions'][0];
+type TDepth = Object;
+
 const API: string = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
 const MS_MULTIPLY: number = 1000;
 const DECIMAL_DELIMITER: number = 100_000_000;
 
 @Injectable()
-export class HegicService implements IAggregator {
-    async getCurrentData(): Promise<Array<Option>> {
+export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
+    protected readonly logger: Logger = new Logger(HegicService.name);
+
+    protected get rateLimit(): number {
+        return 1000;
+    }
+
+    protected async getRawOptions(): Promise<Array<TRawOption>> {
         const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
 
-        return rawOptionsResponse.hegicOptions.map(
-            (data: TOptionsResponse['hegicOptions'][0]): Option => {
-                return {
-                    id: data.id,
-                    name: data.id,
-                    marketKey: EMarketKey.HEGIC,
-                    marketType: EMarketType.DEX,
-                    type: data.type.toUpperCase() as EOptionType,
-                    size: 1,
-                    strike: Number(data.strike) / DECIMAL_DELIMITER,
-                    expirationDate: new Date(Number(data.expiration) * MS_MULTIPLY),
-                    base: data.underlying.symbol,
-                    quote: 'USD',
-                    strikeAsset: data.underlying.symbol,
-                    marketUrl: 'https://www.hegic.co/',
-                    ask: null, // TODO -
-                    bid: null, // TODO -
-                };
-            },
-        );
+        return rawOptionsResponse.hegicOptions;
+    }
+
+    protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
+        return {}; // TODO -
+    }
+
+    protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
+        return {
+            id: rawOption.id,
+            name: rawOption.id,
+            marketKey: EMarketKey.HEGIC,
+            marketType: EMarketType.DEX,
+            type: rawOption.type.toUpperCase() as EOptionType,
+            size: 1,
+            strike: Number(rawOption.strike) / DECIMAL_DELIMITER,
+            expirationDate: new Date(Number(rawOption.expiration) * MS_MULTIPLY),
+            base: rawOption.underlying.symbol,
+            quote: 'USD',
+            strikeAsset: rawOption.underlying.symbol,
+            marketUrl: 'https://www.hegic.co/',
+            ask: null, // TODO -
+            bid: null, // TODO -
+        };
     }
 
     private getQuery(): string {

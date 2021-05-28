@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EOptionType, Option } from '@app/shared/option.schema';
-import { IAggregator } from '../options-aggregator.service';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import { AggregatorAbstract } from '../aggregator.abstract';
 
 type TOptionsResponse = {
     markets: Array<{
@@ -17,6 +17,9 @@ type TOptionsResponse = {
         };
     }>;
 };
+
+type TRawOption = TOptionsResponse['markets'][0];
+type TDepth = Object;
 
 const API: string = 'https://api.thegraph.com/subgraphs/name/sirenmarkets/protocol';
 const QUERY: string = gql`
@@ -37,36 +40,46 @@ const QUERY: string = gql`
 const MS_MULTIPLY: number = 1000;
 
 @Injectable()
-export class SirenService implements IAggregator {
-    async getCurrentData(): Promise<Array<Option>> {
+export class SirenService extends AggregatorAbstract<TRawOption, TDepth> {
+    protected readonly logger: Logger = new Logger(SirenService.name);
+
+    protected get rateLimit(): number {
+        return 1000;
+    }
+
+    protected async getRawOptions(): Promise<Array<TRawOption>> {
         const rawOptionsResponse: TOptionsResponse = await request(API, QUERY);
 
-        return rawOptionsResponse.markets.map(
-            (data: TOptionsResponse['markets'][0]): Option => {
-                const base: string = data.paymentToken.symbol;
-                const quote: string = data.collateralToken.symbol;
-                const type: EOptionType = this.tryExtractType(data.marketName);
-                const isPut: boolean = type === EOptionType.PUT;
-                const urlFinalPath: string = isPut ? `${base}-${quote}` : `${quote}-${base}`;
+        return rawOptionsResponse.markets;
+    }
 
-                return {
-                    id: data.id,
-                    name: data.marketName,
-                    marketKey: EMarketKey.SIREN,
-                    marketType: EMarketType.DEX,
-                    type,
-                    size: 1,
-                    strike: this.tryExtractStrike(data.marketName),
-                    expirationDate: new Date(Number(data.expirationDate) * MS_MULTIPLY),
-                    base,
-                    quote,
-                    strikeAsset: data.paymentToken.symbol,
-                    marketUrl: 'https://app.sirenmarkets.com/trade/' + urlFinalPath,
-                    ask: null, // TODO -
-                    bid: null, // TODO -
-                };
-            },
-        );
+    protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
+        return {}; // TODO -
+    }
+
+    protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
+        const base: string = rawOption.paymentToken.symbol;
+        const quote: string = rawOption.collateralToken.symbol;
+        const type: EOptionType = this.tryExtractType(rawOption.marketName);
+        const isPut: boolean = type === EOptionType.PUT;
+        const urlFinalPath: string = isPut ? `${base}-${quote}` : `${quote}-${base}`;
+
+        return {
+            id: rawOption.id,
+            name: rawOption.marketName,
+            marketKey: EMarketKey.SIREN,
+            marketType: EMarketType.DEX,
+            type,
+            size: 1,
+            strike: this.tryExtractStrike(rawOption.marketName),
+            expirationDate: new Date(Number(rawOption.expirationDate) * MS_MULTIPLY),
+            base,
+            quote,
+            strikeAsset: rawOption.paymentToken.symbol,
+            marketUrl: 'https://app.sirenmarkets.com/trade/' + urlFinalPath,
+            ask: null, // TODO -
+            bid: null, // TODO -
+        };
     }
 
     private tryExtractType(marketName: string): EOptionType {

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { IAggregator } from '../options-aggregator.service';
+import { Injectable, Logger } from '@nestjs/common';
 import { EOptionType, Option } from '@app/shared/option.schema';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import { AggregatorAbstract } from '../aggregator.abstract';
 
 type TOptionsResponse = {
     acotokens: Array<{
@@ -23,39 +23,52 @@ type TOptionsResponse = {
     }>;
 };
 
+type TRawOption = TOptionsResponse['acotokens'][0];
+type TDepth = Object;
+
 const API: string = 'https://api.thegraph.com/subgraphs/name/auctusproject/auctus-options';
 const MS_MULTIPLY: number = 1000;
 
 @Injectable()
-export class AuctusService implements IAggregator {
-    async getCurrentData(): Promise<Array<Option>> {
+export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
+    protected readonly logger: Logger = new Logger(AuctusService.name);
+
+    protected get rateLimit(): number {
+        return 1000;
+    }
+
+    protected async getRawOptions(): Promise<Array<TRawOption>> {
         const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
 
-        return rawOptionsResponse.acotokens.map(
-            (data: TOptionsResponse['acotokens'][0]): Option => {
-                const id: string = data.id;
-                const base: string = data.underlying.symbol;
-                const quote: string = data.collateral.symbol;
-                const strikeAsset: string = data.strikeAsset.symbol;
+        return rawOptionsResponse.acotokens;
+    }
 
-                return {
-                    id,
-                    name: data.name,
-                    marketKey: EMarketKey.AUCTUS,
-                    marketType: EMarketType.DEX,
-                    type: data.isCall ? EOptionType.CALL : EOptionType.PUT,
-                    size: 1,
-                    strike: Number(data.strikePrice),
-                    expirationDate: new Date(Number(data.expiryTime) * MS_MULTIPLY),
-                    base,
-                    quote,
-                    strikeAsset,
-                    marketUrl: `https://app.auctus.org/advanced/trade/${base}_${strikeAsset}/${id}`,
-                    ask: null, // TODO -
-                    bid: null, // TODO -
-                };
-            },
-        );
+    protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
+        return {}; // TODO -
+    }
+
+    protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
+        const id: string = rawOption.id;
+        const base: string = rawOption.underlying.symbol;
+        const quote: string = rawOption.collateral.symbol;
+        const strikeAsset: string = rawOption.strikeAsset.symbol;
+
+        return {
+            id,
+            name: rawOption.name,
+            marketKey: EMarketKey.AUCTUS,
+            marketType: EMarketType.DEX,
+            type: rawOption.isCall ? EOptionType.CALL : EOptionType.PUT,
+            size: 1,
+            strike: Number(rawOption.strikePrice),
+            expirationDate: new Date(Number(rawOption.expiryTime) * MS_MULTIPLY),
+            base,
+            quote,
+            strikeAsset,
+            marketUrl: `https://app.auctus.org/advanced/trade/${base}_${strikeAsset}/${id}`,
+            ask: null, // TODO -
+            bid: null, // TODO -
+        };
     }
 
     private getQuery(): string {

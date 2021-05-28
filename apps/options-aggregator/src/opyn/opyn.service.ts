@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EOptionType, Option } from '@app/shared/option.schema';
-import { IAggregator } from '../options-aggregator.service';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import { AggregatorAbstract } from '../aggregator.abstract';
 
 type TOptionsResponse = {
     otokens: Array<{
@@ -24,34 +24,47 @@ type TOptionsResponse = {
     }>;
 };
 
+type TRawOption = TOptionsResponse['otokens'][0];
+type TDepth = Object;
+
 const API: string = 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet';
 const MS_MULTIPLY: number = 1000;
 
 @Injectable()
-export class OpynService implements IAggregator {
-    async getCurrentData(): Promise<Array<Option>> {
+export class OpynService extends AggregatorAbstract<TRawOption, TDepth> {
+    protected readonly logger: Logger = new Logger(OpynService.name);
+
+    protected get rateLimit(): number {
+        return 1000;
+    }
+
+    protected async getRawOptions(): Promise<Array<TRawOption>> {
         const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
 
-        return rawOptionsResponse.otokens.map(
-            (data: TOptionsResponse['otokens'][0]): Option => {
-                return {
-                    id: data.id,
-                    name: data.name,
-                    marketKey: EMarketKey.OPYN,
-                    marketType: EMarketType.DEX,
-                    type: data.isPut ? EOptionType.PUT : EOptionType.CALL,
-                    size: 1,
-                    strike: Number(data.strikePrice) / Math.pow(10, data.decimals),
-                    expirationDate: new Date(Number(data.expiryTimestamp) * MS_MULTIPLY),
-                    base: data.underlyingAsset.symbol,
-                    quote: data.collateralAsset.symbol,
-                    strikeAsset: data.strikeAsset.symbol,
-                    marketUrl: 'https://www.opyn.co/#/trade',
-                    ask: null, // TODO -
-                    bid: null, // TODO -
-                };
-            },
-        );
+        return rawOptionsResponse.otokens;
+    }
+
+    protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
+        return {}; // TODO -
+    }
+
+    protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
+        return {
+            id: rawOption.id,
+            name: rawOption.name,
+            marketKey: EMarketKey.OPYN,
+            marketType: EMarketType.DEX,
+            type: rawOption.isPut ? EOptionType.PUT : EOptionType.CALL,
+            size: 1,
+            strike: Number(rawOption.strikePrice) / Math.pow(10, rawOption.decimals),
+            expirationDate: new Date(Number(rawOption.expiryTimestamp) * MS_MULTIPLY),
+            base: rawOption.underlyingAsset.symbol,
+            quote: rawOption.collateralAsset.symbol,
+            strikeAsset: rawOption.strikeAsset.symbol,
+            marketUrl: 'https://www.opyn.co/#/trade',
+            ask: null, // TODO -
+            bid: null, // TODO -
+        };
     }
 
     private getQuery(): string {
