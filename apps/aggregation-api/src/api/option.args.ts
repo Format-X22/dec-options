@@ -60,12 +60,15 @@ export class OptionListArgs extends PaginationArgs {
 
 @ArgsType()
 export class StrikeGroupArgs {
-    @Field((): typeof Date => Date)
-    expirationDate: Option['expirationDate'];
+    @Field((): typeof EOptionType => EOptionType, { nullable: true })
+    type?: Option['type'];
 
-    @Field((): typeof EOptionType => EOptionType)
-    type: Option['type'];
+    @Field((): typeof String => String, { nullable: true })
+    base?: Option['base'];
 
-    @Field((): typeof String => String)
-    base: Option['base'];
+    @Field((): typeof Date => Date, { nullable: true })
+    fromDate?: Date;
+
+    @Field((): typeof Date => Date, { nullable: true })
+    toDate?: Date;
 }

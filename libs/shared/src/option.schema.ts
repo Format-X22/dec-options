@@ -137,9 +137,6 @@ export class StrikeGroup {
 
     @Field((): typeof String => String)
     base: Option['base'];
-
-    @Field((): typeof Date => Date)
-    expirationDate: Option['expirationDate'];
 }
 
 export type OptionDocument = Option & Document;

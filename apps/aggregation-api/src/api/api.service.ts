@@ -119,13 +119,31 @@ export class ApiService {
     }
 
     async getStrikes(args: StrikeGroupArgs): Promise<Array<StrikeGroup>> {
+        const filter: FilterQuery<Option> = {};
+
+        if (args.type) {
+            filter.type = args.type;
+        }
+
+        if (args.base) {
+            filter.base = args.base;
+        }
+
+        if (args.fromDate || args.toDate) {
+            filter.expirationDate = {};
+
+            if (args.fromDate) {
+                filter.expirationDate.$gte = args.fromDate;
+            }
+
+            if (args.toDate) {
+                filter.expirationDate.$lte = args.toDate;
+            }
+        }
+
         const data: Array<TRawStrikeGroup> = await this.optionsDataModel.aggregate([
             {
-                $match: {
-                    expirationDate: args.expirationDate,
-                    type: args.type,
-                    base: args.base,
-                },
+                $match: filter,
             },
             {
                 $group: {
@@ -153,7 +171,6 @@ export class ApiService {
             (raw: TRawStrikeGroup): StrikeGroup => ({
                 strike: raw.strike,
                 markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
-                expirationDate: args.expirationDate,
                 type: args.type,
                 base: args.base,
             }),
