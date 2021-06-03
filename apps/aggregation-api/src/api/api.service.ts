@@ -5,7 +5,9 @@ import { FilterQuery, Model } from 'mongoose';
 import { OptionsQueryDto } from './options-query.dto';
 import { ListDto } from '@app/shared/list.dto';
 import { EMarketKey, Market, markets, marketsMapByKey } from '@app/shared/market.schema';
-import { ESortDirection, OptionListArgs, StrikeGroupArgs } from './option.args';
+import { EPackByDateSize, ESortDirection, ExpirationGroupArgs, OptionListArgs, StrikeGroupArgs } from './option.args';
+import * as moment from 'moment';
+import { unitOfTime } from 'moment';
 
 export type TOptionsParams = {
     base: Array<Option['base']>;
@@ -79,7 +81,7 @@ export class ApiService {
         return markets;
     }
 
-    async getExpirations(): Promise<Array<ExpirationGroup>> {
+    async getExpirations(args: ExpirationGroupArgs): Promise<Array<ExpirationGroup>> {
         const data: Array<TRawExpirationGroup> = await this.optionsDataModel.aggregate([
             {
                 $match: {
@@ -110,12 +112,18 @@ export class ApiService {
             },
         ]);
 
-        return data.map(
+        let result: Array<ExpirationGroup> = data.map(
             (raw: TRawExpirationGroup): ExpirationGroup => ({
                 expirationDate: raw.expirationDate,
                 markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
             }),
         );
+
+        if (args.packByDateSize) {
+            result = this.packExpirationsByDateSize(result, args.packByDateSize, args.timezone);
+        }
+
+        return result;
     }
 
     async getStrikes(args: StrikeGroupArgs): Promise<Array<StrikeGroup>> {
@@ -231,5 +239,42 @@ export class ApiService {
         } else {
             return -1;
         }
+    }
+
+    private packExpirationsByDateSize(
+        data: Array<ExpirationGroup>,
+        size: EPackByDateSize,
+        timezone: number,
+    ): Array<ExpirationGroup> {
+        const result: Array<ExpirationGroup> = [];
+        const momentSize: unitOfTime.StartOf = (size as unknown) as unitOfTime.StartOf;
+
+        for (const expiration of data) {
+            const last: ExpirationGroup = result[result.length - 1];
+            const lastDate: moment.Moment = moment(last?.expirationDate || 0)
+                .utcOffset(timezone)
+                .startOf(momentSize);
+            const currentDate: moment.Moment = moment(expiration.expirationDate)
+                .utcOffset(timezone)
+                .startOf(momentSize);
+
+            if (!result.length || !currentDate.isSame(lastDate)) {
+                expiration.expirationDate = currentDate.toDate();
+
+                result.push(expiration);
+            } else {
+                const marketsToPush: Array<Market> = [];
+
+                for (const market of expiration.markets) {
+                    if (!last.markets.includes(market)) {
+                        marketsToPush.push(market);
+                    }
+                }
+
+                last.markets.push(...marketsToPush);
+            }
+        }
+
+        return result;
     }
 }

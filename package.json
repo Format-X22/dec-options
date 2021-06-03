@@ -38,6 +38,9 @@
     "pm2:status": "pm2 status"
   },
   "dependencies": {
+    "@0x/connect": "^6.0.9",
+    "@0x/order-utils": "^10.4.23",
+    "@0x/orderbook": "^2.2.7",
     "@nestjs/common": "^7.6.15",
     "@nestjs/config": "^0.6.3",
     "@nestjs/core": "^7.6.15",
@@ -56,6 +59,7 @@
     "graphql-tools": "^7.0.5",
     "i": "^0.3.6",
     "lodash": "^4.17.21",
+    "moment": "^2.29.1",
     "mongoose": "^5.12.5",
     "next": "^10.2.0",
     "npm": "^7.11.1",
@@ -69,6 +73,7 @@
     "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
+    "@0x/typescript-typings": "^5.2.0",
     "@nestjs/cli": "^7.6.0",
     "@nestjs/schematics": "^7.3.0",
     "@nestjs/testing": "^7.6.15",
