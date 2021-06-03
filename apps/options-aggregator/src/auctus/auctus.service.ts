@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
@@ -68,6 +68,8 @@ export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
             marketUrl: `https://app.auctus.org/advanced/trade/${base}_${strikeAsset}/${id}`,
             ask: null, // TODO -
             bid: null, // TODO -
+            deliveryType: EOptionDeliveryType.DELIVERY,
+            styleType: EOptionStyleType.AMERICAN,
         };
     }
 

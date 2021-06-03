@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market, OrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
@@ -43,6 +43,8 @@ export class DeribitService extends AggregatorAbstract<TRawOption, TDepth> {
             marketUrl: 'https://www.deribit.com/main#/options',
             ask: depth.asks?.[0]?.[0] || 0,
             bid: depth.bids?.[0]?.[0] || 0,
+            deliveryType: EOptionDeliveryType.SETTLEMENT,
+            styleType: EOptionStyleType.EUROPEAN,
         };
     }
 }

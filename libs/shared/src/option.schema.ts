@@ -12,6 +12,18 @@ export enum EOptionType {
 }
 registerEnumType(EOptionType, { name: 'OptionType' });
 
+export enum EOptionDeliveryType {
+    DELIVERY = 'DELIVERY',
+    SETTLEMENT = 'SETTLEMENT',
+}
+registerEnumType(EOptionDeliveryType, { name: 'OptionDeliveryType' });
+
+export enum EOptionStyleType {
+    AMERICAN = 'AMERICAN',
+    EUROPEAN = 'EUROPEAN',
+}
+registerEnumType(EOptionStyleType, { name: 'OptionStyleType' });
+
 @Schema({ versionKey: false })
 @ObjectType({ isAbstract: true })
 export class Option {
@@ -41,6 +53,14 @@ export class Option {
     @ApiProperty({ enum: EOptionType })
     @Field((): typeof EOptionType => EOptionType)
     type: EOptionType;
+
+    @Prop({ enum: EOptionDeliveryType, type: String })
+    @Field((): typeof EOptionDeliveryType => EOptionDeliveryType)
+    deliveryType: EOptionDeliveryType;
+
+    @Prop({ enum: EOptionStyleType, type: String })
+    @Field((): typeof EOptionStyleType => EOptionStyleType)
+    styleType: EOptionStyleType;
 
     @Prop()
     @ApiProperty()

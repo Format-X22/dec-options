@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
@@ -64,6 +64,8 @@ export class OpynService extends AggregatorAbstract<TRawOption, TDepth> {
             marketUrl: 'https://www.opyn.co/#/trade',
             ask: null, // TODO -
             bid: null, // TODO -
+            deliveryType: EOptionDeliveryType.SETTLEMENT,
+            styleType: EOptionStyleType.EUROPEAN,
         };
     }
 

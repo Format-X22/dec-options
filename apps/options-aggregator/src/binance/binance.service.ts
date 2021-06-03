@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionType, Option } from '@app/shared/option.schema';
-import { Exchange } from 'ccxt';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
+import { Exchange } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
 
@@ -80,6 +80,8 @@ export class BinanceService extends AggregatorAbstract<TRawOption, TDepth> {
             marketUrl: 'https://voptions.binance.com/en',
             ask: depth.asks?.[0]?.[0] || 0,
             bid: depth.bids?.[0]?.[0] || 0,
+            deliveryType: EOptionDeliveryType.SETTLEMENT,
+            styleType: EOptionStyleType.EUROPEAN,
         };
     }
 }
