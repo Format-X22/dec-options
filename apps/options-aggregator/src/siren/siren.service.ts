@@ -97,7 +97,7 @@ export class SirenService extends AggregatorAbstract<TRawOption, TDepth> {
 
     private tryExtractStrike(marketName: string): number {
         const elements: Array<string> = marketName.split('.');
-        const strikeString: string = elements[elements.length - 1];
+        const strikeString: string = elements[elements.length - 1].replace(',', '.');
         const strike: number = Number(strikeString);
 
         if (isNaN(strike)) {

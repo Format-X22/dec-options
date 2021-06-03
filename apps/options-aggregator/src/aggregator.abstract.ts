@@ -17,7 +17,7 @@ export abstract class AggregatorAbstract<TRawOption, TDepth> {
             this.logger.error(error);
         }
 
-        setImmediate(this.iteration.bind(this));
+        setImmediate(this.startSyncLoop.bind(this));
     }
 
     protected async iteration(): Promise<void> {
