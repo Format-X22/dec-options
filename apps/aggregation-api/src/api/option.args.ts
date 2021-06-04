@@ -1,6 +1,6 @@
 import { ArgsType, Field, Int, registerEnumType } from '@nestjs/graphql';
 import { PaginationArgs } from '@app/shared/list.dto';
-import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsEnum, IsInstance, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { EOptionType, Option } from '@app/shared/option.schema';
 
@@ -92,11 +92,11 @@ export class StrikeGroupArgs {
 
     @Field((): typeof Date => Date, { nullable: true })
     @IsOptional()
-    @IsDateString()
+    @IsInstance(Date)
     fromDate?: Date;
 
     @Field((): typeof Date => Date, { nullable: true })
     @IsOptional()
-    @IsDateString()
+    @IsInstance(Date)
     toDate?: Date;
 }
