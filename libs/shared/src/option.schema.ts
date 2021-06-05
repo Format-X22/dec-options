@@ -137,6 +137,12 @@ export class StrikeGroup {
 
     @Field((): typeof String => String)
     base: Option['base'];
+
+    @Field((): typeof Float => Float, { nullable: true })
+    minAsk: number;
+
+    @Field((): typeof Float => Float, { nullable: true })
+    maxBid: number;
 }
 
 export type OptionDocument = Option & Document;

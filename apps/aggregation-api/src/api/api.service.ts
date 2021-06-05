@@ -40,6 +40,8 @@ type TRawExpirationGroup = {
 type TRawStrikeGroup = {
     strike: number;
     marketKeys: Array<EMarketKey>;
+    minAsk: number;
+    maxBid: number;
 };
 
 @Injectable()
@@ -159,6 +161,12 @@ export class ApiService {
                     marketKeys: {
                         $addToSet: '$marketKey',
                     },
+                    minAsk: {
+                        $min: '$ask',
+                    },
+                    maxBid: {
+                        $max: '$bid',
+                    }
                 },
             },
             {
@@ -171,6 +179,8 @@ export class ApiService {
                     _id: 0,
                     strike: '$_id',
                     marketKeys: 1,
+                    minAsk: 1,
+                    maxBid: 1,
                 },
             },
         ]);
@@ -181,6 +191,8 @@ export class ApiService {
                 markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
                 type: args.type,
                 base: args.base,
+                minAsk: raw.minAsk,
+                maxBid: raw.maxBid,
             }),
         );
     }
