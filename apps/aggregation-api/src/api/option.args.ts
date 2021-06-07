@@ -76,6 +76,11 @@ export class ExpirationGroupArgs {
     @Min(-24)
     @Max(24)
     timezone?: number;
+
+    @Field((): typeof String => String, { nullable: true })
+    @IsOptional()
+    @IsString()
+    base?: Option['base'];
 }
 
 @ArgsType()

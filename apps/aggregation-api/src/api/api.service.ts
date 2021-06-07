@@ -84,13 +84,19 @@ export class ApiService {
     }
 
     async getExpirations(args: ExpirationGroupArgs): Promise<Array<ExpirationGroup>> {
+        const filter: FilterQuery<Option> = {
+            expirationDate: {
+                $gt: new Date(),
+            },
+        };
+
+        if (args.base) {
+            filter.base = args.base;
+        }
+
         const data: Array<TRawExpirationGroup> = await this.optionsDataModel.aggregate([
             {
-                $match: {
-                    expirationDate: {
-                        $gt: new Date(),
-                    },
-                },
+                $match: filter,
             },
             {
                 $group: {
@@ -166,7 +172,7 @@ export class ApiService {
                     },
                     maxBid: {
                         $max: '$bid',
-                    }
+                    },
                 },
             },
             {
