@@ -75,8 +75,3 @@ $ npm run test:e2e:api
                                
 App - http://localhost:3000/   
 GraphQL - http://localhost:3000/graphql/
-
-#### Deprecated:
-
-Rest api - http://localhost:3000/api/    
-Swagger - http://localhost:3000/swagger/

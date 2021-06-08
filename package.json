@@ -47,7 +47,6 @@
     "@nestjs/graphql": "^7.10.6",
     "@nestjs/mongoose": "^7.2.4",
     "@nestjs/platform-express": "^7.6.15",
-    "@nestjs/swagger": "^4.8.0",
     "antd": "^4.15.4",
     "apollo-server-express": "^2.24.1",
     "bignumber.js": "^9.0.1",
@@ -70,8 +69,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.6",
-    "sleep-promise": "^9.1.0",
-    "swagger-ui-express": "^4.1.6"
+    "sleep-promise": "^9.1.0"
   },
   "devDependencies": {
     "@0x/typescript-typings": "^5.2.0",
