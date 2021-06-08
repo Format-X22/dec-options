@@ -1,0 +1,18 @@
+@use "sass:math";
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Manrope, serif;
+    font-size: 12px;
+    background: #000000;
+    color: #fff;
+}
+
+@for $i from 1 through 10 {
+    .swiper-slide:nth-child(#{$i}) {
+        .ant-skeleton-button {
+            animation-delay: math.div($i, 10) + s;
+        }
+    }
+}
