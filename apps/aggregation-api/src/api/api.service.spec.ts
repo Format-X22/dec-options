@@ -5,7 +5,7 @@ import { ApiModule } from './api.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
 import { Option, OptionSchema } from '@app/shared/option.schema';
-import { ApiController } from './api.controller';
+import { HttpModule } from '@nestjs/common';
 
 describe('ApiService', (): void => {
     let service: ApiService;
@@ -15,6 +15,7 @@ describe('ApiService', (): void => {
         async (): Promise<void> => {
             module = await Test.createTestingModule({
                 imports: [
+                    HttpModule,
                     ConfigModule.forRoot({
                         isGlobal: true,
                         cache: true,
@@ -29,7 +30,6 @@ describe('ApiService', (): void => {
                     }),
                     MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
                 ],
-                controllers: [ApiController],
                 providers: [ApiService],
             }).compile();
 
