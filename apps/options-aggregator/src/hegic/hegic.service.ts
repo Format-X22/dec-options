@@ -3,25 +3,30 @@ import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
+import * as sleep from 'sleep-promise';
+import BigNumber from 'bignumber.js';
 
 type TOptionsResponse = {
     hegicOptions: Array<{
         id: string;
         underlying: {
             symbol: string;
+            decimals: number;
         };
         strike: string;
         expiration: string;
         type: string;
+        premium: string;
     }>;
 };
 
 type TRawOption = TOptionsResponse['hegicOptions'][0];
-type TDepth = Object;
+type TDepth = { ask: number };
 
 const API: string = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
 const MS_MULTIPLY: number = 1000;
 const DECIMAL_DELIMITER: number = 100_000_000;
+const PAGE_SIZE: number = 1000;
 
 @Injectable()
 export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
@@ -32,13 +37,31 @@ export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
     }
 
     protected async getRawOptions(): Promise<Array<TRawOption>> {
-        const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
+        const result: Array<TRawOption> = [];
+        let skip: number = 0;
 
-        return rawOptionsResponse.hegicOptions;
+        while (true) {
+            const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery(skip));
+            const data: Array<TRawOption> = rawOptionsResponse.hegicOptions;
+
+            if (!data.length) {
+                break;
+            }
+
+            result.push(...data);
+            skip += PAGE_SIZE;
+
+            await sleep(this.rateLimit);
+        }
+
+        return result;
     }
 
     protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
-        return {}; // TODO -
+        const premium: BigNumber = new BigNumber(rawOption.premium);
+        const decimals: BigNumber = new BigNumber(rawOption.underlying.decimals);
+
+        return { ask: premium.div(new BigNumber(10).pow(decimals)).toNumber() };
     }
 
     protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
@@ -55,26 +78,28 @@ export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
             quote: 'USD',
             strikeAsset: rawOption.underlying.symbol,
             marketUrl: 'https://www.hegic.co/',
-            ask: null, // TODO -
-            bid: null, // TODO -
+            ask: depth.ask,
+            bid: null,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.AMERICAN,
         };
     }
 
-    private getQuery(): string {
+    private getQuery(skip: number): string {
         const now: number = Math.floor(Date.now() / MS_MULTIPLY);
 
         return gql`{  
-            hegicOptions(where: {state: Active expiration_gt: ${now}}) {
+            hegicOptions(where: {state: Active expiration_gt: ${now}} skip: ${skip} first: ${PAGE_SIZE}) {
                 id
                 underlying {
                     symbol
+                    decimals
                 }
                 strike
                 amount
                 expiration
                 type
+                premium
             }
         }`;
     }

@@ -98,11 +98,11 @@ export class Option {
     marketUrl: string;
 
     @Prop()
-    @Field()
+    @Field({ nullable: true })
     ask: number;
 
     @Prop()
-    @Field()
+    @Field({ nullable: true })
     bid: number;
 }
 

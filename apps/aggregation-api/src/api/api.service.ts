@@ -16,7 +16,7 @@ export type TOptionsParams = {
 };
 
 type TOptionsQuery = {
-    market?: Option['marketKey'];
+    marketKey?: Option['marketKey'];
     marketType?: Option['marketType'];
     type?: Option['type'];
 };
@@ -207,7 +207,7 @@ export class ApiService {
         const dbQuery: TOptionsQuery = {};
 
         if (requestQuery.filterByMarket) {
-            dbQuery.market = requestQuery.filterByMarket;
+            dbQuery.marketKey = requestQuery.filterByMarket;
         }
 
         if (requestQuery.filterByMarketType) {
