@@ -1,5 +1,3 @@
-import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
-import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 import { ArgsType, Field, Int, ObjectType } from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
 import { Max, Min } from 'class-validator';
@@ -17,30 +15,6 @@ export class Pagination {
 
     @Field()
     total: number;
-}
-
-export class ListDto<TItem> {
-    @ApiProperty({ type: Object, isArray: true, description: 'Any data object' })
-    data: Array<TItem>;
-    pagination: Pagination;
-}
-
-export function makeListDtoApi(itemsType: Parameters<typeof getSchemaPath>[0]): { schema: SchemaObject } {
-    return {
-        schema: {
-            allOf: [
-                { $ref: getSchemaPath(ListDto) },
-                {
-                    properties: {
-                        data: {
-                            type: 'array',
-                            items: { $ref: getSchemaPath(itemsType) },
-                        },
-                    },
-                },
-            ],
-        },
-    };
 }
 
 export class Paginated<T> {
