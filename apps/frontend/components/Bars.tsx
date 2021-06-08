@@ -17,10 +17,15 @@ const TextContainer = styled.div`
     background: ${$blue};
 `;
 
-const BarsContainer = styled.div`
+type BarsContainerProps = {
+    readonly align: string;
+    readonly max: number;
+};
+
+const BarsContainer: React.FunctionComponent<BarsContainerProps> = styled.div`
     display: flex;
-    flex-direction: ${({ align }) => (align === 'left' ? 'row' : 'row-reverse')};
-    ${({ max }) => `width: ${(max + 1) * 4 + (max + 1 - 1) * 2}px`};
+    flex-direction: ${({ align }: BarsContainerProps): string => (align === 'left' ? 'row' : 'row-reverse')};
+    ${({ max }: BarsContainerProps): string => `width: ${(max + 1) * 4 + (max + 1 - 1) * 2}px`};
 
     &:hover {
         ${TextContainer} {
@@ -28,13 +33,17 @@ const BarsContainer = styled.div`
         }
     }
 `;
-// tslint:disable-current-file:typedef
 
-const Bar: StyledComponen = styled.div`
+type BarProps = {
+    readonly active: boolean;
+    readonly className: string;
+};
+
+const Bar: React.FunctionComponent<BarProps> = styled.div`
+    background: ${({ active }: BarProps): string => (active ? $blue : $barBackground)};
     width: 4px;
     height: 16px;
     border-radius: 1px;
-    background: ${({ active }) => (active ? $blue : $barBackground)};
 
     &.left {
         & + & {
@@ -50,7 +59,7 @@ const Bar: StyledComponen = styled.div`
 `;
 
 function Bars({ max, value, align = 'left' }: { max: number; value: number; align: ALIGN }): JSX.Element {
-    const maxBarsCount = 5;
+    const maxBarsCount = 6;
     const activeBarsPercent = (value / max) * 100;
     const activeBarsQty =
         activeBarsPercent === 0
@@ -59,16 +68,20 @@ function Bars({ max, value, align = 'left' }: { max: number; value: number; alig
             ? 1
             : activeBarsPercent < 25
             ? 2
-            : activeBarsPercent < 50
+            : activeBarsPercent < 35
             ? 3
-            : activeBarsPercent < 80
+            : activeBarsPercent < 60
             ? 4
-            : 5;
+            : activeBarsPercent < 80
+            ? 5
+            : 6;
     return (
         <BarsContainer max={maxBarsCount} align={align}>
-            {[...Array(maxBarsCount)].map((_, i) => (
-                <Bar active={i < activeBarsQty} key={`bar_${i}`} className={align} />
-            ))}
+            {[...Array(maxBarsCount)].map(
+                (_: unknown, i: number): JSX.Element => (
+                    <Bar active={i < activeBarsQty} key={`bar_${i}`} className={align} />
+                ),
+            )}
         </BarsContainer>
     );
 }

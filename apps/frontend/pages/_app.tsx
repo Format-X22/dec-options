@@ -1,4 +1,5 @@
 import App, { AppContext, AppInitialProps, AppProps } from 'next/app';
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import React, { Dispatch, useReducer } from 'react';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
@@ -33,10 +34,6 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
         changeState,
     };
 
-    if (typeof window === 'undefined') {
-        return null;
-    }
-
     return (
         <>
             <Head>
@@ -62,4 +59,6 @@ MyApp.getInitialProps = async (appContext: AppContext): Promise<AppInitialProps>
     return { ...appProps };
 };
 
-export default MyApp;
+export default dynamic(() => Promise.resolve(MyApp), {
+    ssr: false,
+});

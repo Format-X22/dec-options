@@ -49,6 +49,7 @@
     "@nestjs/mongoose": "^7.2.4",
     "@nestjs/platform-express": "^7.6.15",
     "@nestjs/swagger": "^4.8.0",
+    "@types/styled-components": "^5.1.9",
     "antd": "^4.15.4",
     "apollo-server-express": "^2.24.1",
     "ccxt": "^1.48.32",

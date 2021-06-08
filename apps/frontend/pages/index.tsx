@@ -2,9 +2,9 @@ import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import Header from '../components/Header';
 import Filters from '../components/Filters';
-import StrikesTable from '../components/StrikesTable';
 import { ContextApp } from './_app';
 import { ActionType, ContextState } from './stateType';
+import StrikesTable from '../components/StrikesTable/StrikesTable';
 
 const Container = styled.div`
     display: flex;

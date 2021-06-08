@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { $labelColor, $optionColor, $selectBackground, $selectBackgroundHover } from '../theme';
+import { IconUp } from './IconUp';
+import { IconDown } from './IconDown';
+import { DOMEvent } from '../types';
 
 export type Option = {
     name: string;
-    // tslint:disable-next-line:no-any
     value: any;
 };
 
@@ -23,7 +25,12 @@ const Label = styled.label`
     margin-right: 16px;
 `;
 
-const SelectContainer = styled.div`
+type SelectContainerProps = {
+    open: boolean;
+    onClick: (e: Event) => void;
+};
+
+const SelectContainer: React.FunctionComponent<SelectContainerProps> = styled.div`
     position: relative;
     width: auto;
     min-width: 128px;
@@ -38,20 +45,24 @@ const SelectContainer = styled.div`
     line-height: 18px;
     letter-spacing: 0.16px;
     cursor: pointer;
-    background: ${({ open }) => (open ? $selectBackgroundHover : $selectBackground)};
+    background: ${({ open }: SelectContainerProps) => (open ? $selectBackgroundHover : $selectBackground)};
 
     &:hover {
         background: ${$selectBackgroundHover};
     }
 `;
 
-const OptionsContainer = styled.div`
+type OptionsContainerProps = {
+    open: boolean;
+};
+
+const OptionsContainer: React.FunctionComponent<OptionsContainerProps> = styled.div`
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
     width: 100%;
     min-width: 200px;
-    display: ${({ open }) => (open ? 'flex' : 'none')};
+    display: ${({ open }: OptionsContainerProps) => (open ? 'flex' : 'none')};
     border-radius: 2px;
     flex-direction: column;
     z-index: 99;
@@ -59,7 +70,12 @@ const OptionsContainer = styled.div`
     overflow: hidden;
 `;
 
-const Option = styled.div`
+type OptionProps = {
+    active: boolean;
+    onClick: () => void;
+};
+
+const Option: React.FunctionComponent<OptionProps> = styled.div`
     width: 100%;
     font-style: normal;
     font-weight: 500;
@@ -74,34 +90,12 @@ const Option = styled.div`
         background: ${$selectBackgroundHover};
     }
 
-    ${({ active }) => active && `background: ${$selectBackgroundHover}`};
+    ${({ active }: OptionProps) => active && `background: ${$selectBackgroundHover}`};
 
     & + & {
         border-top: 1px solid ${$selectBackgroundHover};
     }
 `;
-
-function IconDown(): JSX.Element {
-    return (
-        <svg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'>
-            <path
-                d='M4.62204 5.56356C4.82142 5.7938 5.17858 5.7938 5.37796 5.56356L9.47967 0.827327C9.7601 0.503505 9.53008 0 9.1017 0H0.898298C0.469922 0 0.239896 0.503505 0.520334 0.827327L4.62204 5.56356Z'
-                fill='#626262'
-            />
-        </svg>
-    );
-}
-
-function IconUp(): JSX.Element {
-    return (
-        <svg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'>
-            <path
-                d='M4.62288 0.936435C4.82226 0.706205 5.17942 0.706205 5.3788 0.936436L9.4805 5.67267C9.76094 5.9965 9.53092 6.5 9.10254 6.5H0.899138C0.470762 6.5 0.240736 5.9965 0.521174 5.67267L4.62288 0.936435Z'
-                fill='#626262'
-            />
-        </svg>
-    );
-}
 
 function Select({
     value,
@@ -116,7 +110,7 @@ function Select({
     onChange: (value: any) => void;
     label?: string;
 }): JSX.Element {
-    const ref = React.useRef();
+    const ref = React.useRef<HTMLDivElement>(null);
     const [open, setOpen] = React.useState(false);
 
     const toggle = (): void => {
@@ -132,15 +126,14 @@ function Select({
     const valueString = valueOption ? valueOption.name : value || '\u00A0';
 
     React.useEffect(() => {
-        const listener = (e: Event): void => {
+        const listener = (e: DOMEvent<Node>): void => {
             let target: Node = e.target;
-            // let { target }: { target: EventTarget } = e;
             while (target && !document.body.isSameNode(target)) {
-                target = target.parentNode;
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                if (target && ref && ref.current && ref.current.isSameNode(target)) {
-                    return;
+                if (ref && typeof ref.current !== 'undefined') {
+                    target = target.parentNode;
+                    if (target && ref.current.isSameNode(target)) {
+                        return;
+                    }
                 }
             }
             setOpen(false);
@@ -162,7 +155,11 @@ function Select({
                 <OptionsContainer open={open}>
                     {options.map(
                         (option: Option): JSX.Element => (
-                            <Option active={option.value === value} onClick={optionClickHandler(option.value)}>
+                            <Option
+                                active={option.value === value}
+                                key={option.value}
+                                onClick={optionClickHandler(option.value)}
+                            >
                                 {option.name}
                             </Option>
                         ),

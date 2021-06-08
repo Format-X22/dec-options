@@ -9,6 +9,7 @@ import Bars from './Bars';
 import { ContextApp } from '../pages/_app';
 import { ActionType } from '../pages/stateType';
 import Select from './Select';
+import { TSetter } from '../types';
 
 const StyledFilters = styled.div`
     width: 100%;
@@ -53,19 +54,23 @@ const DateTitle = styled.div`
     margin-bottom: 16px;
 `;
 
-const DateElement = styled.div`
+type DateElementProps = {
+    active: boolean;
+};
+
+const DateElement: React.FunctionComponent<DateElementProps> = styled.div`
     cursor: pointer;
     display: flex;
     flex-direction: column;
     padding: 16px;
     width: 100%;
     height: 100%;
-    background: ${({ active }) => (active ? $dateBackgroundActive : $dateBackground)};
+    background: ${({ active }: DateElementProps): string => (active ? $dateBackgroundActive : $dateBackground)};
     position: relative;
     border-radius: 2px;
     overflow: hidden;
 
-    ${({ active }) =>
+    ${({ active }: DateElementProps): string =>
         active &&
         `${DateTitle} {
         color: #000;
@@ -99,7 +104,7 @@ function TimeTable(): JSX.Element {
         changeState({ type: ActionType.SET_FILTER_DATE, payload: newValue });
     }
 
-    const [loadingTimeout, setLoadingTimeout] = React.useState(true);
+    const [loadingTimeout, setLoadingTimeout]: [boolean, TSetter<boolean>] = React.useState(true);
     const { loading, data, error } = useQuery(GET_EXPIRATIONS, {
         variables: {
             timezone: new Date().getTimezoneOffset() / 60,
@@ -135,13 +140,15 @@ function TimeTable(): JSX.Element {
             <Swiper slidesPerView='auto' loop={false} spaceBetween={12} cssMode>
                 {data && (loading || loadingTimeout || error) ? (
                     <>
-                        {[...Array(10)].map((_, index: number) => (
-                            <SwiperSlide style={{ width: '160px' }} key={`skeleton_slide_${index}`}>
-                                <SwiperSlideElement>
-                                    <Skeleton.Button active />
-                                </SwiperSlideElement>
-                            </SwiperSlide>
-                        ))}
+                        {[...Array(10)].map(
+                            (_: unknown, index: number): JSX.Element => (
+                                <SwiperSlide style={{ width: '160px' }} key={`skeleton_slide_${index}`}>
+                                    <SwiperSlideElement>
+                                        <Skeleton.Button active />
+                                    </SwiperSlideElement>
+                                </SwiperSlide>
+                            ),
+                        )}
                     </>
                 ) : null}
                 {data &&
@@ -150,7 +157,7 @@ function TimeTable(): JSX.Element {
                     // tslint:disable-next-line:typedef
                     data.expirations.map(({ expirationDate, markets }) => (
                         <SwiperSlide style={{ width: '160px' }} key={`skeleton_slide_${expirationDate}`}>
-                            <SwiperSlideElement onClick={() => onChange(getDateString(expirationDate))}>
+                            <SwiperSlideElement onClick={(): void => onChange(getDateString(expirationDate))}>
                                 <DateElement active={value === getDateString(expirationDate)}>
                                     <DateTitle>{printDate(expirationDate)}</DateTitle>
                                     <Bars
