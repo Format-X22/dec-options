@@ -145,6 +145,15 @@ export class StrikeGroup {
     maxBid: number;
 }
 
+@ObjectType()
+export class Base {
+    @Field((): typeof String => String)
+    symbol: Option['base'];
+
+    @Field((): typeof Float => Float)
+    usdPrice: number;
+}
+
 export type OptionDocument = Option & Document;
 export const OptionSchema: mongoose.Schema<OptionDocument> = SchemaFactory.createForClass<Option, OptionDocument>(
     Option,

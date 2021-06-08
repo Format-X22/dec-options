@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -7,7 +7,7 @@ import { OptionResolver } from './option.resolver';
 import { MarketResolver } from './market.resolver';
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }])],
+    imports: [MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]), HttpModule],
     controllers: [ApiController],
     providers: [ApiService, OptionResolver, MarketResolver],
 })

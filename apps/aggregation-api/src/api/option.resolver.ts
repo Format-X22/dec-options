@@ -1,5 +1,5 @@
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { ExpirationGroup, Option, OptionGQL, OptionList, StrikeGroup } from '@app/shared/option.schema';
+import { Base, ExpirationGroup, Option, OptionGQL, OptionList, StrikeGroup } from '@app/shared/option.schema';
 import { ApiService } from './api.service';
 import { ExpirationGroupArgs, OptionListArgs, StrikeGroupArgs } from './option.args';
 import { Market, marketsMapByKey } from '@app/shared/market.schema';
@@ -26,6 +26,11 @@ export class OptionResolver {
     @Query((): Array<typeof StrikeGroup> => [StrikeGroup])
     async strikes(@Args() args: StrikeGroupArgs): Promise<Array<StrikeGroup>> {
         return await this.apiService.getStrikes(args);
+    }
+
+    @Query((): Array<typeof Base> => [Base])
+    async bases(): Promise<Array<Base>> {
+        return await this.apiService.getBases();
     }
 
     @ResolveField()
