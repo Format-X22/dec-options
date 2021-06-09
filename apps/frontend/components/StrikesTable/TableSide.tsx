@@ -13,6 +13,10 @@ import greeks from 'greeks';
 import iv from 'implied-volatility';
 import { ApolloError } from '@apollo/client';
 
+function checkGreek(value: number): GreekValue {
+    return `${value}`.includes('e') ? null : value;
+}
+
 export function TableSide({
     data,
     error,
@@ -40,12 +44,14 @@ export function TableSide({
                     let gamma: GreekValue = null;
                     let theta: GreekValue = null;
                     let vega: GreekValue = null;
+                    let minAsk: number = strikeElement.minAsk;
+                    let maxBid: number = strikeElement.maxBid;
                     if (strikeElement.minAsk) {
-                        const optionPrice =
-                            currentPrice *
-                            (strikeElement.maxBid
-                                ? Math.abs(strikeElement.maxBid + strikeElement.minAsk) / 2
-                                : strikeElement.minAsk);
+                        minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
+                        maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
+
+                        const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
+
                         const strike = strikeElement.strike;
                         const datesDifference = Math.abs(differenceInDays(new Date(date), new Date()) + 1) / 365;
                         volatility = iv.getImpliedVolatility(
@@ -61,11 +67,13 @@ export function TableSide({
                         theta = greeks.getTheta(currentPrice, strike, datesDifference, volatility, 0, type);
                         vega = greeks.getVega(currentPrice, strike, datesDifference, volatility, 0, type);
                     }
-                    obj.volatility = volatility;
-                    obj.delta = delta;
-                    obj.gamma = gamma;
-                    obj.theta = theta;
-                    obj.vega = vega;
+                    obj.volatility = checkGreek(volatility);
+                    obj.delta = checkGreek(delta);
+                    obj.gamma = checkGreek(gamma);
+                    obj.theta = checkGreek(theta);
+                    obj.vega = checkGreek(vega);
+                    obj.maxBid = maxBid;
+                    obj.minAsk = minAsk;
                     return obj;
                 }
                 return strikeElement;
@@ -86,19 +94,19 @@ export function TableSide({
     return (
         <>
             <TableRow reverse={reverse}>
-                <TableCell>
+                <TableCell data-name='param'>
                     <TitleText>IV</TitleText>
                 </TableCell>
-                <TableCell>
+                <TableCell data-name='param'>
                     <TitleText>Delta</TitleText>
                 </TableCell>
-                <TableCell>
+                <TableCell data-name='greek'>
                     <TitleText>Gamma</TitleText>
                 </TableCell>
-                <TableCell>
+                <TableCell data-name='greek'>
                     <TitleText>Theta</TitleText>
                 </TableCell>
-                <TableCell>
+                <TableCell data-name='greek'>
                     <TitleText>Vega</TitleText>
                 </TableCell>
                 <TableCell>
@@ -117,16 +125,16 @@ export function TableSide({
                 (dataWithGreeks || data).map((strike, j) =>
                     strike ? (
                         <TableRow reverse={reverse} key={strike.strike + j}>
-                            <PrintGreek propKey='volatility' strikeData={strike} />
-                            <PrintGreek propKey='delta' strikeData={strike} />
-                            <PrintGreek propKey='gamma' strikeData={strike} />
-                            <PrintGreek propKey='theta' strikeData={strike} />
-                            <PrintGreek propKey='vega' strikeData={strike} />
+                            <PrintGreek propKey='volatility' strikeData={strike} name='param' />
+                            <PrintGreek propKey='delta' strikeData={strike} name='param' />
+                            <PrintGreek propKey='gamma' strikeData={strike} name='greek' />
+                            <PrintGreek propKey='theta' strikeData={strike} name='greek' />
+                            <PrintGreek propKey='vega' strikeData={strike} name='greek' />
                             <TableCell>
-                                <TitleText active>{(strike.minAsk * currentPrice || 0).toFixed(4)}</TitleText>
+                                <TitleText active>{strike.minAsk > 1 ? strike.minAsk.toFixed(2) : <Lines />}</TitleText>
                             </TableCell>
                             <TableCell>
-                                <TitleText active>{(strike.maxBid * currentPrice || 0).toFixed(4)}</TitleText>
+                                <TitleText active>{strike.maxBid > 1 ? strike.maxBid.toFixed(2) : <Lines />}</TitleText>
                             </TableCell>
                             <TableCell>
                                 <TitleText active>
@@ -136,27 +144,27 @@ export function TableSide({
                         </TableRow>
                     ) : (
                         <TableRow reverse={reverse} key={j}>
-                            <TableCell>
+                            <TableCell data-name='param'>
                                 <TitleText>
                                     <Lines />
                                 </TitleText>
                             </TableCell>
-                            <TableCell>
+                            <TableCell data-name='param'>
                                 <TitleText>
                                     <Lines />
                                 </TitleText>
                             </TableCell>
-                            <TableCell>
+                            <TableCell data-name='greek'>
                                 <TitleText>
                                     <Lines />
                                 </TitleText>
                             </TableCell>
-                            <TableCell>
+                            <TableCell data-name='greek'>
                                 <TitleText>
                                     <Lines />
                                 </TitleText>
                             </TableCell>
-                            <TableCell>
+                            <TableCell data-name='greek'>
                                 <TitleText>
                                     <Lines />
                                 </TitleText>

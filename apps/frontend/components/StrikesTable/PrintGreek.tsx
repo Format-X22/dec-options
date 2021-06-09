@@ -3,12 +3,12 @@ import { TitleText } from './TitleText';
 import { Lines } from './Lines';
 import React from 'react';
 
-export function PrintGreek({ strikeData, propKey }): JSX.Element {
+export function PrintGreek({ strikeData, propKey, name }): JSX.Element {
     return (
-        <TableCell>
+        <TableCell data-name={name}>
             <TitleText>
                 {strikeData[propKey] ? (
-                    strikeData[propKey].toFixed(4)
+                    strikeData[propKey].toFixed(2)
                 ) : (
                     <TitleText>
                         <Lines />

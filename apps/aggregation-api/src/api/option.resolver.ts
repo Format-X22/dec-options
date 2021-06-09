@@ -29,8 +29,10 @@ export class OptionResolver {
     }
 
     @Query((): Array<typeof Base> => [Base])
-    async bases(): Promise<Array<Base>> {
-        return await this.apiService.getBases();
+    async bases(...args): Promise<Array<Base>> {
+        const [, , , req] = args;
+        const calcPrices = !!req.fieldNodes[0].selectionSet.selections.find(({ name }) => name.value === 'usdPrice');
+        return await this.apiService.getBases(calcPrices);
     }
 
     @ResolveField()

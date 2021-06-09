@@ -58,11 +58,22 @@ const Bar: React.FunctionComponent<BarProps> = styled.div`
     }
 `;
 
-function Bars({ max, value, align = 'left' }: { max: number; value: number; align: ALIGN }): JSX.Element {
+function Bars({
+    max,
+    value,
+    align = 'left',
+    activeBars,
+}: {
+    max: number;
+    value: number;
+    align: ALIGN;
+    activeBars?: number;
+}): JSX.Element {
     const maxBarsCount = 6;
     const activeBarsPercent = (value / max) * 100;
     const activeBarsQty =
-        activeBarsPercent === 0
+        activeBars ||
+        (activeBarsPercent === 0
             ? 0
             : activeBarsPercent < 10
             ? 1
@@ -74,7 +85,7 @@ function Bars({ max, value, align = 'left' }: { max: number; value: number; alig
             ? 4
             : activeBarsPercent < 80
             ? 5
-            : 6;
+            : 6);
     return (
         <BarsContainer max={maxBarsCount} align={align}>
             {[...Array(maxBarsCount)].map(

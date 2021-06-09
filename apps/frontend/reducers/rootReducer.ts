@@ -8,6 +8,8 @@ export const rootReducer = (state: State, action: Action): State => {
             return { ...state, filter: { ...state.filter, currency: action.payload } };
         case ActionType.SET_PRICE:
             return { ...state, prices: { ...state.prices, [action.payload.key]: action.payload.price } };
+        case ActionType.SET_PRICES:
+            return { ...state, prices: { ...state.prices, ...action.payload } };
         default:
             throw new Error('Unexpected action');
     }

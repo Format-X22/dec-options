@@ -74,13 +74,13 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
 
     return (
         <TableContainer>
-            <TablePart>
+            <TablePart header>
                 <CallsIcon />
             </TablePart>
-            <TablePart noTable>
+            <TablePart header noTable>
                 <TitleText>{dateString}</TitleText>
             </TablePart>
-            <TablePart reverse>
+            <TablePart header reverse>
                 <PutsIcon />
             </TablePart>
             <TablePart>
@@ -95,7 +95,7 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
                     </StrikeCell>
                 ))}
             </StrikeColumn>
-            <TablePart>
+            <TablePart reverse>
                 <TableSide data={putsDataByStrike} error={putsError} reverse type='put' date={fromDate} />
             </TablePart>
         </TableContainer>

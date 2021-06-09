@@ -29,6 +29,7 @@ type TOptionsSort = {
 type TRawExpirationGroup = {
     expirationDate: Date;
     marketKeys: Array<EMarketKey>;
+    uniqueValues: number[];
 };
 
 type TRawStrikeGroup = {
@@ -99,6 +100,9 @@ export class ApiService {
                     marketKeys: {
                         $addToSet: '$marketKey',
                     },
+                    uniqueValues: {
+                        $addToSet: '$strike',
+                    },
                 },
             },
             {
@@ -111,6 +115,7 @@ export class ApiService {
                     _id: 0,
                     expirationDate: '$_id',
                     marketKeys: 1,
+                    uniqueValues: 2,
                 },
             },
         ]);
@@ -119,6 +124,7 @@ export class ApiService {
             (raw: TRawExpirationGroup): ExpirationGroup => ({
                 expirationDate: raw.expirationDate,
                 markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
+                strikes: raw.uniqueValues.length,
             }),
         );
 
@@ -198,34 +204,38 @@ export class ApiService {
         );
     }
 
-    async getBases(): Promise<Array<Base>> {
+    async getBases(calcPrices: boolean): Promise<Array<Base>> {
         const symbols: Array<Base['symbol']> = await this.optionsDataModel.distinct('base');
         const result: Array<Base> = [];
 
         for (const symbol of symbols) {
-            const priceUrl: string = `https://api.3commas.io/currency_rates?pair=USDT_${symbol}&type=Accounts%3A%3AFtx`;
-            let priceResponse: AxiosResponse<TRaw3CommasPrice>;
+            if (calcPrices) {
+                const priceUrl: string = `https://api.3commas.io/currency_rates?pair=USDT_${symbol}&type=Accounts%3A%3AFtx`;
+                let priceResponse: AxiosResponse<TRaw3CommasPrice>;
 
-            try {
-                priceResponse = await this.httpService.get<TRaw3CommasPrice>(priceUrl).toPromise();
-            } catch (error) {
-                result.push({ symbol, usdPrice: 0 });
+                try {
+                    priceResponse = await this.httpService.get<TRaw3CommasPrice>(priceUrl).toPromise();
+                } catch (error) {
+                    result.push({ symbol, usdPrice: 0 });
 
-                Logger.error(`3Commas price FATAL error - ${error}, base ${symbol}`);
-                continue;
-            }
+                    Logger.error(`3Commas price FATAL error - ${error}, base ${symbol}`);
+                    continue;
+                }
 
-            if (priceResponse.status !== 200 || !Number(priceResponse?.data?.last)) {
-                const status: number = priceResponse.status;
-                const statusText: string = priceResponse.statusText;
-                const errorData: string = JSON.stringify(priceResponse.data || null, null, 2);
-                const responseErrorData: string = `${status}: ${statusText} (data: ${errorData})`;
+                if (priceResponse.status !== 200 || !Number(priceResponse?.data?.last)) {
+                    const status: number = priceResponse.status;
+                    const statusText: string = priceResponse.statusText;
+                    const errorData: string = JSON.stringify(priceResponse.data || null, null, 2);
+                    const responseErrorData: string = `${status}: ${statusText} (data: ${errorData})`;
 
-                Logger.error(`3Commas price error - ${responseErrorData}, base ${symbol}`);
+                    Logger.error(`3Commas price error - ${responseErrorData}, base ${symbol}`);
 
-                result.push({ symbol, usdPrice: 0 });
+                    result.push({ symbol, usdPrice: 0 });
+                } else {
+                    result.push({ symbol, usdPrice: Number(priceResponse.data.last) });
+                }
             } else {
-                result.push({ symbol, usdPrice: Number(priceResponse.data.last) });
+                result.push({ symbol, usdPrice: 0 });
             }
         }
 

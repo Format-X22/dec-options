@@ -14,6 +14,7 @@ export enum ActionType {
     SET_FILTER_DATE = 'SET_FILTER_DATE',
     SET_FILTER_CURRENCY = 'SET_FILTER_CURRENCY',
     SET_PRICE = 'SET_PRICE',
+    SET_PRICES = 'SET_PRICES',
 }
 
 type ActionStringPayload = {
@@ -29,7 +30,14 @@ type ActionPricePayload = {
     };
 };
 
-export type Action = ActionStringPayload | ActionPricePayload;
+type ActionPricesPayload = {
+    type: ActionType.SET_PRICES;
+    payload: {
+        [key: string]: number;
+    };
+};
+
+export type Action = ActionStringPayload | ActionPricePayload | ActionPricesPayload;
 
 export type ContextState = {
     state: State;

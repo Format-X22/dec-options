@@ -7,4 +7,8 @@ export const TableContainer = styled.div`
     grid-template-columns: 1fr 104px 1fr;
     grid-template-rows: 68px auto;
     row-gap: 1px;
+
+    @media (max-width: 680px) {
+        grid-template-columns: 1fr 64px 1fr;
+    }
 `;

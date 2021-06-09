@@ -18,7 +18,9 @@ export const initialState: State = {
         date: '',
         currency: 'ETH',
     },
-    prices: {},
+    prices: {
+        ETH: 0,
+    },
 };
 
 export const ContextApp = React.createContext<Partial<ContextState>>({});
