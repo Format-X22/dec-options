@@ -1,8 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { OpenAPIObject } from '@nestjs/swagger/dist/interfaces';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap(): Promise<void> {
@@ -15,17 +13,6 @@ async function bootstrap(): Promise<void> {
             transform: true,
         }),
     );
-
-    const swaggerConfig: ReturnType<DocumentBuilder['build']> = new DocumentBuilder()
-        .setTitle('3Commas Options')
-        .setDescription('CEX/DEX options aggregator')
-        .setVersion('1.0')
-        .addBearerAuth()
-        .build();
-
-    const documentation: OpenAPIObject = SwaggerModule.createDocument(app, swaggerConfig);
-
-    SwaggerModule.setup('swagger', app, documentation);
 
     await app.listen(port);
 }

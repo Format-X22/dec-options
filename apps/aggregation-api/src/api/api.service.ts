@@ -1,22 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { Option, OptionDocument, ExpirationGroup, StrikeGroup } from '@app/shared/option.schema';
+import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { Option, OptionDocument, ExpirationGroup, StrikeGroup, Base } from '@app/shared/option.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { OptionsQueryDto } from './options-query.dto';
-import { ListDto } from '@app/shared/list.dto';
 import { EMarketKey, Market, markets, marketsMapByKey } from '@app/shared/market.schema';
 import { EPackByDateSize, ESortDirection, ExpirationGroupArgs, OptionListArgs, StrikeGroupArgs } from './option.args';
 import * as moment from 'moment';
 import { unitOfTime } from 'moment';
-
-export type TOptionsParams = {
-    base: Array<Option['base']>;
-    quote: Array<Option['quote']>;
-    market: Array<Option['marketKey']>;
-};
+import { AxiosResponse } from 'axios';
+import { Paginated } from '@app/shared/list.dto';
 
 type TOptionsQuery = {
-    market?: Option['marketKey'];
+    marketKey?: Option['marketKey'];
     marketType?: Option['marketType'];
     type?: Option['type'];
 };
@@ -44,23 +38,24 @@ type TRawStrikeGroup = {
     maxBid: number;
 };
 
+type TRaw3CommasPrice = {
+    last: string;
+};
+
 @Injectable()
 export class ApiService {
-    constructor(@InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>) {}
+    protected readonly logger: Logger = new Logger(ApiService.name);
+
+    constructor(
+        @InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>,
+        private httpService: HttpService,
+    ) {}
 
     async getOption(_id: Option['_id']): Promise<Option> {
         return this.optionsDataModel.findById(_id);
     }
 
-    async getOptionsParamsList(): Promise<TOptionsParams> {
-        const base: TOptionsParams['base'] = await this.optionsDataModel.distinct('base');
-        const quote: TOptionsParams['quote'] = await this.optionsDataModel.distinct('quote');
-        const market: TOptionsParams['market'] = await this.optionsDataModel.distinct('market');
-
-        return { base, quote, market };
-    }
-
-    async getOptions(requestQuery: OptionsQueryDto | OptionListArgs): Promise<ListDto<Option>> {
+    async getOptions(requestQuery: OptionListArgs): Promise<Paginated<Option>> {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
         const query: FilterQuery<OptionDocument> = { ...dbQuery, expirationDate: { $gt: new Date() } };
@@ -70,7 +65,7 @@ export class ApiService {
             limit: requestQuery.limit,
         });
         const total: number = await this.optionsDataModel.countDocuments(query);
-        const pagination: ListDto<Option>['pagination'] = {
+        const pagination: Paginated<Option>['pagination'] = {
             offset: requestQuery.offset,
             limit: requestQuery.limit,
             total,
@@ -203,11 +198,45 @@ export class ApiService {
         );
     }
 
-    private makeOptionsQuery(requestQuery: OptionsQueryDto | OptionListArgs): TOptionsQuery {
+    async getBases(): Promise<Array<Base>> {
+        const symbols: Array<Base['symbol']> = await this.optionsDataModel.distinct('base');
+        const result: Array<Base> = [];
+
+        for (const symbol of symbols) {
+            const priceUrl: string = `https://api.3commas.io/currency_rates?pair=USDT_${symbol}&type=Accounts%3A%3AFtx`;
+            let priceResponse: AxiosResponse<TRaw3CommasPrice>;
+
+            try {
+                priceResponse = await this.httpService.get<TRaw3CommasPrice>(priceUrl).toPromise();
+            } catch (error) {
+                result.push({ symbol, usdPrice: 0 });
+
+                Logger.error(`3Commas price FATAL error - ${error}, base ${symbol}`);
+                continue;
+            }
+
+            if (priceResponse.status !== 200 || !Number(priceResponse?.data?.last)) {
+                const status: number = priceResponse.status;
+                const statusText: string = priceResponse.statusText;
+                const errorData: string = JSON.stringify(priceResponse.data || null, null, 2);
+                const responseErrorData: string = `${status}: ${statusText} (data: ${errorData})`;
+
+                Logger.error(`3Commas price error - ${responseErrorData}, base ${symbol}`);
+
+                result.push({ symbol, usdPrice: 0 });
+            } else {
+                result.push({ symbol, usdPrice: Number(priceResponse.data.last) });
+            }
+        }
+
+        return result;
+    }
+
+    private makeOptionsQuery(requestQuery: OptionListArgs): TOptionsQuery {
         const dbQuery: TOptionsQuery = {};
 
         if (requestQuery.filterByMarket) {
-            dbQuery.market = requestQuery.filterByMarket;
+            dbQuery.marketKey = requestQuery.filterByMarket;
         }
 
         if (requestQuery.filterByMarketType) {
@@ -221,7 +250,7 @@ export class ApiService {
         return dbQuery;
     }
 
-    private makeOptionsSort(requestQuery: OptionsQueryDto | OptionListArgs): TOptionsSort {
+    private makeOptionsSort(requestQuery: OptionListArgs): TOptionsSort {
         const dbSort: TOptionsSort = {};
 
         if (requestQuery.sortByMarket) {

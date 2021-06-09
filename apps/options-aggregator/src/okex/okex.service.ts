@@ -28,7 +28,7 @@ export class OkexService extends AggregatorAbstract<TRawOption, TDepth> {
     }
 
     protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
-        return await this.exchange.fetchOrderBook(rawOption.symbol)
+        return await this.exchange.fetchOrderBook(rawOption.symbol);
     }
 
     protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
