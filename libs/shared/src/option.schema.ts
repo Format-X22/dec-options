@@ -109,6 +109,9 @@ export class ExpirationGroup {
 
     @Field((): Array<typeof Market> => [Market])
     markets: Array<Market>;
+
+    @Field((): typeof Float => Float)
+    strikes: number;
 }
 
 @ObjectType()
