@@ -35,7 +35,7 @@ function Button({
 }: {
     children: React.ReactElement | string;
     onClick?: () => void;
-    disabled: boolean;
+    disabled?: boolean;
 }): JSX.Element {
     function onClickHandler(): void {
         onClick && onClick();

@@ -32,7 +32,7 @@ const GET_PRICES = gql`
     }
 `;
 
-function Index(): JSX.Element {
+function Index(props): JSX.Element {
     const router = useRouter();
     const { base = 'ETH', date } = router.query;
     const { changeState }: Partial<ContextState> = useContext(ContextApp);

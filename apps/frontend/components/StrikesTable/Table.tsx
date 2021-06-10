@@ -23,7 +23,15 @@ const GET_STRIKES = gql`
     }
 `;
 
-export function Table({ date, base }: { date: string; base: string }): JSX.Element {
+export function Table({
+    date,
+    base,
+    openSubscribeModal,
+}: {
+    date: string;
+    base: string;
+    openSubscribeModal: () => void;
+}): JSX.Element {
     const fromDate = new Date(date);
     fromDate.setHours(0);
     fromDate.setMinutes(0);
@@ -84,7 +92,13 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
                 <PutsIcon />
             </TablePart>
             <TablePart>
-                <TableSide data={callsDataByStrike} error={callsError} type='call' date={fromDate} />
+                <TableSide
+                    onRowClick={openSubscribeModal}
+                    data={callsDataByStrike}
+                    error={callsError}
+                    type='call'
+                    date={fromDate}
+                />
             </TablePart>
             <StrikeColumn>
                 <StrikeCell>Strike</StrikeCell>
@@ -96,7 +110,14 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
                 ))}
             </StrikeColumn>
             <TablePart reverse>
-                <TableSide data={putsDataByStrike} error={putsError} reverse type='put' date={fromDate} />
+                <TableSide
+                    onRowClick={openSubscribeModal}
+                    data={putsDataByStrike}
+                    error={putsError}
+                    reverse
+                    type='put'
+                    date={fromDate}
+                />
             </TablePart>
         </TableContainer>
     );

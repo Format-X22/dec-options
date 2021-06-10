@@ -8,6 +8,8 @@ import * as moment from 'moment';
 import { unitOfTime } from 'moment';
 import { AxiosResponse } from 'axios';
 import { Paginated } from '@app/shared/list.dto';
+import { SubscribeGroupArgs } from './api.args';
+import { SubscribeResult, Subscribers, SubscribersDocument } from '@app/shared/api.schema';
 
 type TOptionsQuery = {
     marketKey?: Option['marketKey'];
@@ -49,11 +51,34 @@ export class ApiService {
 
     constructor(
         @InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>,
+        @InjectModel(Subscribers.name) private subscribersDataModel: Model<SubscribersDocument>,
         private httpService: HttpService,
     ) {}
 
     async getOption(_id: Option['_id']): Promise<Option> {
         return this.optionsDataModel.findById(_id);
+    }
+
+    async subscribe(args: SubscribeGroupArgs): Promise<SubscribeResult> {
+        const filter = {
+            email: args.email,
+        };
+        const result = await this.subscribersDataModel.find(filter);
+        console.log(result);
+        if (!result.length) {
+            try {
+                await this.subscribersDataModel.insertMany([
+                    {
+                        date: new Date(),
+                        email: args.email,
+                    },
+                ]);
+                return { success: true };
+            } catch (e) {
+                return { success: false };
+            }
+        }
+        return { success: true };
     }
 
     async getOptions(requestQuery: OptionListArgs): Promise<Paginated<Option>> {

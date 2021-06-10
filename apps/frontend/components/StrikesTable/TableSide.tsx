@@ -12,6 +12,7 @@ import { Lines } from './Lines';
 import greeks from 'greeks';
 import iv from 'implied-volatility';
 import { ApolloError } from '@apollo/client';
+import TableRowButton from './TableRowButton';
 
 function checkGreek(value: number): GreekValue {
     return `${value}`.includes('e') ? null : value;
@@ -23,12 +24,14 @@ export function TableSide({
     reverse = false,
     type,
     date,
+    onRowClick,
 }: {
     data: any;
     error: ApolloError;
     reverse?: boolean;
     type: string;
     date: Date;
+    onRowClick: () => void;
 }): JSX.Element {
     const { state }: Partial<ContextState> = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
@@ -125,6 +128,7 @@ export function TableSide({
                 (dataWithGreeks || data).map((strike, j) =>
                     strike ? (
                         <TableRow reverse={reverse} key={strike.strike + j}>
+                            {Boolean(strike.minAsk) && <TableRowButton onClick={onRowClick}>{'>'}</TableRowButton>}
                             <PrintGreek propKey='volatility' strikeData={strike} name='param' />
                             <PrintGreek propKey='delta' strikeData={strike} name='param' />
                             <PrintGreek propKey='gamma' strikeData={strike} name='greek' />

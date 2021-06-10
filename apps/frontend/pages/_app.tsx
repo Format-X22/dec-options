@@ -11,7 +11,7 @@ import 'swiper/swiper.scss';
 import { Action, ContextState, State } from './stateType';
 import { rootReducer } from '../reducers/rootReducer';
 
-const client = new ApolloClient({ uri: '/graphql', cache: new InMemoryCache() });
+export const client = new ApolloClient({ uri: '/graphql', cache: new InMemoryCache() });
 
 export const initialState: State = {
     filter: {

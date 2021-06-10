@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../theme';
 import Button from './Button';
+import { Modal } from './Modal';
 
 const StyledHeader = styled.div`
     width: 100%;
@@ -20,10 +21,20 @@ const Logo = styled.div`
 `;
 
 function Header({}: { children?: React.ReactElement | string }): JSX.Element {
+    const [connectModalIsVisible, setConnectModalIsVisible] = React.useState(false);
+    const closeModal = () => {
+        setConnectModalIsVisible(false);
+    };
+    const openModal = () => {
+        setConnectModalIsVisible(true);
+    };
     return (
         <StyledHeader>
             <Logo>OPEX</Logo>
-            <Button disabled>Connect wallet</Button>
+            <Button onClick={openModal}>Connect wallet</Button>
+            <Modal visible={connectModalIsVisible} onClose={closeModal} title='Keep calm and just wait'>
+                The connection with Ethereum network will be available soon.
+            </Modal>
         </StyledHeader>
     );
 }
