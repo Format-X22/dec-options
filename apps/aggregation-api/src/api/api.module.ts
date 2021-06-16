@@ -6,6 +6,7 @@ import { OptionResolver } from './option.resolver';
 import { MarketResolver } from './market.resolver';
 import { SubscribersResolver } from './subscribers.resolver';
 import { Subscribers, SubscribersSchema } from '@app/shared/subscribers.schema';
+import { PriceModule } from '../price/price.module';
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import { Subscribers, SubscribersSchema } from '@app/shared/subscribers.schema';
             { name: Subscribers.name, schema: SubscribersSchema },
         ]),
         HttpModule,
+        PriceModule,
     ],
     providers: [ApiService, OptionResolver, MarketResolver, SubscribersResolver],
 })

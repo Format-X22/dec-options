@@ -5,6 +5,7 @@ import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose
 import { ApiModule } from './api/api.module';
 import { ViewModule } from './view/view.module';
 import { GraphQLModule } from '@nestjs/graphql';
+import { PriceModule } from './price/price.module';
 
 @Module({
     imports: [
@@ -25,6 +26,7 @@ import { GraphQLModule } from '@nestjs/graphql';
             installSubscriptionHandlers: true,
             autoSchemaFile: true,
         }),
+        PriceModule,
     ],
     controllers: [],
     providers: [],
