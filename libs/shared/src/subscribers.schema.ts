@@ -1,10 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import mongoose from 'mongoose';
-import { Field, Float, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { EMarketKey, EMarketType, Market } from '@app/shared/market.schema';
-import { makePaginated } from '@app/shared/list.dto';
-import { Option, OptionDocument } from '@app/shared/option.schema';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class SubscribeResult {

@@ -1,8 +1,10 @@
+import * as fieldsInfo from 'graphql-fields';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Base, ExpirationGroup, Option, OptionGQL, OptionList, StrikeGroup } from '@app/shared/option.schema';
 import { ApiService } from './api.service';
 import { ExpirationGroupArgs, OptionListArgs, StrikeGroupArgs } from './option.args';
 import { Market, marketsMapByKey } from '@app/shared/market.schema';
+import { GraphQLResolveInfo } from 'graphql/type/definition';
 
 @Resolver((): typeof OptionGQL => OptionGQL)
 export class OptionResolver {
@@ -29,10 +31,14 @@ export class OptionResolver {
     }
 
     @Query((): Array<typeof Base> => [Base])
-    async bases(...args): Promise<Array<Base>> {
-        const [, , , req] = args;
-        const calcPrices = !!req.fieldNodes[0].selectionSet.selections.find(({ name }) => name.value === 'usdPrice');
-        return await this.apiService.getBases(calcPrices);
+    async bases(source: never, args: never, root: never, info: GraphQLResolveInfo): Promise<Array<Base>> {
+        let pricesRequired: boolean = false;
+
+        if ('usdPrice' in fieldsInfo(info)) {
+            pricesRequired = true;
+        }
+
+        return await this.apiService.getBases(pricesRequired);
     }
 
     @ResolveField()

@@ -4,8 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Option, OptionSchema } from '@app/shared/option.schema';
 import { OptionResolver } from './option.resolver';
 import { MarketResolver } from './market.resolver';
-import { ApiResolver } from './api.resolver';
-import { Subscribers, SubscribersSchema } from '@app/shared/api.schema';
+import { SubscribersResolver } from './subscribers.resolver';
+import { Subscribers, SubscribersSchema } from '@app/shared/subscribers.schema';
 
 @Module({
     imports: [
@@ -15,6 +15,6 @@ import { Subscribers, SubscribersSchema } from '@app/shared/api.schema';
         ]),
         HttpModule,
     ],
-    providers: [ApiService, OptionResolver, MarketResolver, ApiResolver],
+    providers: [ApiService, OptionResolver, MarketResolver, SubscribersResolver],
 })
 export class ApiModule {}

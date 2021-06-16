@@ -1,10 +1,10 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { SubscribeResult } from '@app/shared/api.schema';
+import { SubscribeResult } from '@app/shared/subscribers.schema';
 import { ApiService } from './api.service';
-import { SubscribeGroupArgs } from './api.args';
+import { SubscribeGroupArgs } from './subscribers.args';
 
 @Resolver((): typeof SubscribeResult => SubscribeResult)
-export class ApiResolver {
+export class SubscribersResolver {
     constructor(private readonly apiService: ApiService) {}
 
     @Query((): typeof SubscribeResult => SubscribeResult)
