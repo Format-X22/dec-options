@@ -41,12 +41,10 @@ export class DeribitService extends AggregatorAbstract<TRawOption, TDepth> {
             quote: rawOption.quote,
             strikeAsset: rawOption.base,
             marketUrl: 'https://www.deribit.com/main#/options',
-            askBase: depth.asks?.[0]?.[0] || 0, // TODO -
-            askQuote: null, // TODO -
-            askCount: null, // TODO -
-            bidBase: depth.bids?.[0]?.[0] || 0, // TODO -
-            bidQuote: null, // TODO -
-            bidCount: null, // TODO -
+            askBase: null,
+            askQuote: depth.asks?.[0]?.[0] || 0,
+            bidBase: null,
+            bidQuote: depth.bids?.[0]?.[0] || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
         };

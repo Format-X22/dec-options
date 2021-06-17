@@ -94,19 +94,11 @@ export class Option {
 
     @Prop()
     @Field({ nullable: true })
-    askCount: number;
-
-    @Prop()
-    @Field({ nullable: true })
     bidBase: number;
 
     @Prop()
     @Field({ nullable: true })
     bidQuote: number;
-
-    @Prop()
-    @Field({ nullable: true })
-    bidCount: number;
 }
 
 @ObjectType('Option')

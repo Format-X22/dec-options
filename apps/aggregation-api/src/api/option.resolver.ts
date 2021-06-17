@@ -5,10 +5,11 @@ import { ApiService } from './api.service';
 import { ExpirationGroupArgs, OptionListArgs, StrikeGroupArgs } from './option.args';
 import { Market, marketsMapByKey } from '@app/shared/market.schema';
 import { GraphQLResolveInfo } from 'graphql/type/definition';
+import { PriceService } from '../price/price.service';
 
 @Resolver((): typeof OptionGQL => OptionGQL)
 export class OptionResolver {
-    constructor(private readonly apiService: ApiService) {}
+    constructor(private readonly apiService: ApiService, private readonly priceService: PriceService) {}
 
     @Query((): typeof OptionGQL => OptionGQL)
     async option(@Args('_id') _id: string): Promise<Option> {
@@ -44,5 +45,65 @@ export class OptionResolver {
     @ResolveField()
     market(@Parent() option: Option): Market {
         return marketsMapByKey.get(option.marketKey);
+    }
+
+    @ResolveField((): typeof Number => Number, { nullable: true })
+    bidBase(@Parent() option: Option): number {
+        if (Number.isFinite(option.bidBase)) {
+            return option.bidBase;
+        }
+
+        if (!Number.isFinite(option.bidQuote)) {
+            return null;
+        }
+
+        const basePrice: number = this.priceService.getPrice(option.base);
+
+        return option.bidQuote / basePrice;
+    }
+
+    @ResolveField((): typeof Number => Number, { nullable: true })
+    bidQuote(@Parent() option: Option): number {
+        if (Number.isFinite(option.bidQuote)) {
+            return option.bidQuote;
+        }
+
+        if (!Number.isFinite(option.bidBase)) {
+            return null;
+        }
+
+        const basePrice: number = this.priceService.getPrice(option.base);
+
+        return option.bidBase * basePrice;
+    }
+
+    @ResolveField((): typeof Number => Number, { nullable: true })
+    askBase(@Parent() option: Option): number {
+        if (Number.isFinite(option.askBase)) {
+            return option.askBase;
+        }
+
+        if (!Number.isFinite(option.askQuote)) {
+            return null;
+        }
+
+        const basePrice: number = this.priceService.getPrice(option.base);
+
+        return option.askQuote / basePrice;
+    }
+
+    @ResolveField((): typeof Number => Number, { nullable: true })
+    askQuote(@Parent() option: Option): number {
+        if (Number.isFinite(option.askQuote)) {
+            return option.askQuote;
+        }
+
+        if (!Number.isFinite(option.askBase)) {
+            return null;
+        }
+
+        const basePrice: number = this.priceService.getPrice(option.base);
+
+        return option.askBase * basePrice;
     }
 }

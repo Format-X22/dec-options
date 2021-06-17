@@ -53,8 +53,6 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
     }
 
     getPrice(symbol: string): number {
-        console.log(this.price, symbol);
-
         return this.price.get(symbol as ESymbol);
     }
 
@@ -120,7 +118,7 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
         }
     }
 
-    async getPriceFrom2Commas(symbol: string): Promise<number> {
+    private async getPriceFrom2Commas(symbol: string): Promise<number> {
         const priceUrl: string = `https://api.3commas.io/currency_rates?pair=USDT_${symbol}&type=Accounts%3A%3AFtx`;
         let priceResponse: AxiosResponse<TRaw3CommasPrice>;
 
