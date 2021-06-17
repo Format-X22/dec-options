@@ -78,8 +78,12 @@ export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
             quote: 'USD',
             strikeAsset: rawOption.underlying.symbol,
             marketUrl: 'https://www.hegic.co/',
-            ask: depth.ask,
-            bid: null,
+            askBase: null, // TODO -
+            askQuote: depth.ask, // TODO -
+            askCount: null, // TODO -
+            bidBase: null,
+            bidQuote: null,
+            bidCount: null,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.AMERICAN,
         };

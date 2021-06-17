@@ -45,8 +45,12 @@ export class OkexService extends AggregatorAbstract<TRawOption, TDepth> {
             quote: rawOption.quote,
             strikeAsset: rawOption.base,
             marketUrl: 'https://www.okex.com/en/trade-option/' + rawOption.id,
-            ask: depth.asks?.[0]?.[0] || 0,
-            bid: depth.bids?.[0]?.[0] || 0,
+            askBase: depth.asks?.[0]?.[0] || 0, // TODO -
+            askQuote: null, // TODO -
+            askCount: null, // TODO -
+            bidBase: depth.bids?.[0]?.[0] || 0, // TODO -
+            bidQuote: null, // TODO -
+            bidCount: null, // TODO -
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
         };

@@ -62,8 +62,12 @@ export class OpynService extends AggregatorAbstract<TRawOption, TDepth> {
             quote: rawOption.collateralAsset.symbol,
             strikeAsset: rawOption.strikeAsset.symbol,
             marketUrl: 'https://www.opyn.co/#/trade',
-            ask: null, // TODO -
-            bid: null, // TODO -
+            askBase: null, // TODO -
+            askQuote: null, // TODO -
+            askCount: null, // TODO -
+            bidBase: null, // TODO -
+            bidQuote: null, // TODO -
+            bidCount: null, // TODO -
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
         };

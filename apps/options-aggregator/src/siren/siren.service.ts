@@ -77,8 +77,12 @@ export class SirenService extends AggregatorAbstract<TRawOption, TDepth> {
             quote,
             strikeAsset: rawOption.paymentToken.symbol,
             marketUrl: 'https://app.sirenmarkets.com/trade/' + urlFinalPath,
-            ask: null, // TODO -
-            bid: null, // TODO -
+            askBase: null, // TODO -
+            askQuote: null, // TODO -
+            askCount: null, // TODO -
+            bidBase: null, // TODO -
+            bidQuote: null, // TODO -
+            bidCount: null, // TODO -
             deliveryType: EOptionDeliveryType.DELIVERY,
             styleType: EOptionStyleType.AMERICAN,
         };

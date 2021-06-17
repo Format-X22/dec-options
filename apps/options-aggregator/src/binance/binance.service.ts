@@ -78,8 +78,12 @@ export class BinanceService extends AggregatorAbstract<TRawOption, TDepth> {
             quote: rawOption.quoteAsset,
             strikeAsset: rawOption.underlying.replace(rawOption.quoteAsset, ''),
             marketUrl: 'https://voptions.binance.com/en',
-            ask: depth.asks?.[0]?.[0] || 0,
-            bid: depth.bids?.[0]?.[0] || 0,
+            askBase: depth.asks?.[0]?.[0] || 0,
+            askQuote: null, // TODO -
+            askCount: null, // TODO -
+            bidBase: depth.bids?.[0]?.[0] || 0, // TODO -
+            bidQuote: null, // TODO -
+            bidCount: null, // TODO -
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
         };

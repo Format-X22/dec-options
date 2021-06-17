@@ -66,8 +66,12 @@ export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
             quote,
             strikeAsset,
             marketUrl: `https://app.auctus.org/advanced/trade/${base}_${strikeAsset}/${id}`,
-            ask: null, // TODO -
-            bid: null, // TODO -
+            askBase: null, // TODO -
+            askQuote: null, // TODO -
+            askCount: null, // TODO -
+            bidBase: null, // TODO -
+            bidQuote: null, // TODO -
+            bidCount: null, // TODO -
             deliveryType: EOptionDeliveryType.DELIVERY,
             styleType: EOptionStyleType.AMERICAN,
         };
