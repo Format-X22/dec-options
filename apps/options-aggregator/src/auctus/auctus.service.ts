@@ -25,14 +25,9 @@ type TOptionsResponse = {
 
 type TRawOption = TOptionsResponse['acotokens'][0];
 type TDepth = Object;
-type TokenData = {
-    address: string;
-    decimals: number;
-};
 
 const API: string = 'https://api.thegraph.com/subgraphs/name/auctusproject/auctus-options';
 const MS_MULTIPLY: number = 1000;
-const USDC_ADDRESS: string = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
 
 @Injectable()
 export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
@@ -49,29 +44,6 @@ export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
     }
 
     protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
-        /*const orderbook: Orderbook = Orderbook.getOrderbookForWebsocketProvider({
-            httpEndpoint: 'https://api.0x.org/sra/v3',
-            websocketEndpoint: 'wss://api.0x.org/sra/v3',
-        });
-
-        console.log(rawOption.name, rawOption.id);
-
-        console.log(
-            'BIDS',
-            await orderbook.getOrdersAsync(
-                assetDataUtils.encodeERC20AssetData(USDC_ADDRESS),
-                assetDataUtils.encodeERC20AssetData(rawOption.id),
-            ),
-        );
-
-        console.log(
-            'ASK',
-            await orderbook.getOrdersAsync(
-                assetDataUtils.encodeERC20AssetData(USDC_ADDRESS),
-                assetDataUtils.encodeERC20AssetData(rawOption.id),
-            ),
-        );*/
-
         return {}; // TODO -
     }
 
