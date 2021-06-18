@@ -32,13 +32,15 @@ const MS_MULTIPLY: number = 1000;
 @Injectable()
 export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
     protected readonly logger: Logger = new Logger(AuctusService.name);
+    protected readonly pageSize: number = 1000;
+    protected isGetWithPagination: boolean = true;
 
     protected get rateLimit(): number {
         return 1000;
     }
 
-    protected async getRawOptions(): Promise<Array<TRawOption>> {
-        const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
+    protected async getRawOptions(skip: number): Promise<Array<TRawOption>> {
+        const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery(skip));
 
         return rawOptionsResponse.acotokens;
     }
@@ -75,12 +77,12 @@ export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
         };
     }
 
-    private getQuery(): string {
+    private getQuery(skip: number): string {
         const now: number = Math.floor(Date.now() / MS_MULTIPLY);
 
         return gql`
             {
-                acotokens(where: { expiryTime_gt: ${now} }) {
+                acotokens(where: { expiryTime_gt: ${now} } first: ${this.pageSize} skip: ${skip}) {
                     id
                     underlying {
                         symbol

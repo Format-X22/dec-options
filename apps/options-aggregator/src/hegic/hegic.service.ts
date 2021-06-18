@@ -31,6 +31,8 @@ const PAGE_SIZE: number = 1000;
 @Injectable()
 export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
     protected readonly logger: Logger = new Logger(HegicService.name);
+    protected readonly pageSize: number = 1000;
+    protected isGetWithPagination: boolean = true;
 
     protected get rateLimit(): number {
         return 1000;

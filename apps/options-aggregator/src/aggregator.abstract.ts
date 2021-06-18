@@ -7,6 +7,8 @@ import * as sleep from 'sleep-promise';
 export abstract class AggregatorAbstract<TRawOption, TDepth> {
     protected logger: Logger;
     protected abstract get rateLimit(): number;
+    protected isGetWithPagination: boolean = false;
+    protected readonly pageSize: number = null;
 
     constructor(@InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>) {}
 
@@ -17,11 +19,29 @@ export abstract class AggregatorAbstract<TRawOption, TDepth> {
             this.logger.error(error);
         }
 
-        // setImmediate(this.startSyncLoop.bind(this));
+        setImmediate(this.startSyncLoop.bind(this));
     }
 
     protected async iteration(): Promise<void> {
-        const rawOptions: Array<TRawOption> = await this.getRawOptions();
+        let rawOptions: Array<TRawOption>;
+
+        if (this.isGetWithPagination) {
+            if (!this.pageSize) {
+                this.logger.error(`Invalid page size = ${this.pageSize}`);
+                sleep(this.rateLimit * 10);
+                return;
+            }
+
+            rawOptions = await this.getRawOptionsWithPagination();
+        } else {
+            if (this.pageSize) {
+                this.logger.error(`Page size unacceptable = ${this.pageSize}`);
+                sleep(this.rateLimit * 10);
+                return;
+            }
+
+            rawOptions = await this.getRawOptions();
+        }
 
         sleep(this.rateLimit);
 
@@ -43,7 +63,27 @@ export abstract class AggregatorAbstract<TRawOption, TDepth> {
         throw new Error(`Invalid response - ${type} - ${JSON.stringify(data, null, 2)}`);
     }
 
-    protected abstract getRawOptions(): Promise<Array<TRawOption>>;
+    private async getRawOptionsWithPagination(): Promise<Array<TRawOption>> {
+        const result: Array<TRawOption> = [];
+        let skip: number = 0;
+
+        while (true) {
+            const data: Array<TRawOption> = await this.getRawOptions(skip);
+
+            if (!data.length) {
+                break;
+            }
+
+            result.push(...data);
+            skip += this.pageSize;
+
+            await sleep(this.rateLimit);
+        }
+
+        return result;
+    }
+
+    protected abstract getRawOptions(skip?: number): Promise<Array<TRawOption>>;
     protected abstract getDepth(rawOption: TRawOption): Promise<TDepth>;
     protected abstract constructOptionData(rawOption: TRawOption, depth: TDepth): Option;
 }

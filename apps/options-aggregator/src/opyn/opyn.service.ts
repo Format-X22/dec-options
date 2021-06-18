@@ -33,13 +33,15 @@ const MS_MULTIPLY: number = 1000;
 @Injectable()
 export class OpynService extends AggregatorAbstract<TRawOption, TDepth> {
     protected readonly logger: Logger = new Logger(OpynService.name);
+    protected readonly pageSize: number = 1000;
+    protected isGetWithPagination: boolean = true;
 
     protected get rateLimit(): number {
         return 1000;
     }
 
-    protected async getRawOptions(): Promise<Array<TRawOption>> {
-        const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery());
+    protected async getRawOptions(skip: number): Promise<Array<TRawOption>> {
+        const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery(skip));
 
         return rawOptionsResponse.otokens;
     }
@@ -71,12 +73,12 @@ export class OpynService extends AggregatorAbstract<TRawOption, TDepth> {
         };
     }
 
-    private getQuery(): string {
+    private getQuery(skip: number): string {
         const now: number = Math.floor(Date.now() / MS_MULTIPLY);
 
         return gql`
             {
-                otokens(where: { expiryTimestamp_gt: ${now} }) {
+                otokens(where: { expiryTimestamp_gt: ${now} } first: ${this.pageSize} skip: ${skip}) {
                     id
                     underlyingAsset {
                         symbol

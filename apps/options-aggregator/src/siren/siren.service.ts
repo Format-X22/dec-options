@@ -22,33 +22,20 @@ type TRawOption = TOptionsResponse['markets'][0];
 type TDepth = Object;
 
 const API: string = 'https://api.thegraph.com/subgraphs/name/sirenmarkets/protocol';
-const QUERY: string = gql`
-    {
-        markets {
-            id
-            marketName
-            expirationDate
-            collateralToken {
-                symbol
-            }
-            paymentToken {
-                symbol
-            }
-        }
-    }
-`;
 const MS_MULTIPLY: number = 1000;
 
 @Injectable()
 export class SirenService extends AggregatorAbstract<TRawOption, TDepth> {
     protected readonly logger: Logger = new Logger(SirenService.name);
+    protected readonly pageSize: number = 1000;
+    protected isGetWithPagination: boolean = true;
 
     protected get rateLimit(): number {
         return 1000;
     }
 
-    protected async getRawOptions(): Promise<Array<TRawOption>> {
-        const rawOptionsResponse: TOptionsResponse = await request(API, QUERY);
+    protected async getRawOptions(skip: number): Promise<Array<TRawOption>> {
+        const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery(skip));
 
         return rawOptionsResponse.markets;
     }
@@ -109,5 +96,25 @@ export class SirenService extends AggregatorAbstract<TRawOption, TDepth> {
         }
 
         return strike;
+    }
+
+    private getQuery(skip: number): string {
+        const now: number = Math.floor(Date.now() / MS_MULTIPLY);
+
+        return gql`
+            {
+                markets(where: { expirationDate_gt: ${now} } first: ${this.pageSize} skip: ${skip}) {
+                    id
+                    marketName
+                    expirationDate
+                    collateralToken {
+                        symbol
+                    }
+                    paymentToken {
+                        symbol
+                    }
+                }
+            }
+        `;
     }
 }
