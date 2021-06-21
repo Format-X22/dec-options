@@ -21,6 +21,14 @@ type TRaw3CommasPrice = {
     last: string;
 };
 
+enum EApiMarkets {
+    FTX = 'ftx',
+    BINANCE = 'binance',
+    HIT_BTC = 'hitbtc',
+}
+
+const API_POINT: string = 'https://api.3commas.io/public/api/ver1';
+
 @Injectable()
 export class PriceService implements OnModuleInit, OnModuleDestroy {
     protected readonly logger: Logger = new Logger(PriceService.name);
@@ -74,43 +82,51 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
                     break;
 
                 case ESymbol.BTC:
-                case ESymbol.WBTC:
-                    const btcPrice: number = await this.getPriceFrom2Commas(ESymbol.BTC);
+                case ESymbol.WBTC: {
+                    const price: number = await this.getPriceFrom2Commas(EApiMarkets.FTX, `USD_${ESymbol.BTC}`);
 
-                    this.price.set(ESymbol.BTC, btcPrice);
-                    this.price.set(ESymbol.WBTC, btcPrice);
+                    this.price.set(ESymbol.BTC, price);
+                    this.price.set(ESymbol.WBTC, price);
                     handled.add(ESymbol.BTC);
                     handled.add(ESymbol.WBTC);
                     break;
+                }
 
                 case ESymbol.ETH:
-                case ESymbol.WETH:
-                    const ethPrice: number = await this.getPriceFrom2Commas(ESymbol.ETH);
+                case ESymbol.WETH: {
+                    const price: number = await this.getPriceFrom2Commas(EApiMarkets.FTX, `USDT_${ESymbol.ETH}`);
 
-                    this.price.set(ESymbol.ETH, ethPrice);
-                    this.price.set(ESymbol.WETH, ethPrice);
+                    this.price.set(ESymbol.ETH, price);
+                    this.price.set(ESymbol.WETH, price);
                     handled.add(ESymbol.ETH);
                     handled.add(ESymbol.WETH);
                     break;
+                }
 
                 case ESymbol.SUSHI:
                 case ESymbol.UNI:
-                case ESymbol.YFI:
-                    const defPrice: number = await this.getPriceFrom2Commas(symbol);
+                case ESymbol.YFI: {
+                    const price: number = await this.getPriceFrom2Commas(EApiMarkets.FTX, `USDT_${symbol}`);
 
-                    this.price.set(symbol, defPrice);
+                    this.price.set(symbol, price);
                     handled.add(symbol);
                     break;
+                }
 
-                case ESymbol.EOS:
-                    // TODO -
-                    this.price.set(ESymbol.EOS, 0);
+                case ESymbol.EOS: {
+                    const price: number = await this.getPriceFrom2Commas(EApiMarkets.BINANCE, `USDT_${symbol}`);
+                    this.price.set(ESymbol.EOS, price);
                     break;
+                }
 
-                case ESymbol.AUC:
-                    // TODO -
-                    this.price.set(ESymbol.AUC, 0);
+                case ESymbol.AUC: {
+                    const priceInBtc: number = await this.getPriceFrom2Commas(EApiMarkets.HIT_BTC, `BTC_${symbol}`);
+                    const btcPrice: number = this.getPrice(ESymbol.BTC);
+                    const price: number = priceInBtc * btcPrice;
+
+                    this.price.set(ESymbol.AUC, price);
                     break;
+                }
 
                 default:
                     this.logger.error(`Unknown symbol ${symbol}`);
@@ -118,14 +134,14 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
         }
     }
 
-    private async getPriceFrom2Commas(symbol: string): Promise<number> {
-        const priceUrl: string = `https://api.3commas.io/currency_rates?pair=USDT_${symbol}&type=Accounts%3A%3AFtx`;
+    private async getPriceFrom2Commas(market: EApiMarkets, pair: string): Promise<number> {
+        const priceUrl: string = `${API_POINT}/accounts/currency_rates?market_code=${market}&pair=${pair}`;
         let priceResponse: AxiosResponse<TRaw3CommasPrice>;
 
         try {
             priceResponse = await this.httpService.get<TRaw3CommasPrice>(priceUrl).toPromise();
         } catch (error) {
-            Logger.error(`3Commas price FATAL error - ${error}, base ${symbol}`);
+            Logger.error(`3Commas price FATAL error - ${error}, base ${pair}`);
             return 0;
         }
 
@@ -135,7 +151,7 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
             const errorData: string = JSON.stringify(priceResponse.data || null, null, 2);
             const responseErrorData: string = `${status}: ${statusText} (data: ${errorData})`;
 
-            Logger.error(`3Commas price error - ${responseErrorData}, symbol ${symbol}`);
+            Logger.error(`3Commas price error - ${responseErrorData}, pair ${pair}`);
 
             return 0;
         } else {
