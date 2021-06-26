@@ -186,10 +186,10 @@ export class ApiService {
                         $addToSet: '$marketKey',
                     },
                     minAsk: {
-                        $min: '$ask',
+                        $min: '$askQuote',
                     },
                     maxBid: {
-                        $max: '$bid',
+                        $max: '$bidQuote',
                     },
                 },
             },
