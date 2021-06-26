@@ -5,6 +5,8 @@ import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
 import * as puppeteer from 'puppeteer';
 import { Browser, Page } from 'puppeteer';
+import * as moment from 'moment';
+import { Moment } from 'moment';
 
 type TOptionsResponse = {
     otokens: Array<{
@@ -27,7 +29,10 @@ type TOptionsResponse = {
 };
 
 type TRawOption = TOptionsResponse['otokens'][0];
-type TDepth = Object;
+type TDepth = {
+    ask: number;
+    bid: number;
+};
 type TParsedPrices = Array<{
     base: string;
     expiration: string;
@@ -69,7 +74,22 @@ export class OpynService extends AggregatorAbstract<TRawOption, TDepth> implemen
     }
 
     protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
-        return {}; // TODO -
+        const strike: number = Number(rawOption.strikePrice) / Math.pow(10, rawOption.decimals);
+        const type: EOptionType = rawOption.isPut ? EOptionType.PUT : EOptionType.CALL;
+        const date: Moment = moment.utc(Number(rawOption.expiryTimestamp) * MS_MULTIPLY).startOf('day');
+        const cached: TDepth = this.pricesCache.find((parsedOption: TParsedPrices[0]): boolean => {
+            return (
+                parsedOption.strike === strike &&
+                parsedOption.type === type &&
+                Number(moment.utc(parsedOption.expiration, 'DD MMM YYYY').toDate()) === Number(date)
+            );
+        });
+
+        if (cached) {
+            return { ask: cached.ask, bid: cached.bid };
+        } else {
+            return { ask: 0, bid: 0 };
+        }
     }
 
     protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
@@ -86,10 +106,10 @@ export class OpynService extends AggregatorAbstract<TRawOption, TDepth> implemen
             quote: rawOption.collateralAsset.symbol,
             strikeAsset: rawOption.strikeAsset.symbol,
             marketUrl: 'https://www.opyn.co/#/trade',
-            askBase: null, // TODO -
-            askQuote: null, // TODO -
-            bidBase: null, // TODO -
-            bidQuote: null, // TODO -
+            askBase: null,
+            askQuote: depth.ask,
+            bidBase: null,
+            bidQuote: depth.bid,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
         };
@@ -214,9 +234,8 @@ export class OpynService extends AggregatorAbstract<TRawOption, TDepth> implemen
                 function getExpiration(expirationButton: HTMLButtonElement): string {
                     const rawDate: string = expirationButton.innerHTML;
                     const rawDateTokens: Array<string> = rawDate.split(' ');
-                    const validDateString: string = rawDateTokens.slice(1, rawDateTokens.length).join(' ');
 
-                    return new Date(validDateString).toString();
+                    return rawDateTokens.slice(1, rawDateTokens.length).join(' ');
                 }
 
                 function getStrike(cols: HTMLCollection): number {
