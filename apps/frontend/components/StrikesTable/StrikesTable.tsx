@@ -6,7 +6,6 @@ import { Modal } from '../Modal';
 import styled from 'styled-components';
 import Input from '../Input';
 import { gql } from '@apollo/client';
-import { cli } from 'webpack';
 
 const ModalContent = styled.div`
     display: flex;
@@ -35,20 +34,20 @@ function StrikesTable(): JSX.Element {
     const [valid, setValid] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
 
-    const closeModal = () => {
+    const closeModal = (): void => {
         setSubscribeModalIsVisible(false);
     };
-    const openModal = () => {
+    const openModal = (): void => {
         setSubscribeModalIsVisible(true);
     };
 
-    const onChange = (value: string) => {
+    const onChange = (value: string): void => {
         setValid(true);
         setEmail(value);
         setError(null);
     };
 
-    const sendEmail = async (): void => {
+    const sendEmail = async (): Promise<void> => {
         const data = await client.query({
             query: SUBSCRIBE,
             variables: {
@@ -66,8 +65,9 @@ function StrikesTable(): JSX.Element {
 
     const onButtonClick = (): void => {
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const valid = re.test(String(email).toLowerCase());
-        if (!valid) {
+        const isValid: boolean = re.test(String(email).toLowerCase());
+
+        if (!isValid) {
             setError('Please type valid email.');
             setValid(false);
         } else {

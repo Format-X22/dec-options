@@ -13,6 +13,15 @@ import greeks from 'greeks';
 import iv from 'implied-volatility';
 import { ApolloError } from '@apollo/client';
 import TableRowButton from './TableRowButton';
+import { StrikeGroup } from '../../../../libs/shared/src/option.schema';
+
+type TStrikeElementData = StrikeGroup & {
+    volatility?: number;
+    delta?: number;
+    gamma?: number;
+    theta?: number;
+    vega?: number;
+};
 
 function checkGreek(value: number): GreekValue {
     return `${value}`.includes('e') ? null : value;
@@ -38,51 +47,56 @@ export function TableSide({
     const [dataWithGreeks, setDataWithGreeks] = React.useState(null);
 
     function calcGreeks(): void {
-        if (data) {
-            const newData = data.map((strikeElement) => {
-                if (strikeElement) {
-                    const obj = { ...strikeElement };
-                    let volatility: GreekValue = null;
-                    let delta: GreekValue = null;
-                    let gamma: GreekValue = null;
-                    let theta: GreekValue = null;
-                    let vega: GreekValue = null;
-                    let minAsk: number = strikeElement.minAsk;
-                    let maxBid: number = strikeElement.maxBid;
-                    if (strikeElement.minAsk) {
-                        minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
-                        maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
-
-                        const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
-
-                        const strike = strikeElement.strike;
-                        const datesDifference = Math.abs(differenceInDays(new Date(date), new Date()) + 1) / 365;
-                        volatility = iv.getImpliedVolatility(
-                            optionPrice,
-                            currentPrice,
-                            strike,
-                            datesDifference,
-                            0,
-                            type,
-                        );
-                        delta = greeks.getDelta(currentPrice, strike, datesDifference, volatility, 0, type);
-                        gamma = greeks.getGamma(currentPrice, strike, datesDifference, volatility, 0, type);
-                        theta = greeks.getTheta(currentPrice, strike, datesDifference, volatility, 0, type);
-                        vega = greeks.getVega(currentPrice, strike, datesDifference, volatility, 0, type);
-                    }
-                    obj.volatility = checkGreek(volatility);
-                    obj.delta = checkGreek(delta);
-                    obj.gamma = checkGreek(gamma);
-                    obj.theta = checkGreek(theta);
-                    obj.vega = checkGreek(vega);
-                    obj.maxBid = maxBid;
-                    obj.minAsk = minAsk;
-                    return obj;
-                }
-                return strikeElement;
-            });
-            setDataWithGreeks(newData);
+        if (!data) {
+            return;
         }
+
+        const newData = data.map(
+            (strikeElement: StrikeGroup): TStrikeElementData => {
+                if (!strikeElement) {
+                    return strikeElement;
+                }
+
+                const elementData: TStrikeElementData = { ...strikeElement };
+                let volatility: GreekValue = null;
+                let delta: GreekValue = null;
+                let gamma: GreekValue = null;
+                let theta: GreekValue = null;
+                let vega: GreekValue = null;
+                let minAsk: number = strikeElement.minAsk;
+                let maxBid: number = strikeElement.maxBid;
+
+                if (Number.isFinite(strikeElement.minAsk)) {
+                    minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
+                    maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
+
+                    const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
+                    const strike = strikeElement.strike;
+                    const datesDifference = Math.abs(differenceInDays(new Date(date), new Date()) + 1) / 365;
+
+                    volatility = iv.getImpliedVolatility(optionPrice, currentPrice, strike, datesDifference, 0, type);
+
+                    const greeksArgs = [currentPrice, strike, datesDifference, volatility, 0, type];
+
+                    delta = greeks.getDelta(...greeksArgs);
+                    gamma = greeks.getGamma(...greeksArgs);
+                    theta = greeks.getTheta(...greeksArgs);
+                    vega = greeks.getVega(...greeksArgs);
+                }
+
+                elementData.volatility = checkGreek(volatility);
+                elementData.delta = checkGreek(delta);
+                elementData.gamma = checkGreek(gamma);
+                elementData.theta = checkGreek(theta);
+                elementData.vega = checkGreek(vega);
+                elementData.maxBid = maxBid;
+                elementData.minAsk = minAsk;
+
+                return elementData;
+            },
+        );
+
+        setDataWithGreeks(newData);
     }
 
     React.useEffect((): void => {
@@ -128,17 +142,23 @@ export function TableSide({
                 (dataWithGreeks || data).map((strike, j) =>
                     strike ? (
                         <TableRow reverse={reverse} key={strike.strike + j}>
-                            {Boolean(strike.minAsk) && <TableRowButton onClick={onRowClick}>{'>'}</TableRowButton>}
+                            {Number.isFinite(strike.minAsk) && (
+                                <TableRowButton onClick={onRowClick}>{'>'}</TableRowButton>
+                            )}
                             <PrintGreek propKey='volatility' strikeData={strike} name='param' />
                             <PrintGreek propKey='delta' strikeData={strike} name='param' />
                             <PrintGreek propKey='gamma' strikeData={strike} name='greek' />
                             <PrintGreek propKey='theta' strikeData={strike} name='greek' />
                             <PrintGreek propKey='vega' strikeData={strike} name='greek' />
                             <TableCell>
-                                <TitleText active>{strike.minAsk > 1 ? strike.minAsk.toFixed(2) : <Lines />}</TitleText>
+                                <TitleText active>
+                                    {Number.isFinite(strike.minAsk) ? strike.minAsk.toFixed(2) : <Lines />}
+                                </TitleText>
                             </TableCell>
                             <TableCell>
-                                <TitleText active>{strike.maxBid > 1 ? strike.maxBid.toFixed(2) : <Lines />}</TitleText>
+                                <TitleText active>
+                                    {Number.isFinite(strike.maxBid) ? strike.maxBid.toFixed(2) : <Lines />}
+                                </TitleText>
                             </TableCell>
                             <TableCell>
                                 <TitleText active>

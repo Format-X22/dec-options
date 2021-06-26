@@ -7,13 +7,7 @@ export function PrintGreek({ strikeData, propKey, name }): JSX.Element {
     return (
         <TableCell data-name={name}>
             <TitleText>
-                {strikeData[propKey] ? (
-                    strikeData[propKey].toFixed(2)
-                ) : (
-                    <TitleText>
-                        <Lines />
-                    </TitleText>
-                )}
+                {Number.isFinite(strikeData[propKey]) ? strikeData[propKey].toFixed(2) : <TitleText>-</TitleText>}
             </TitleText>
         </TableCell>
     );
