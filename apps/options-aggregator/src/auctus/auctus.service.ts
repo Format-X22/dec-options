@@ -65,31 +65,21 @@ export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
     }
 
     protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
-        const asks: Array<TDepthItem> = [];
-        const bids: Array<TDepthItem> = [];
+        const depth: TDepth = { asks: [], bids: [] };
         const askUrl: string = this.makeDepthUrl(rawOption.id, USDT_CONTRACT);
         const bidUrl: string = this.makeDepthUrl(USDT_CONTRACT, rawOption.id);
         const askRawOrders: AxiosResponse<TRawDepth> = await this.httpService.get(askUrl).toPromise();
         const bidRawOrders: AxiosResponse<TRawDepth> = await this.httpService.get(bidUrl).toPromise();
 
         for (const { order } of askRawOrders.data.records) {
-            const amount: number = this.applyDecimals(order.makerAmount, rawOption.underlying.decimals);
-            const price: number = this.applyDecimals(order.takerAmount, USDT_DECIMALS) / amount;
-
-            asks.push({ amount, price });
+            depth.asks.push(this.extractDepthData(order.makerAmount, order.takerAmount, rawOption));
         }
 
         for (const { order } of bidRawOrders.data.records) {
-            const amount: number = this.applyDecimals(order.takerAmount, rawOption.underlying.decimals);
-            const price: number = this.applyDecimals(order.makerAmount, USDT_DECIMALS) / amount;
-
-            bids.push({ amount, price });
+            depth.bids.push(this.extractDepthData(order.takerAmount, order.makerAmount, rawOption));
         }
 
-        asks.sort((a: TDepthItem, b: TDepthItem): number => b.price - a.price);
-        bids.sort((a: TDepthItem, b: TDepthItem): number => b.price - a.price);
-
-        return { asks, bids };
+        return this.sortOrders(depth);
     }
 
     protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
@@ -154,5 +144,20 @@ export class AuctusService extends AggregatorAbstract<TRawOption, TDepth> {
 
     private applyDecimals(numberString: string, decimals: number | string): number {
         return new BigNumber(numberString).div(new BigNumber(10).pow(decimals)).toNumber();
+    }
+
+    private extractDepthData(baseRawAmount: string, quoteRawAmount: string, rawOption: TRawOption): TDepthItem {
+        const amount: number = this.applyDecimals(baseRawAmount, rawOption.underlying.decimals);
+        const price: number = this.applyDecimals(quoteRawAmount, USDT_DECIMALS) / amount;
+
+        return { amount, price };
+    }
+
+    private sortOrders(depth: TDepth): TDepth {
+        [depth.asks, depth.bids].forEach((orders: Array<TDepthItem>): void => {
+            orders.sort((a: TDepthItem, b: TDepthItem): number => b.price - a.price);
+        });
+
+        return depth;
     }
 }
