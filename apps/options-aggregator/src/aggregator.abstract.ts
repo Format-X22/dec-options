@@ -1,7 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Option, OptionDocument } from '@app/shared/option.schema';
 import { Model } from 'mongoose';
-import { Logger } from '@nestjs/common';
+import { HttpService, Logger } from '@nestjs/common';
 import * as sleep from 'sleep-promise';
 
 export abstract class AggregatorAbstract<TRawOption, TDepth> {
@@ -10,7 +10,10 @@ export abstract class AggregatorAbstract<TRawOption, TDepth> {
     protected isGetWithPagination: boolean = false;
     protected readonly pageSize: number = null;
 
-    constructor(@InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>) {}
+    constructor(
+        @InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>,
+        protected httpService: HttpService,
+    ) {}
 
     async startSyncLoop(): Promise<void> {
         try {

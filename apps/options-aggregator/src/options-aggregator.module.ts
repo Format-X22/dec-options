@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { OptionsAggregatorService } from './options-aggregator.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -26,6 +26,7 @@ import { Option, OptionSchema } from '@app/shared/option.schema';
             inject: [ConfigService],
         }),
         MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
+        HttpModule,
     ],
     providers: [
         OptionsAggregatorService,
