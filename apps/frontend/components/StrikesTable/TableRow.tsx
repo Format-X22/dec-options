@@ -4,6 +4,8 @@ import { $backgroundLight, $lineColor, $tableRowHover } from '../../theme';
 
 type TableRowProps = {
     reverse?: boolean;
+    onClick?: () => void;
+    className?: string;
 };
 export const TableRow: React.FunctionComponent<TableRowProps> = styled.div`
     display: flex;
