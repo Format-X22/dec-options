@@ -5,8 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
 import { HegicService } from './hegic/hegic.service';
 import { OpynService } from './opyn/opyn.service';
-import { AuctusService } from './auctus/auctus.service';
-import { SirenService } from './siren/siren.service';
 import { DeribitService } from './deribit/deribit.service';
 import { BinanceService } from './binance/binance.service';
 import { OkexService } from './okex/okex.service';
@@ -32,8 +30,6 @@ import { Option, OptionSchema } from '@app/shared/option.schema';
         OptionsAggregatorService,
         HegicService,
         OpynService,
-        AuctusService,
-        SirenService,
         DeribitService,
         BinanceService,
         OkexService,
