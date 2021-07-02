@@ -93,7 +93,7 @@ export function Table({
             </TablePart>
             <TablePart>
                 <TableSide
-                    onRowClick={openSubscribeModal}
+                    onRowClick={(): void => console.log('CLICKED')} // TODO -
                     data={callsDataByStrike}
                     error={callsError}
                     type='call'
@@ -111,7 +111,7 @@ export function Table({
             </StrikeColumn>
             <TablePart reverse>
                 <TableSide
-                    onRowClick={openSubscribeModal}
+                    onRowClick={(): void => console.log('CLICKED')} // TODO -
                     data={putsDataByStrike}
                     error={putsError}
                     reverse

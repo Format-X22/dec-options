@@ -15,25 +15,16 @@ export const TableRow: React.FunctionComponent<TableRowProps> = styled.div`
     flex-direction: ${({ reverse }: TableRowProps) => (reverse ? 'row-reverse' : 'row')};
     position: relative;
 
+    &.data-row {
+        cursor: pointer;
+    }
+
     & + & {
         border-top: 1px solid ${$lineColor};
     }
 
     &:hover {
         background: ${$tableRowHover};
-    }
-
-    button {
-        visibility: hidden;
-        pointer-events: none;
-
-        @media (min-width: 681px) {
-            ${({ reverse }: TableRowProps) => `${reverse ? 'right' : 'left'}: 0;`};
-        }
-
-        @media (max-width: 680px) {
-            ${({ reverse }: TableRowProps) => `${!reverse ? 'right' : 'left'}: 0;`};
-        }
     }
 
     &:hover {

@@ -51,50 +51,48 @@ export function TableSide({
             return;
         }
 
-        const newData = data.map(
-            (strikeElement: StrikeGroup): TStrikeElementData => {
-                if (!strikeElement) {
-                    return strikeElement;
-                }
+        const newData = data.map((strikeElement: StrikeGroup): TStrikeElementData => {
+            if (!strikeElement) {
+                return strikeElement;
+            }
 
-                const elementData: TStrikeElementData = { ...strikeElement };
-                let volatility: GreekValue = null;
-                let delta: GreekValue = null;
-                let gamma: GreekValue = null;
-                let theta: GreekValue = null;
-                let vega: GreekValue = null;
-                let minAsk: number = strikeElement.minAsk;
-                let maxBid: number = strikeElement.maxBid;
+            const elementData: TStrikeElementData = { ...strikeElement };
+            let volatility: GreekValue = null;
+            let delta: GreekValue = null;
+            let gamma: GreekValue = null;
+            let theta: GreekValue = null;
+            let vega: GreekValue = null;
+            let minAsk: number = strikeElement.minAsk;
+            let maxBid: number = strikeElement.maxBid;
 
-                if (Number.isFinite(strikeElement.minAsk)) {
-                    minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
-                    maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
+            if (Number.isFinite(strikeElement.minAsk)) {
+                minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
+                maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
 
-                    const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
-                    const strike = strikeElement.strike;
-                    const datesDifference = Math.abs(differenceInDays(new Date(date), new Date()) + 1) / 365;
+                const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
+                const strike = strikeElement.strike;
+                const datesDifference = Math.abs(differenceInDays(new Date(date), new Date()) + 1) / 365;
 
-                    volatility = iv.getImpliedVolatility(optionPrice, currentPrice, strike, datesDifference, 0, type);
+                volatility = iv.getImpliedVolatility(optionPrice, currentPrice, strike, datesDifference, 0, type);
 
-                    const greeksArgs = [currentPrice, strike, datesDifference, volatility, 0, type];
+                const greeksArgs = [currentPrice, strike, datesDifference, volatility, 0, type];
 
-                    delta = greeks.getDelta(...greeksArgs);
-                    gamma = greeks.getGamma(...greeksArgs);
-                    theta = greeks.getTheta(...greeksArgs);
-                    vega = greeks.getVega(...greeksArgs);
-                }
+                delta = greeks.getDelta(...greeksArgs);
+                gamma = greeks.getGamma(...greeksArgs);
+                theta = greeks.getTheta(...greeksArgs);
+                vega = greeks.getVega(...greeksArgs);
+            }
 
-                elementData.volatility = checkGreek(volatility);
-                elementData.delta = checkGreek(delta);
-                elementData.gamma = checkGreek(gamma);
-                elementData.theta = checkGreek(theta);
-                elementData.vega = checkGreek(vega);
-                elementData.maxBid = maxBid;
-                elementData.minAsk = minAsk;
+            elementData.volatility = checkGreek(volatility);
+            elementData.delta = checkGreek(delta);
+            elementData.gamma = checkGreek(gamma);
+            elementData.theta = checkGreek(theta);
+            elementData.vega = checkGreek(vega);
+            elementData.maxBid = maxBid;
+            elementData.minAsk = minAsk;
 
-                return elementData;
-            },
-        );
+            return elementData;
+        });
 
         setDataWithGreeks(newData);
     }
@@ -141,10 +139,7 @@ export function TableSide({
                 data &&
                 (dataWithGreeks || data).map((strike, j) =>
                     strike ? (
-                        <TableRow reverse={reverse} key={strike.strike + j}>
-                            {Number.isFinite(strike.minAsk) && (
-                                <TableRowButton onClick={onRowClick}>{'>'}</TableRowButton>
-                            )}
+                        <TableRow reverse={reverse} key={strike.strike + j} onClick={onRowClick} className='data-row'>
                             <PrintGreek propKey='volatility' strikeData={strike} name='param' />
                             <PrintGreek propKey='delta' strikeData={strike} name='param' />
                             <PrintGreek propKey='gamma' strikeData={strike} name='greek' />
