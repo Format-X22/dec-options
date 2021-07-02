@@ -28,10 +28,10 @@ function Icon(): JSX.Element {
     );
 }
 
-function PutsIcon(): JSX.Element {
+function PutsIcon({ large = false }: { large?: boolean }): JSX.Element {
     return (
         <Container>
-            <Text>Puts</Text>
+            <Text style={large ? { fontSize: 20 } : { fontSize: 12 }}>Puts</Text>
             <Icon />
         </Container>
     );

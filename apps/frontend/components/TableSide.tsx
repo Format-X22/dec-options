@@ -1,19 +1,19 @@
-import { ContextState } from '../../pages/stateType';
+import { ContextState } from '../pages/stateType';
 import React, { useContext } from 'react';
-import { ContextApp } from '../../pages/_app';
-import { GreekValue } from '../../types';
+import { ContextApp } from '../pages/_app';
+import { GreekValue } from '../types';
 import { differenceInDays } from 'date-fns';
-import { TableRow } from './TableRow';
-import { TableCell } from './TableCell';
-import { TitleText } from './TitleText';
-import { PrintGreek } from './PrintGreek';
-import Bars from '../Bars';
-import { Lines } from './Lines';
+import { TableRow } from './StrikesTable/TableRow';
+import { TableCell } from './StrikesTable/TableCell';
+import { TitleText } from './StrikesTable/TitleText';
+import { PrintGreek } from './StrikesTable/PrintGreek';
+import Bars from './Bars';
+import { Lines } from './StrikesTable/Lines';
 import greeks from 'greeks';
 import iv from 'implied-volatility';
 import { ApolloError } from '@apollo/client';
-import TableRowButton from './TableRowButton';
-import { StrikeGroup } from '../../../../libs/shared/src/option.schema';
+import TableRowButton from './StrikesTable/TableRowButton';
+import { StrikeGroup } from '../../../libs/shared/src/option.schema';
 
 type TStrikeElementData = StrikeGroup & {
     volatility?: number;
@@ -34,6 +34,7 @@ export function TableSide({
     type,
     date,
     onRowClick,
+    hideSourcesColumn,
 }: {
     data: any;
     error: ApolloError;
@@ -41,6 +42,7 @@ export function TableSide({
     type: string;
     date: Date;
     onRowClick: () => void;
+    hideSourcesColumn?: boolean;
 }): JSX.Element {
     const { state }: Partial<ContextState> = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
@@ -130,9 +132,11 @@ export function TableSide({
                 <TableCell>
                     <TitleText>Max Bid</TitleText>
                 </TableCell>
-                <TableCell>
-                    <TitleText>Sources</TitleText>
-                </TableCell>
+                {!hideSourcesColumn && (
+                    <TableCell>
+                        <TitleText>Sources</TitleText>
+                    </TableCell>
+                )}
             </TableRow>
             {error && <TableRow>{error.toString()}</TableRow>}
             {!error &&
@@ -198,11 +202,13 @@ export function TableSide({
                                     <Lines />
                                 </TitleText>
                             </TableCell>
-                            <TableCell>
-                                <TitleText>
-                                    <Bars max={7} value={0} align={reverse ? 'left' : 'right'} />
-                                </TitleText>
-                            </TableCell>
+                            {!hideSourcesColumn && (
+                                <TableCell>
+                                    <TitleText>
+                                        <Bars max={7} value={0} align={reverse ? 'left' : 'right'} />
+                                    </TitleText>
+                                </TableCell>
+                            )}
                         </TableRow>
                     ),
                 )}

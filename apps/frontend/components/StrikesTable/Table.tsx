@@ -6,7 +6,7 @@ import { TablePart } from './TablePart';
 import CallsIcon from '../CallsIcon';
 import { TitleText } from './TitleText';
 import PutsIcon from '../PutsIcon';
-import { TableSide } from './TableSide';
+import { TableSide } from '../TableSide';
 import { StrikeColumn } from './StrikeColumn';
 import { StrikeCell } from './StrikeCell';
 

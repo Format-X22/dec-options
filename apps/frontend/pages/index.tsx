@@ -7,6 +7,10 @@ import { ContextApp } from './_app';
 import { ActionType, ContextState } from './stateType';
 import StrikesTable from '../components/StrikesTable/StrikesTable';
 import { gql, useQuery } from '@apollo/client';
+import { GroupInfo } from '../components/OptionsTable/GroupInfo';
+import { TableSide } from '../components/TableSide';
+import { Table } from '../components/OptionsTable/Table';
+import { OptionsPanel } from '../components/OptionsTable/OptionsPanel';
 
 const Container = styled.div`
     display: flex;
@@ -91,6 +95,7 @@ function Index(props): JSX.Element {
             <Header />
             <Filters />
             <StrikesTable />
+            <OptionsPanel />
         </Container>
     );
 }

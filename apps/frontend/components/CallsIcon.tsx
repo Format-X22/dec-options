@@ -11,7 +11,6 @@ const Container = styled.div`
 
 const Text = styled.span`
     font-weight: 600;
-    font-size: 12px;
     line-height: 20px;
     color: ${$colorGreen};
     margin-right: 12px;
@@ -28,10 +27,10 @@ function Icon(): JSX.Element {
     );
 }
 
-function CallsIcon(): JSX.Element {
+function CallsIcon({large = false}: {large?: boolean}): JSX.Element {
     return (
         <Container>
-            <Text>Calls</Text>
+            <Text style={large ? { fontSize: 20 } : { fontSize: 12 }}>Calls</Text>
             <Icon />
         </Container>
     );
