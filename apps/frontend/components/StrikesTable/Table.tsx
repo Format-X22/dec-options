@@ -1,14 +1,16 @@
 import { gql, useQuery } from '@apollo/client';
-import React from 'react';
+import React, { useContext } from 'react';
 import format from 'date-fns/format';
 import { TableContainer } from './TableContainer';
 import { TablePart } from './TablePart';
 import CallsIcon from '../CallsIcon';
 import { TitleText } from './TitleText';
 import PutsIcon from '../PutsIcon';
-import { TableSide } from '../TableSide';
+import { TableSide } from './TableSide';
 import { StrikeColumn } from './StrikeColumn';
 import { StrikeCell } from './StrikeCell';
+import { ActionType, ContextState, ESplashPanels } from '../../pages/stateType';
+import { ContextApp } from '../../pages/_app';
 
 const GET_STRIKES = gql`
     query getStrikes($type: OptionType, $base: String, $fromDate: DateTime, $toDate: DateTime) {
@@ -32,6 +34,8 @@ export function Table({
     base: string;
     openSubscribeModal: () => void;
 }): JSX.Element {
+    const { changeState }: Partial<ContextState> = useContext(ContextApp);
+
     const fromDate = new Date(date);
     fromDate.setHours(0);
     fromDate.setMinutes(0);
@@ -93,7 +97,20 @@ export function Table({
             </TablePart>
             <TablePart>
                 <TableSide
-                    onRowClick={(): void => console.log('CLICKED')} // TODO -
+                    onRowClick={(strike: number): void => {
+                        changeState({
+                            type: ActionType.SET_CURRENT_PANEL,
+                            payload: ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK,
+                        });
+                        changeState({
+                            type: ActionType.SET_SELECTED_OPTION,
+                            payload: {
+                                date: new Date(date),
+                                type: 'call',
+                                strike,
+                            },
+                        });
+                    }}
                     data={callsDataByStrike}
                     error={callsError}
                     type='call'
@@ -111,7 +128,20 @@ export function Table({
             </StrikeColumn>
             <TablePart reverse>
                 <TableSide
-                    onRowClick={(): void => console.log('CLICKED')} // TODO -
+                    onRowClick={(strike): void => {
+                        changeState({
+                            type: ActionType.SET_CURRENT_PANEL,
+                            payload: ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK,
+                        });
+                        changeState({
+                            type: ActionType.SET_SELECTED_OPTION,
+                            payload: {
+                                date: new Date(date),
+                                type: 'put',
+                                strike,
+                            },
+                        });
+                    }}
                     data={putsDataByStrike}
                     error={putsError}
                     reverse

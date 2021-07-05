@@ -10,6 +10,10 @@ export const rootReducer = (state: State, action: Action): State => {
             return { ...state, prices: { ...state.prices, [action.payload.key]: action.payload.price } };
         case ActionType.SET_PRICES:
             return { ...state, prices: { ...state.prices, ...action.payload } };
+        case ActionType.SET_CURRENT_PANEL:
+            return { ...state, currentSplashPanel: action.payload };
+        case ActionType.SET_SELECTED_OPTION:
+            return { ...state, selectedOption: action.payload };
         default:
             throw new Error('Unexpected action');
     }

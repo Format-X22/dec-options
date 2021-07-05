@@ -1,19 +1,19 @@
-import { ContextState } from '../pages/stateType';
+import { ContextState } from '../../pages/stateType';
 import React, { useContext } from 'react';
-import { ContextApp } from '../pages/_app';
-import { GreekValue } from '../types';
+import { ContextApp } from '../../pages/_app';
+import { GreekValue } from '../../types';
 import { differenceInDays } from 'date-fns';
-import { TableRow } from './StrikesTable/TableRow';
-import { TableCell } from './StrikesTable/TableCell';
-import { TitleText } from './StrikesTable/TitleText';
-import { PrintGreek } from './StrikesTable/PrintGreek';
-import Bars from './Bars';
-import { Lines } from './StrikesTable/Lines';
+import { TableRow } from './TableRow';
+import { TableCell } from './TableCell';
+import { TitleText } from './TitleText';
+import { PrintGreek } from './PrintGreek';
+import Bars from '../Bars';
+import { Lines } from './Lines';
 import greeks from 'greeks';
 import iv from 'implied-volatility';
 import { ApolloError } from '@apollo/client';
-import TableRowButton from './StrikesTable/TableRowButton';
-import { StrikeGroup } from '../../../libs/shared/src/option.schema';
+import TableRowButton from './TableRowButton';
+import { StrikeGroup } from '../../../../libs/shared/src/option.schema';
 
 type TStrikeElementData = StrikeGroup & {
     volatility?: number;
@@ -41,7 +41,7 @@ export function TableSide({
     reverse?: boolean;
     type: string;
     date: Date;
-    onRowClick: () => void;
+    onRowClick: (strike: number) => void;
     hideSourcesColumn?: boolean;
 }): JSX.Element {
     const { state }: Partial<ContextState> = useContext(ContextApp);
@@ -143,7 +143,12 @@ export function TableSide({
                 data &&
                 (dataWithGreeks || data).map((strike, j) =>
                     strike ? (
-                        <TableRow reverse={reverse} key={strike.strike + j} onClick={onRowClick} className='data-row'>
+                        <TableRow
+                            reverse={reverse}
+                            key={strike.strike + j}
+                            onClick={(): void => onRowClick(strike.strike)}
+                            className='data-row'
+                        >
                             <PrintGreek propKey='volatility' strikeData={strike} name='param' />
                             <PrintGreek propKey='delta' strikeData={strike} name='param' />
                             <PrintGreek propKey='gamma' strikeData={strike} name='greek' />

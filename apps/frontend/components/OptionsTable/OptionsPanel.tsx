@@ -8,8 +8,16 @@ const PanelBodyWrap = styled.div`
     margin-top: 4px;
     display: flex;
     flex-direction: row;
+    align-content: space-between;
+
+    & > div + div {
+        margin-left: 5px;
+    }
 `;
-const ColumnWrap = styled.div`
+const TableWrap = styled.div`
+    flex: 2;
+`;
+const OrderBookWrap = styled.div`
     flex: 1;
 `;
 
@@ -18,12 +26,13 @@ export function OptionsPanel(): JSX.Element {
         <>
             <GroupInfo />
             <PanelBodyWrap>
-                <ColumnWrap>
+                <TableWrap>
                     <Table />
-                </ColumnWrap>
-                <ColumnWrap>
+                </TableWrap>
+
+                <OrderBookWrap>
                     <OrderBook />
-                </ColumnWrap>
+                </OrderBookWrap>
             </PanelBodyWrap>
         </>
     );

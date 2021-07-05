@@ -8,6 +8,12 @@ export type State = {
     prices: {
         [key: string]: number;
     };
+    currentSplashPanel: ESplashPanels;
+    selectedOption: {
+        date: Date;
+        type: 'call' | 'put';
+        strike: number;
+    };
 };
 
 export enum ActionType {
@@ -15,6 +21,13 @@ export enum ActionType {
     SET_FILTER_CURRENCY = 'SET_FILTER_CURRENCY',
     SET_PRICE = 'SET_PRICE',
     SET_PRICES = 'SET_PRICES',
+    SET_CURRENT_PANEL = 'SET_CURRENT_PANEL',
+    SET_SELECTED_OPTION = 'SET_SELECTED_OPTION',
+}
+
+export enum ESplashPanels {
+    STRIKES_TABLE = 'STRIKES_TABLE',
+    OPTIONS_TABLE_WITH_ORDER_BOOK = 'OPTIONS_TABLE_WITH_ORDER_BOOK',
 }
 
 type ActionStringPayload = {
@@ -37,7 +50,26 @@ type ActionPricesPayload = {
     };
 };
 
-export type Action = ActionStringPayload | ActionPricePayload | ActionPricesPayload;
+type TActionCurrentPanelPayload = {
+    type: ActionType.SET_CURRENT_PANEL;
+    payload: ESplashPanels;
+};
+
+type TActionSelectedOption = {
+    type: ActionType.SET_SELECTED_OPTION;
+    payload: {
+        date: Date;
+        type: 'call' | 'put';
+        strike: number;
+    };
+};
+
+export type Action =
+    | ActionStringPayload
+    | ActionPricePayload
+    | ActionPricesPayload
+    | TActionCurrentPanelPayload
+    | TActionSelectedOption;
 
 export type ContextState = {
     state: State;
