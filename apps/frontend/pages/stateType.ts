@@ -13,6 +13,7 @@ export type State = {
         date: Date;
         type: 'call' | 'put';
         strike: number;
+        base: string;
     };
 };
 
@@ -61,6 +62,7 @@ type TActionSelectedOption = {
         date: Date;
         type: 'call' | 'put';
         strike: number;
+        base: string;
     };
 };
 

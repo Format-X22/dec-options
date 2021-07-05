@@ -12,10 +12,13 @@ import { Lines } from './Lines';
 import greeks from 'greeks';
 import iv from 'implied-volatility';
 import { ApolloError } from '@apollo/client';
-import TableRowButton from './TableRowButton';
-import { StrikeGroup } from '../../../../libs/shared/src/option.schema';
 
-type TStrikeElementData = StrikeGroup & {
+type TTableData = {
+    strike?: number;
+    minAsk?: number;
+    maxBid?: number;
+    askQuote?: number;
+    bidQuote?: number;
     volatility?: number;
     delta?: number;
     gamma?: number;
@@ -53,26 +56,26 @@ export function TableSide({
             return;
         }
 
-        const newData = data.map((strikeElement: StrikeGroup): TStrikeElementData => {
-            if (!strikeElement) {
-                return strikeElement;
+        const newData = data.map((item: TTableData): TTableData => {
+            if (!item) {
+                return item;
             }
 
-            const elementData: TStrikeElementData = { ...strikeElement };
+            const elementData: TTableData = { ...item };
             let volatility: GreekValue = null;
             let delta: GreekValue = null;
             let gamma: GreekValue = null;
             let theta: GreekValue = null;
             let vega: GreekValue = null;
-            let minAsk: number = strikeElement.minAsk;
-            let maxBid: number = strikeElement.maxBid;
+            let minAsk: number = item.minAsk || item.askQuote || 0;
+            let maxBid: number = item.maxBid || item.bidQuote || 0;
 
-            if (Number.isFinite(strikeElement.minAsk)) {
+            if (Number.isFinite(minAsk)) {
                 minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
                 maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
 
                 const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
-                const strike = strikeElement.strike;
+                const strike = item.strike;
                 const datesDifference = Math.abs(differenceInDays(new Date(date), new Date()) + 1) / 365;
 
                 volatility = iv.getImpliedVolatility(optionPrice, currentPrice, strike, datesDifference, 0, type);

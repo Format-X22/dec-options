@@ -108,6 +108,7 @@ export function Table({
                                 date: new Date(date),
                                 type: 'call',
                                 strike,
+                                base,
                             },
                         });
                     }}
@@ -139,6 +140,7 @@ export function Table({
                                 date: new Date(date),
                                 type: 'put',
                                 strike,
+                                base,
                             },
                         });
                     }}

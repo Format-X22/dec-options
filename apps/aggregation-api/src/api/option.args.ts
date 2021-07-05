@@ -1,4 +1,4 @@
-import { ArgsType, Field, Int, registerEnumType } from '@nestjs/graphql';
+import { ArgsType, Field, Float, Int, registerEnumType } from '@nestjs/graphql';
 import { PaginationArgs } from '@app/shared/list.dto';
 import { IsEnum, IsInstance, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
@@ -31,6 +31,25 @@ export class OptionListArgs extends PaginationArgs {
     @IsOptional()
     @IsEnum(EOptionType)
     filterByType?: EOptionType;
+
+    @Field((): typeof String => String)
+    @IsOptional()
+    filterByBase?: string;
+
+    @Field((): typeof Date => Date, { nullable: true })
+    @IsOptional()
+    @IsInstance(Date)
+    filterByDateFrom?: Date;
+
+    @Field((): typeof Date => Date, { nullable: true })
+    @IsOptional()
+    @IsInstance(Date)
+    filterByDateTo?: Date;
+
+    @Field((): typeof Float => Float, { nullable: true })
+    @IsOptional()
+    @Min(0)
+    filterByStrike?: number;
 
     @Field((): typeof ESortDirection => ESortDirection, { nullable: true })
     @IsOptional()
