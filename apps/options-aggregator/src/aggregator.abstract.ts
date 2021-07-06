@@ -3,8 +3,10 @@ import { Option, OptionDocument } from '@app/shared/option.schema';
 import { Model } from 'mongoose';
 import { HttpService, Logger } from '@nestjs/common';
 import * as sleep from 'sleep-promise';
+import { OrderBook, OrderBookDocument } from '@app/shared/orderbook.schema';
+import { BasePrice, BasePriceDocument } from '@app/shared/base-price.schema';
 
-export abstract class AggregatorAbstract<TRawOption, TDepth> {
+export abstract class AggregatorAbstract<TRawOption> {
     protected logger: Logger;
     protected abstract get rateLimit(): number;
     protected isGetWithPagination: boolean = false;
@@ -12,6 +14,8 @@ export abstract class AggregatorAbstract<TRawOption, TDepth> {
 
     constructor(
         @InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>,
+        @InjectModel(OrderBook.name) private orderBookDataModel: Model<OrderBookDocument>,
+        @InjectModel(BasePrice.name) private basePriceModel: Model<BasePriceDocument>,
         protected httpService: HttpService,
     ) {}
 
@@ -49,16 +53,31 @@ export abstract class AggregatorAbstract<TRawOption, TDepth> {
         sleep(this.rateLimit);
 
         for (const raw of rawOptions) {
-            const depth: TDepth = await this.getDepth(raw);
-            const option: Option = this.constructOptionData(raw, depth);
+            const orderBook: OrderBook = await this.getOrderBook(raw);
+            const option: Option = this.constructOptionData(raw, orderBook);
 
+            await this.saveOrderBook(orderBook);
             await this.saveResult(option);
 
             sleep(this.rateLimit);
         }
     }
 
-    protected async saveResult(data: Option): Promise<void> {
+    protected async getBasePrice(symbol: string): Promise<number> {
+        const result: BasePrice = await this.basePriceModel.findOne({ symbol }, { price: true });
+
+        if (!result) {
+            return 0;
+        }
+
+        return result.price;
+    }
+
+    private async saveOrderBook(orderBook: OrderBook): Promise<void> {
+        await this.orderBookDataModel.updateOne({ optionId: orderBook.optionId }, orderBook, { upsert: true });
+    }
+
+    private async saveResult(data: Option): Promise<void> {
         await this.optionsDataModel.updateOne({ id: data.id }, data, { upsert: true });
     }
 
@@ -87,6 +106,6 @@ export abstract class AggregatorAbstract<TRawOption, TDepth> {
     }
 
     protected abstract getRawOptions(skip?: number): Promise<Array<TRawOption>>;
-    protected abstract getDepth(rawOption: TRawOption): Promise<TDepth>;
-    protected abstract constructOptionData(rawOption: TRawOption, depth: TDepth): Option;
+    protected abstract getOrderBook(rawOption: TRawOption): Promise<OrderBook>;
+    protected abstract constructOptionData(rawOption: TRawOption, depth: OrderBook): Option;
 }

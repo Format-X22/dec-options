@@ -1,15 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EOptionDeliveryType, EOptionStyleType, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
-import { Dictionary, Exchange, Market, OrderBook } from 'ccxt';
+import { Dictionary, Exchange, Market, OrderBook as CcxtOrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
+import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
 type TRawOption = Dictionary<Market>[0];
-type TDepth = OrderBook;
 
 @Injectable()
-export class DeribitService extends AggregatorAbstract<TRawOption, TDepth> {
+export class DeribitService extends AggregatorAbstract<TRawOption> {
     protected readonly logger: Logger = new Logger(DeribitService.name);
     private readonly exchange: Exchange = new ccxt.deribit();
 
@@ -23,11 +23,18 @@ export class DeribitService extends AggregatorAbstract<TRawOption, TDepth> {
         return Object.values(markets).filter((raw: TRawOption): boolean => raw.type === 'option' && raw.active);
     }
 
-    protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
-        return await this.exchange.fetchOrderBook(rawOption.symbol);
+    protected async getOrderBook(rawOption: TRawOption): Promise<OrderBook> {
+        const ccxtOrderBook: CcxtOrderBook = await this.exchange.fetchOrderBook(rawOption.symbol);
+
+        return {
+            optionId: rawOption.id,
+            optionMarketKey: EMarketKey.DERIBIT,
+            asks: ccxtOrderBook.asks.map(([price, amount]: [number, number]): OrderBookOrder => ({ price, amount })),
+            bids: ccxtOrderBook.bids.map(([price, amount]: [number, number]): OrderBookOrder => ({ price, amount })),
+        };
     }
 
-    protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
+    protected constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Option {
         return {
             id: rawOption.id,
             name: rawOption.symbol,
@@ -42,9 +49,9 @@ export class DeribitService extends AggregatorAbstract<TRawOption, TDepth> {
             strikeAsset: rawOption.base,
             marketUrl: 'https://www.deribit.com/main#/options',
             askBase: null,
-            askQuote: depth.asks?.[0]?.[0] || 0,
+            askQuote: orderBook.asks[0]?.price || 0,
             bidBase: null,
-            bidQuote: depth.bids?.[0]?.[0] || 0,
+            bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
         };

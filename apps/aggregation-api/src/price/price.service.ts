@@ -2,6 +2,9 @@ import { HttpService, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '
 import { ConfigService } from '@nestjs/config';
 import Timeout = NodeJS.Timeout;
 import { AxiosResponse } from 'axios';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { BasePrice, BasePriceDocument } from '@app/shared/base-price.schema';
 
 enum ESymbol {
     USD = 'USD',
@@ -11,7 +14,6 @@ enum ESymbol {
     ETH = 'ETH',
     WETH = 'WETH',
     EOS = 'EOS',
-    AUC = 'AUC',
     SUSHI = 'SUSHI',
     UNI = 'UNI',
     YFI = 'YFI',
@@ -24,7 +26,6 @@ type TRaw3CommasPrice = {
 enum EApiMarkets {
     FTX = 'ftx',
     BINANCE = 'binance',
-    HIT_BTC = 'hitbtc',
 }
 
 const API_POINT: string = 'https://api.3commas.io/public/api/ver1';
@@ -39,7 +40,11 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
         [ESymbol.USDC, 1],
     ]);
 
-    constructor(private configService: ConfigService, private httpService: HttpService) {}
+    constructor(
+        @InjectModel(BasePrice.name) private basePriceModel: Model<BasePriceDocument>,
+        private configService: ConfigService,
+        private httpService: HttpService,
+    ) {}
 
     async onModuleInit(): Promise<void> {
         this.interval = setInterval(async (): Promise<void> => {
@@ -85,8 +90,8 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
                 case ESymbol.WBTC: {
                     const price: number = await this.getPriceFrom2Commas(EApiMarkets.FTX, `USD_${ESymbol.BTC}`);
 
-                    this.price.set(ESymbol.BTC, price);
-                    this.price.set(ESymbol.WBTC, price);
+                    await this.savePrice(ESymbol.BTC, price);
+                    await this.savePrice(ESymbol.WBTC, price);
                     handled.add(ESymbol.BTC);
                     handled.add(ESymbol.WBTC);
                     break;
@@ -96,8 +101,8 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
                 case ESymbol.WETH: {
                     const price: number = await this.getPriceFrom2Commas(EApiMarkets.FTX, `USDT_${ESymbol.ETH}`);
 
-                    this.price.set(ESymbol.ETH, price);
-                    this.price.set(ESymbol.WETH, price);
+                    await this.savePrice(ESymbol.ETH, price);
+                    await this.savePrice(ESymbol.WETH, price);
                     handled.add(ESymbol.ETH);
                     handled.add(ESymbol.WETH);
                     break;
@@ -108,23 +113,14 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
                 case ESymbol.YFI: {
                     const price: number = await this.getPriceFrom2Commas(EApiMarkets.FTX, `USDT_${symbol}`);
 
-                    this.price.set(symbol, price);
+                    await this.savePrice(symbol, price);
                     handled.add(symbol);
                     break;
                 }
 
                 case ESymbol.EOS: {
                     const price: number = await this.getPriceFrom2Commas(EApiMarkets.BINANCE, `USDT_${symbol}`);
-                    this.price.set(ESymbol.EOS, price);
-                    break;
-                }
-
-                case ESymbol.AUC: {
-                    const priceInBtc: number = await this.getPriceFrom2Commas(EApiMarkets.HIT_BTC, `BTC_${symbol}`);
-                    const btcPrice: number = this.getPrice(ESymbol.BTC);
-                    const price: number = priceInBtc * btcPrice;
-
-                    this.price.set(ESymbol.AUC, price);
+                    await this.savePrice(ESymbol.EOS, price);
                     break;
                 }
 
@@ -132,6 +128,11 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
                     this.logger.error(`Unknown symbol ${symbol}`);
             }
         }
+    }
+
+    private async savePrice(symbol: ESymbol, price: number): Promise<void> {
+        this.price.set(symbol, price);
+        await this.basePriceModel.updateOne({ symbol }, { $set: { symbol, price: price || 0 } }, { upsert: true });
     }
 
     private async getPriceFrom2Commas(market: EApiMarkets, pair: string): Promise<number> {

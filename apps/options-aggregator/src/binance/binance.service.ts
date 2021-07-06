@@ -4,6 +4,7 @@ import * as ccxt from 'ccxt';
 import { Exchange } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
+import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
 const getOptionsApiUrl: string = 'https://vapi.binance.com/vapi/v1/optionInfo';
 const getOptionDepthApiUrl: string = 'https://vapi.binance.com/vapi/v1/depth';
@@ -27,15 +28,13 @@ type TRawOption = TOptionsResponse['data'][0];
 type TOptionsDepthResponse = {
     msg: string;
     data: {
-        bids: [[number]];
-        asks: [[number]];
+        bids: [[number, number]];
+        asks: [[number, number]];
     };
 };
 
-type TDepth = TOptionsDepthResponse['data'];
-
 @Injectable()
-export class BinanceService extends AggregatorAbstract<TRawOption, TDepth> {
+export class BinanceService extends AggregatorAbstract<TRawOption> {
     protected readonly logger: Logger = new Logger(BinanceService.name);
     private readonly exchange: Exchange = new ccxt.binance();
 
@@ -53,7 +52,7 @@ export class BinanceService extends AggregatorAbstract<TRawOption, TDepth> {
         return rawOptionsResponse.data;
     }
 
-    protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
+    protected async getOrderBook(rawOption: TRawOption): Promise<OrderBook> {
         const depthUrl: string = `${getOptionDepthApiUrl}?symbol=${rawOption.symbol}`;
         const rawDepthResponse: TOptionsDepthResponse = await this.exchange.fetch(depthUrl, 'GET');
 
@@ -61,10 +60,19 @@ export class BinanceService extends AggregatorAbstract<TRawOption, TDepth> {
             this.throwRequestError('depth', rawDepthResponse);
         }
 
-        return rawDepthResponse.data;
+        return {
+            optionId: rawOption.id,
+            optionMarketKey: EMarketKey.BINANCE,
+            asks: rawDepthResponse.data.asks.map(
+                ([price, amount]: [number, number]): OrderBookOrder => ({ price, amount }),
+            ),
+            bids: rawDepthResponse.data.bids.map(
+                ([price, amount]: [number, number]): OrderBookOrder => ({ price, amount }),
+            ),
+        };
     }
 
-    protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
+    protected constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Option {
         return {
             id: rawOption.id,
             name: rawOption.symbol,
@@ -79,9 +87,9 @@ export class BinanceService extends AggregatorAbstract<TRawOption, TDepth> {
             strikeAsset: rawOption.underlying.replace(rawOption.quoteAsset, ''),
             marketUrl: 'https://voptions.binance.com/en',
             askBase: null,
-            askQuote: depth.asks?.[0]?.[0] || 0,
+            askQuote: orderBook.asks[0]?.price || 0,
             bidBase: null,
-            bidQuote: depth.bids?.[0]?.[0] || 0,
+            bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
         };

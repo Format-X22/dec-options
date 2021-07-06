@@ -9,6 +9,8 @@ import { DeribitService } from './deribit/deribit.service';
 import { BinanceService } from './binance/binance.service';
 import { OkexService } from './okex/okex.service';
 import { Option, OptionSchema } from '@app/shared/option.schema';
+import { OrderBook, OrderBookSchema } from '@app/shared/orderbook.schema';
+import { BasePrice, BasePriceSchema } from '@app/shared/base-price.schema';
 
 @Module({
     imports: [
@@ -23,16 +25,13 @@ import { Option, OptionSchema } from '@app/shared/option.schema';
             }),
             inject: [ConfigService],
         }),
-        MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
+        MongooseModule.forFeature([
+            { name: Option.name, schema: OptionSchema },
+            { name: OrderBook.name, schema: OrderBookSchema },
+            { name: BasePrice.name, schema: BasePriceSchema },
+        ]),
         HttpModule,
     ],
-    providers: [
-        OptionsAggregatorService,
-        HegicService,
-        OpynService,
-        DeribitService,
-        BinanceService,
-        OkexService,
-    ],
+    providers: [OptionsAggregatorService, HegicService, OpynService, DeribitService, BinanceService, OkexService],
 })
 export class OptionsAggregatorModule {}

@@ -5,6 +5,7 @@ import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
 import * as sleep from 'sleep-promise';
 import BigNumber from 'bignumber.js';
+import { OrderBook } from '@app/shared/orderbook.schema';
 
 type TOptionsResponse = {
     hegicOptions: Array<{
@@ -21,7 +22,6 @@ type TOptionsResponse = {
 };
 
 type TRawOption = TOptionsResponse['hegicOptions'][0];
-type TDepth = { ask: number };
 
 const API: string = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
 const MS_MULTIPLY: number = 1000;
@@ -29,7 +29,7 @@ const DECIMAL_DELIMITER: number = 100_000_000;
 const PAGE_SIZE: number = 1000;
 
 @Injectable()
-export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
+export class HegicService extends AggregatorAbstract<TRawOption> {
     protected readonly logger: Logger = new Logger(HegicService.name);
     protected readonly pageSize: number = 1000;
     protected isGetWithPagination: boolean = true;
@@ -59,14 +59,21 @@ export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
         return result;
     }
 
-    protected async getDepth(rawOption: TRawOption): Promise<TDepth> {
+    protected async getOrderBook(rawOption: TRawOption): Promise<OrderBook> {
         const premium: BigNumber = new BigNumber(rawOption.premium);
         const decimals: BigNumber = new BigNumber(rawOption.underlying.decimals);
+        const askInBase: number = premium.div(new BigNumber(10).pow(decimals)).toNumber();
+        const btcUsdPrice: number = await this.getBasePrice('BTC');
 
-        return { ask: premium.div(new BigNumber(10).pow(decimals)).toNumber() };
+        return {
+            optionId: rawOption.id,
+            optionMarketKey: EMarketKey.HEGIC,
+            asks: [{ price: askInBase * btcUsdPrice, amount: 0 }],
+            bids: [{ price: 0, amount: 0 }],
+        };
     }
 
-    protected constructOptionData(rawOption: TRawOption, depth: TDepth): Option {
+    protected constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Option {
         return {
             id: rawOption.id,
             name: rawOption.id,
@@ -80,10 +87,10 @@ export class HegicService extends AggregatorAbstract<TRawOption, TDepth> {
             quote: 'USD',
             strikeAsset: rawOption.underlying.symbol,
             marketUrl: 'https://www.hegic.co/',
-            askBase: depth.ask,
-            askQuote: null,
+            askBase: null,
+            askQuote: orderBook.asks[0]?.price || 0,
             bidBase: null,
-            bidQuote: null,
+            bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.AMERICAN,
         };
