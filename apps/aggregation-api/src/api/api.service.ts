@@ -15,6 +15,9 @@ type TOptionsQuery = {
     marketKey?: Option['marketKey'];
     marketType?: Option['marketType'];
     type?: Option['type'];
+    base?: Option['base'];
+    strike?: Option['strike'];
+    expirationDate?: { $lt?: Option['expirationDate']; $gt?: Option['expirationDate'] };
 };
 
 type TSortDirection = 1 | -1;
@@ -251,6 +254,26 @@ export class ApiService {
             dbQuery.type = requestQuery.filterByType;
         }
 
+        if (requestQuery.filterByBase) {
+            dbQuery.base = requestQuery.filterByBase;
+        }
+
+        if (requestQuery.filterByStrike) {
+            dbQuery.strike = requestQuery.filterByStrike;
+        }
+
+        if (requestQuery.filterByExpirationDateFrom || requestQuery.filterByExpirationDateTo) {
+            dbQuery.expirationDate = {};
+        }
+
+        if (requestQuery.filterByExpirationDateFrom) {
+            dbQuery.expirationDate.$gt = requestQuery.filterByExpirationDateFrom;
+        }
+
+        if (requestQuery.filterByExpirationDateTo) {
+            dbQuery.expirationDate.$lt = requestQuery.filterByExpirationDateTo;
+        }
+
         return dbQuery;
     }
 
@@ -298,7 +321,7 @@ export class ApiService {
         timezone: number,
     ): Array<ExpirationGroup> {
         const result: Array<ExpirationGroup> = [];
-        const momentSize: unitOfTime.StartOf = (size as unknown) as unitOfTime.StartOf;
+        const momentSize: unitOfTime.StartOf = size as unknown as unitOfTime.StartOf;
 
         for (const expiration of data) {
             const last: ExpirationGroup = result[result.length - 1];

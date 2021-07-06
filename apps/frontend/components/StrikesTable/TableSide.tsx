@@ -38,6 +38,7 @@ export function TableSide({
     date,
     onRowClick,
     hideSourcesColumn,
+    showMarketColumn,
 }: {
     data: any;
     error: ApolloError;
@@ -46,6 +47,7 @@ export function TableSide({
     date: Date;
     onRowClick: (strike: number) => void;
     hideSourcesColumn?: boolean;
+    showMarketColumn?: boolean;
 }): JSX.Element {
     const { state }: Partial<ContextState> = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
@@ -114,6 +116,11 @@ export function TableSide({
     return (
         <>
             <TableRow reverse={reverse}>
+                {showMarketColumn && (
+                    <TableCell>
+                        <TitleText>Market</TitleText>
+                    </TableCell>
+                )}
                 <TableCell data-name='param'>
                     <TitleText>IV</TitleText>
                 </TableCell>
@@ -144,37 +151,51 @@ export function TableSide({
             {error && <TableRow>{error.toString()}</TableRow>}
             {!error &&
                 data &&
-                (dataWithGreeks || data).map((strike, j) =>
-                    strike ? (
+                (dataWithGreeks || data).map((item, j) =>
+                    item ? (
                         <TableRow
                             reverse={reverse}
-                            key={strike.strike + j}
-                            onClick={(): void => onRowClick(strike.strike)}
+                            key={item.strike + j + Math.random()}
+                            onClick={(): void => onRowClick(item.strike)}
                             className='data-row'
                         >
-                            <PrintGreek propKey='volatility' strikeData={strike} name='param' />
-                            <PrintGreek propKey='delta' strikeData={strike} name='param' />
-                            <PrintGreek propKey='gamma' strikeData={strike} name='greek' />
-                            <PrintGreek propKey='theta' strikeData={strike} name='greek' />
-                            <PrintGreek propKey='vega' strikeData={strike} name='greek' />
+                            {showMarketColumn && (
+                                <TableCell>
+                                    <TitleText>{item.market?.name}</TitleText>
+                                </TableCell>
+                            )}
+                            <PrintGreek propKey='volatility' strikeData={item} name='param' />
+                            <PrintGreek propKey='delta' strikeData={item} name='param' />
+                            <PrintGreek propKey='gamma' strikeData={item} name='greek' />
+                            <PrintGreek propKey='theta' strikeData={item} name='greek' />
+                            <PrintGreek propKey='vega' strikeData={item} name='greek' />
                             <TableCell>
                                 <TitleText active>
-                                    {Number.isFinite(strike.minAsk) ? strike.minAsk.toFixed(2) : <Lines />}
+                                    {Number.isFinite(item.minAsk) ? item.minAsk.toFixed(2) : <Lines />}
                                 </TitleText>
                             </TableCell>
                             <TableCell>
                                 <TitleText active>
-                                    {Number.isFinite(strike.maxBid) ? strike.maxBid.toFixed(2) : <Lines />}
+                                    {Number.isFinite(item.maxBid) ? item.maxBid.toFixed(2) : <Lines />}
                                 </TitleText>
                             </TableCell>
-                            <TableCell>
-                                <TitleText active>
-                                    <Bars max={7} value={strike.markets.length} align={reverse ? 'left' : 'right'} />
-                                </TitleText>
-                            </TableCell>
+                            {!hideSourcesColumn && (
+                                <TableCell>
+                                    <TitleText active>
+                                        <Bars max={7} value={item.markets.length} align={reverse ? 'left' : 'right'} />
+                                    </TitleText>
+                                </TableCell>
+                            )}
                         </TableRow>
                     ) : (
                         <TableRow reverse={reverse} key={j}>
+                            {showMarketColumn && (
+                                <TableCell>
+                                    <TitleText>
+                                        <Lines />
+                                    </TitleText>
+                                </TableCell>
+                            )}
                             <TableCell data-name='param'>
                                 <TitleText>
                                     <Lines />

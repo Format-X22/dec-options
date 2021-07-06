@@ -39,12 +39,12 @@ export class OptionListArgs extends PaginationArgs {
     @Field((): typeof Date => Date, { nullable: true })
     @IsOptional()
     @IsInstance(Date)
-    filterByDateFrom?: Date;
+    filterByExpirationDateFrom?: Date;
 
     @Field((): typeof Date => Date, { nullable: true })
     @IsOptional()
     @IsInstance(Date)
-    filterByDateTo?: Date;
+    filterByExpirationDateTo?: Date;
 
     @Field((): typeof Float => Float, { nullable: true })
     @IsOptional()
