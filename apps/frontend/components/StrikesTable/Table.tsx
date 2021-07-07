@@ -97,13 +97,13 @@ export function Table({
             </TablePart>
             <TablePart>
                 <TableSide
-                    onRowClick={(strike: number): void => {
+                    onRowClick={({ strike }: { strike: number }): void => {
                         changeState({
                             type: ActionType.SET_CURRENT_PANEL,
                             payload: ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK,
                         });
                         changeState({
-                            type: ActionType.SET_SELECTED_OPTION,
+                            type: ActionType.SET_SELECTED_OPTION_GROUP,
                             payload: {
                                 date: new Date(date),
                                 type: 'call',
@@ -129,13 +129,13 @@ export function Table({
             </StrikeColumn>
             <TablePart reverse>
                 <TableSide
-                    onRowClick={(strike): void => {
+                    onRowClick={({ strike }: { strike: number }): void => {
                         changeState({
                             type: ActionType.SET_CURRENT_PANEL,
                             payload: ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK,
                         });
                         changeState({
-                            type: ActionType.SET_SELECTED_OPTION,
+                            type: ActionType.SET_SELECTED_OPTION_GROUP,
                             payload: {
                                 date: new Date(date),
                                 type: 'put',

@@ -27,21 +27,28 @@ const Text = styled.span`
 
 export function GroupInfo(): JSX.Element {
     const { state, changeState }: Partial<ContextState> = useContext(ContextApp);
-    const dateString = format(state.selectedOption?.date || new Date(), 'dd MMMM');
+    const dateString = format(state.selectedOptionGroup?.date || new Date(), 'dd MMMM');
 
     return (
         <StyledInfo>
             <Button
-                onClick={(): void =>
+                onClick={(): void => {
                     changeState({
                         type: ActionType.SET_CURRENT_PANEL,
                         payload: ESplashPanels.STRIKES_TABLE,
-                    })
-                }
+                    });
+                    changeState({
+                        type: ActionType.SET_SELECTED_OPTION_FOR_ORDER_BOOK,
+                        payload: {
+                            optionMarketKey: null,
+                            optionId: null,
+                        },
+                    });
+                }}
             >
                 &lt;&lt;&lt; back
             </Button>
-            {state.selectedOption?.type === 'call' ? <CallsIcon large={true} /> : <PutsIcon large={true} />}
+            {state.selectedOptionGroup?.type === 'call' ? <CallsIcon large={true} /> : <PutsIcon large={true} />}
             <Text>{dateString}</Text>
         </StyledInfo>
     );

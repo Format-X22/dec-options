@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { TableSide } from '../StrikesTable/TableSide';
-import { ContextState } from '../../pages/stateType';
+import { ActionType, ContextState } from '../../pages/stateType';
 import { ContextApp } from '../../pages/_app';
 import { gql, useQuery } from '@apollo/client';
 import { Option } from '../../../../libs/shared/src/option.schema';
@@ -22,10 +22,12 @@ const GET_OPTIONS = gql`
             filterByStrike: $strike
         ) {
             data {
+                id
                 strike
                 askQuote
                 bidQuote
                 market {
+                    key
                     name
                 }
             }
@@ -34,15 +36,15 @@ const GET_OPTIONS = gql`
 `;
 
 export function Table(): JSX.Element {
-    const { state }: Partial<ContextState> = useContext(ContextApp);
+    const { state, changeState }: Partial<ContextState> = useContext(ContextApp);
 
-    const fromExpirationDate = new Date(state.selectedOption?.date || 0);
+    const fromExpirationDate = new Date(state.selectedOptionGroup?.date || 0);
 
     fromExpirationDate.setHours(0);
     fromExpirationDate.setMinutes(0);
     fromExpirationDate.setSeconds(0);
 
-    const toExpirationDate = new Date(state.selectedOption?.date || 0);
+    const toExpirationDate = new Date(state.selectedOptionGroup?.date || 0);
 
     toExpirationDate.setHours(23);
     toExpirationDate.setMinutes(59);
@@ -50,9 +52,9 @@ export function Table(): JSX.Element {
 
     const { data, error }: QueryResult<{ options: { data: Array<Option> } }> = useQuery(GET_OPTIONS, {
         variables: {
-            type: state.selectedOption?.type.toUpperCase() || 'CALL',
-            base: state.selectedOption?.base || '',
-            strike: state.selectedOption?.strike || 0,
+            type: state.selectedOptionGroup?.type.toUpperCase() || 'CALL',
+            base: state.selectedOptionGroup?.base || '',
+            strike: state.selectedOptionGroup?.strike || 0,
             fromExpirationDate,
             toExpirationDate,
         },
@@ -62,9 +64,17 @@ export function Table(): JSX.Element {
         <TableSide
             data={data?.options.data}
             error={error}
-            type={state.selectedOption?.type}
-            date={state.selectedOption?.date}
-            onRowClick={(): void => console.log('INSIDE ROW')} // TODO -
+            type={state.selectedOptionGroup?.type}
+            date={state.selectedOptionGroup?.date}
+            onRowClick={(item: Option): void =>
+                changeState({
+                    type: ActionType.SET_SELECTED_OPTION_FOR_ORDER_BOOK,
+                    payload: {
+                        optionMarketKey: item.marketKey,
+                        optionId: item.id,
+                    },
+                })
+            }
             hideSourcesColumn={true}
             showMarketColumn={true}
         />

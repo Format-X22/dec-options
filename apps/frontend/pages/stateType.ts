@@ -1,4 +1,5 @@
 import { Dispatch } from 'react';
+import { EMarketKey } from '../../../libs/shared/src/market.schema';
 
 export type State = {
     filter: {
@@ -9,11 +10,15 @@ export type State = {
         [key: string]: number;
     };
     currentSplashPanel: ESplashPanels;
-    selectedOption: {
+    selectedOptionGroup: {
         date: Date;
         type: 'call' | 'put';
         strike: number;
         base: string;
+    };
+    selectedOptionForOrderBook: {
+        optionMarketKey: EMarketKey;
+        optionId: string;
     };
 };
 
@@ -23,7 +28,8 @@ export enum ActionType {
     SET_PRICE = 'SET_PRICE',
     SET_PRICES = 'SET_PRICES',
     SET_CURRENT_PANEL = 'SET_CURRENT_PANEL',
-    SET_SELECTED_OPTION = 'SET_SELECTED_OPTION',
+    SET_SELECTED_OPTION_GROUP = 'SET_SELECTED_OPTION_GROUP',
+    SET_SELECTED_OPTION_FOR_ORDER_BOOK = 'SET_SELECTED_OPTION_FOR_ORDER_BOOK',
 }
 
 export enum ESplashPanels {
@@ -56,8 +62,8 @@ type TActionCurrentPanelPayload = {
     payload: ESplashPanels;
 };
 
-type TActionSelectedOption = {
-    type: ActionType.SET_SELECTED_OPTION;
+type TActionSelectedOptionGroup = {
+    type: ActionType.SET_SELECTED_OPTION_GROUP;
     payload: {
         date: Date;
         type: 'call' | 'put';
@@ -66,12 +72,21 @@ type TActionSelectedOption = {
     };
 };
 
+type TActionSelectedOptionForOrderBook = {
+    type: ActionType.SET_SELECTED_OPTION_FOR_ORDER_BOOK;
+    payload: {
+        optionMarketKey: EMarketKey;
+        optionId: string;
+    };
+};
+
 export type Action =
     | ActionStringPayload
     | ActionPricePayload
     | ActionPricesPayload
     | TActionCurrentPanelPayload
-    | TActionSelectedOption;
+    | TActionSelectedOptionGroup
+    | TActionSelectedOptionForOrderBook;
 
 export type ContextState = {
     state: State;

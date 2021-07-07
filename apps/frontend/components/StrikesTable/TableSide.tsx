@@ -45,7 +45,7 @@ export function TableSide({
     reverse?: boolean;
     type: string;
     date: Date;
-    onRowClick: (strike: number) => void;
+    onRowClick: (item: any) => void;
     hideSourcesColumn?: boolean;
     showMarketColumn?: boolean;
 }): JSX.Element {
@@ -156,7 +156,7 @@ export function TableSide({
                         <TableRow
                             reverse={reverse}
                             key={item.strike + j + Math.random()}
-                            onClick={(): void => onRowClick(item.strike)}
+                            onClick={(): void => onRowClick(item)}
                             className='data-row'
                         >
                             {showMarketColumn && (

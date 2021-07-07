@@ -7,7 +7,7 @@ import { EMarketKey } from '@app/shared/market.schema';
 export class OrderBookResolver {
     constructor(private readonly apiService: ApiService) {}
 
-    @Query((): typeof OrderBook => OrderBook)
+    @Query((): typeof OrderBook => OrderBook, { nullable: true })
     async orderBook(
         @Args('optionMarketKey', { type: (): typeof EMarketKey => EMarketKey }) optionMarketKey: EMarketKey,
         @Args('optionId', { type: (): typeof String => String }) optionId: string,
