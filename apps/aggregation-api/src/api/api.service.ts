@@ -10,6 +10,7 @@ import { Paginated } from '@app/shared/list.dto';
 import { SubscribeGroupArgs } from './subscribers.args';
 import { SubscribeResult, Subscribers, SubscribersDocument } from '@app/shared/subscribers.schema';
 import { PriceService } from '../price/price.service';
+import { OrderBook, OrderBookDocument } from '@app/shared/orderbook.schema';
 
 type TOptionsQuery = {
     marketKey?: Option['marketKey'];
@@ -49,24 +50,25 @@ export class ApiService {
     protected readonly logger: Logger = new Logger(ApiService.name);
 
     constructor(
-        @InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>,
-        @InjectModel(Subscribers.name) private subscribersDataModel: Model<SubscribersDocument>,
+        @InjectModel(Option.name) private optionsModel: Model<OptionDocument>,
+        @InjectModel(Subscribers.name) private subscribersModel: Model<SubscribersDocument>,
+        @InjectModel(OrderBook.name) private orderBookModel: Model<OrderBookDocument>,
         private priceService: PriceService,
     ) {}
 
     async getOption(_id: Option['_id']): Promise<Option> {
-        return this.optionsDataModel.findById(_id);
+        return this.optionsModel.findById(_id);
     }
 
     async subscribe({ email }: SubscribeGroupArgs): Promise<SubscribeResult> {
-        const result: Subscribers = await this.subscribersDataModel.findOne({ email });
+        const result: Subscribers = await this.subscribersModel.findOne({ email });
 
         if (result) {
             return { success: true };
         }
 
         try {
-            await this.subscribersDataModel.create({ email, date: new Date() });
+            await this.subscribersModel.create({ email, date: new Date() });
 
             return { success: true };
         } catch (error) {
@@ -80,12 +82,12 @@ export class ApiService {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
         const query: FilterQuery<OptionDocument> = { ...dbQuery, expirationDate: { $gt: new Date() } };
-        const data: Array<OptionDocument> = await this.optionsDataModel.find(query, null, {
+        const data: Array<OptionDocument> = await this.optionsModel.find(query, null, {
             sort: dbSort,
             skip: requestQuery.offset,
             limit: requestQuery.limit,
         });
-        const total: number = await this.optionsDataModel.countDocuments(query);
+        const total: number = await this.optionsModel.countDocuments(query);
         const pagination: Paginated<Option>['pagination'] = {
             offset: requestQuery.offset,
             limit: requestQuery.limit,
@@ -110,7 +112,7 @@ export class ApiService {
             filter.base = args.base;
         }
 
-        const data: Array<TRawExpirationGroup> = await this.optionsDataModel.aggregate([
+        const data: Array<TRawExpirationGroup> = await this.optionsModel.aggregate([
             {
                 $match: filter,
             },
@@ -178,7 +180,7 @@ export class ApiService {
             }
         }
 
-        const data: Array<TRawStrikeGroup> = await this.optionsDataModel.aggregate([
+        const data: Array<TRawStrikeGroup> = await this.optionsModel.aggregate([
             {
                 $match: filter,
             },
@@ -225,7 +227,7 @@ export class ApiService {
     }
 
     async getBases(pricesRequired: boolean): Promise<Array<Base>> {
-        const symbols: Array<Base['symbol']> = await this.optionsDataModel.distinct('base');
+        const symbols: Array<Base['symbol']> = await this.optionsModel.distinct('base');
         const result: Array<Base> = [];
 
         for (const symbol of symbols) {
@@ -237,6 +239,10 @@ export class ApiService {
         }
 
         return result;
+    }
+
+    async getOrderBook(optionMarketKey: EMarketKey, optionId: string): Promise<OrderBook> {
+        return this.orderBookModel.findOne({ optionMarketKey, optionId });
     }
 
     private makeOptionsQuery(requestQuery: OptionListArgs): TOptionsQuery {
