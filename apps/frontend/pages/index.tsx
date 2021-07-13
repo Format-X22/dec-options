@@ -12,7 +12,6 @@ import { OptionsPanel } from '../components/OptionsTable/OptionsPanel';
 const Container = styled.div`
     display: flex;
     flex-direction: column;
-    width: 100vw;
     min-height: 100vh;
 `;
 
