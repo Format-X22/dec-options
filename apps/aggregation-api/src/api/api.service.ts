@@ -79,6 +79,8 @@ export class ApiService {
     }
 
     async getOptions(requestQuery: OptionListArgs): Promise<Paginated<Option>> {
+        console.log('PM2 FAIL');
+
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
         const data: Array<OptionDocument> = await this.optionsModel.find(dbQuery, null, {
