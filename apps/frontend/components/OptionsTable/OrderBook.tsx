@@ -112,9 +112,16 @@ export function OrderBook(): JSX.Element {
     );
 
     if (data) {
-        for (const orderBook of Object.values(data)) {
-            asks.push(...orderBook?.asks || []);
-            bids.push(...orderBook?.bids || []);
+        for (const [key, orderBook] of Object.entries(data)) {
+            const marketName: string = key.split('_')[1];
+            let asksData: Array<OrderBookOrder> = orderBook?.asks || [];
+            let bidsData: Array<OrderBookOrder> = orderBook?.bids || [];
+
+            asksData = asksData.map((order: OrderBookOrder): OrderBookOrder => ({ ...order, marketName }));
+            bidsData = bidsData.map((order: OrderBookOrder): OrderBookOrder => ({ ...order, marketName }));
+
+            asks.push(...asksData);
+            bids.push(...bidsData);
         }
     }
 
@@ -143,6 +150,9 @@ export function OrderBook(): JSX.Element {
                 <TableCell className={'TODO-order-book-column-size'}>
                     <TitleText>Amount</TitleText>
                 </TableCell>
+                <TableCell className={'TODO-order-book-column-size'}>
+                    <TitleText>Source</TitleText>
+                </TableCell>
             </TableRow>
             {optionGroupError && <TableRow>{optionGroupError.toString()}</TableRow>}
             {!optionGroupError && error && <TableRow>{error.toString()}</TableRow>}
@@ -160,6 +170,9 @@ export function OrderBook(): JSX.Element {
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <TitleText>{order.amount}</TitleText>
                                     </TableCell>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <TitleText>{order.marketName}</TitleText>
+                                    </TableCell>
                                 </TableRow>
                             ),
                         )}
@@ -173,6 +186,9 @@ export function OrderBook(): JSX.Element {
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
                                     <TitleText>{order.amount}</TitleText>
+                                </TableCell>
+                                <TableCell className={'TODO-order-book-column-size'}>
+                                    <TitleText>{order.marketName}</TitleText>
                                 </TableCell>
                             </TableRow>
                         ),
@@ -189,7 +205,7 @@ function makeOrderBookQuery(options: Array<Option> = []): DocumentNode {
 
     options.forEach((option: OptionGQL, index: number): void => {
         body += `
-            id${index}: orderBook(optionId: "${option.id}", optionMarketKey: ${option.market.key}) {
+            id${index}_${option.market.name}: orderBook(optionId: "${option.id}", optionMarketKey: ${option.market.key}) {
                 optionMarketKey
                 asks {
                     price

@@ -13,6 +13,8 @@ export class OrderBookOrder {
     @Prop()
     @Field((): typeof Float => Float)
     amount: number;
+
+    marketName?: string;
 }
 
 export type OrderBookOrderDocument = OrderBookOrder & mongoose.Document;
