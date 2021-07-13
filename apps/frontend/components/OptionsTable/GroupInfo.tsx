@@ -1,12 +1,10 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../../theme';
-import CallsIcon from '../CallsIcon';
 import Button from '../Button';
 import { ActionType, ContextState, ESplashPanels } from '../../pages/stateType';
 import { ContextApp } from '../../pages/_app';
 import format from 'date-fns/format';
-import PutsIcon from '../PutsIcon';
 
 const StyledInfo = styled.div`
     width: 100%;
@@ -24,6 +22,10 @@ const Text = styled.span`
     line-height: 20px;
     margin-right: 12px;
 `;
+
+const Space = styled.span`
+  margin-left: 25px;
+`
 
 export function GroupInfo(): JSX.Element {
     const { state, changeState }: Partial<ContextState> = useContext(ContextApp);
@@ -48,8 +50,11 @@ export function GroupInfo(): JSX.Element {
             >
                 &lt;&lt;&lt; back
             </Button>
-            {state.selectedOptionGroup?.type === 'call' ? <CallsIcon large={true} /> : <PutsIcon large={true} />}
+            <Space />
+            <Text>{state.selectedOptionGroup?.base}</Text>
             <Text>{dateString}</Text>
+            <Text>{state.selectedOptionGroup?.strike}</Text>
+            {state.selectedOptionGroup?.type === 'call' ? <Text>{'CALL'}</Text> : <Text>{'PUT'}</Text>}
         </StyledInfo>
     );
 }

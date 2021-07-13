@@ -9,16 +9,15 @@ const PanelBodyWrap = styled.div`
     display: flex;
     flex-direction: row;
     align-content: space-between;
+    justify-content: center;
 
     & > div + div {
         margin-left: 5px;
     }
 `;
-const TableWrap = styled.div`
-    flex: 2;
-`;
 const OrderBookWrap = styled.div`
-    flex: 1;
+    width: 33%;
+    min-width: 400px;
 `;
 
 export function OptionsPanel(): JSX.Element {
@@ -26,10 +25,6 @@ export function OptionsPanel(): JSX.Element {
         <>
             <GroupInfo />
             <PanelBodyWrap>
-                <TableWrap>
-                    <Table />
-                </TableWrap>
-
                 <OrderBookWrap>
                     <OrderBook />
                 </OrderBookWrap>

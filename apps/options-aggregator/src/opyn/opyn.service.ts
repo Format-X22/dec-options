@@ -54,12 +54,10 @@ export class OpynService extends AggregatorAbstract<TRawOption> implements OnMod
     protected readonly pageSize: number = 1000;
     protected isGetWithPagination: boolean = true;
     private pricesCache: TParsedPrices = [];
-    private pageForParsing: Page;
+    private browser: Browser;
 
     async onModuleInit(): Promise<void> {
-        const browser: Browser = await puppeteer.launch();
-
-        this.pageForParsing = await browser.newPage();
+        this.browser = await puppeteer.launch();
     }
 
     protected get rateLimit(): number {
@@ -151,11 +149,13 @@ export class OpynService extends AggregatorAbstract<TRawOption> implements OnMod
     }
 
     private async parsePricesToCache(): Promise<void> {
-        await this.pageForParsing.goto(PARSE_URL, { waitUntil: 'networkidle2' });
+        const page: Page = await this.browser.newPage();
+
+        await page.goto(PARSE_URL, { waitUntil: 'networkidle2' });
 
         // Can't use `this` and any external functions and modules
         // Can't use enums too
-        this.pricesCache = await this.pageForParsing.evaluate(async (): Promise<TParsedPrices> => {
+        this.pricesCache = await page.evaluate(async (): Promise<TParsedPrices> => {
             const result: TParsedPrices = [];
 
             return await parse();
@@ -265,5 +265,7 @@ export class OpynService extends AggregatorAbstract<TRawOption> implements OnMod
                 return Array.from(root.querySelectorAll(query));
             }
         });
+        
+        await page.close();
     }
 }
