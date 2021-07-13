@@ -81,13 +81,12 @@ export class ApiService {
     async getOptions(requestQuery: OptionListArgs): Promise<Paginated<Option>> {
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
-        const query: FilterQuery<OptionDocument> = { ...dbQuery, expirationDate: { $gt: new Date() } };
-        const data: Array<OptionDocument> = await this.optionsModel.find(query, null, {
+        const data: Array<OptionDocument> = await this.optionsModel.find(dbQuery, null, {
             sort: dbSort,
             skip: requestQuery.offset,
             limit: requestQuery.limit,
         });
-        const total: number = await this.optionsModel.countDocuments(query);
+        const total: number = await this.optionsModel.countDocuments(dbQuery);
         const pagination: Paginated<Option>['pagination'] = {
             offset: requestQuery.offset,
             limit: requestQuery.limit,
@@ -278,6 +277,10 @@ export class ApiService {
 
         if (requestQuery.filterByExpirationDateTo) {
             dbQuery.expirationDate.$lt = requestQuery.filterByExpirationDateTo;
+        }
+
+        if (!dbQuery.expirationDate) {
+            dbQuery.expirationDate = { $gt: new Date() };
         }
 
         return dbQuery;
