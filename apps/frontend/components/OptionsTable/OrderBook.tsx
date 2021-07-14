@@ -187,10 +187,10 @@ export function OrderBook(): JSX.Element {
                                     <BidsText>{price}</BidsText>
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <BidsText>{amount}</BidsText>
+                                    <TitleText>{amount}</TitleText>
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <BidsText>{marketName}</BidsText>
+                                    <TitleText>{marketName}</TitleText>
                                 </TableCell>
                             </TableRow>
                         ),
