@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { TableRow } from '../StrikesTable/TableRow';
 import { TableCell } from '../StrikesTable/TableCell';
 import { TitleText } from '../StrikesTable/TitleText';
@@ -54,7 +54,7 @@ const GET_ORDER_BOOK = gql`
     }
 `;
 
-const AsksText: React.FunctionComponent = styled.div`
+const AsksText: FC = styled.div`
     font-weight: 500;
     font-size: 12px;
     line-height: 20px;
@@ -64,7 +64,7 @@ const AsksText: React.FunctionComponent = styled.div`
     color: red;
 `;
 
-const BidsText: React.FunctionComponent = styled.div`
+const BidsText: FC = styled.div`
     font-weight: 500;
     font-size: 12px;
     line-height: 20px;
@@ -74,7 +74,28 @@ const BidsText: React.FunctionComponent = styled.div`
     color: green;
 `;
 
-const Divider: React.FunctionComponent = styled.div`
+
+const SubTable: FC<{reverse?: boolean}> = styled.div`
+    max-height: 50%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: ${({ reverse }: {reverse?: boolean}) => (reverse ? 'column-reverse' : 'column')};
+
+    &::-webkit-scrollbar-thumb {
+      background: #303030;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    &::-webkit-scrollbar {
+      padding: 2px;
+      width: 12px;
+      height: 12px;
+      background: #000000;
+    }
+`;
+
+const Divider: FC = styled.div`
     width: 100%;
     border: 1px solid white;
 `;
@@ -160,9 +181,9 @@ export function OrderBook(): JSX.Element {
             {!optionGroupError && error && <TableRow>{error.toString()}</TableRow>}
             {!optionGroupError && !error && (
                 <>
-                    {asks
+                  <SubTable reverse>
+                      {asks
                         .slice()
-                        .reverse()
                         .map(
                             ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
                                 <TableRow key={`asks-${index}-${price}-${amount}-${marketName}`}>
@@ -177,9 +198,11 @@ export function OrderBook(): JSX.Element {
                                     </TableCell>
                                 </TableRow>
                             ),
-                        )}
-                    {asks.length === 0 && <TableRow>{'No asks...'}</TableRow>}
-                    <Divider />
+                      )}
+                      {asks.length === 0 && <TableRow>{'No asks...'}</TableRow>}
+                  </SubTable>
+                  <Divider />
+                  <SubTable>
                     {bids.map(
                         ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
                             <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
@@ -196,6 +219,7 @@ export function OrderBook(): JSX.Element {
                         ),
                     )}
                     {bids.length === 0 && <TableRow>{'No bids...'}</TableRow>}
+                  </SubTable>
                 </>
             )}
         </>

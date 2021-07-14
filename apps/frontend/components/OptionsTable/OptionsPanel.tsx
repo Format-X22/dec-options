@@ -8,15 +8,19 @@ const PanelBodyWrap = styled.div`
     display: flex;
     flex-direction: row;
     align-content: space-between;
-    justify-content: center;
+    justify-content: flex-start;
+    overflow: hidden;
 
     & > div + div {
         margin-left: 5px;
     }
 `;
 const OrderBookWrap = styled.div`
-    width: 33%;
-    min-width: 400px;
+    width: 50%;
+
+    @media screen and (max-width: 576px) {
+      width: 100%;
+    }
 `;
 
 export function OptionsPanel(): JSX.Element {

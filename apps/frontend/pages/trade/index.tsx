@@ -4,7 +4,7 @@ import { OptionsPanel } from '../../components/OptionsTable/OptionsPanel';
 
 const Index = () => {
   return (
-    <Layout>
+    <Layout screenHeight={true}>
       <OptionsPanel />
     </Layout>
   );

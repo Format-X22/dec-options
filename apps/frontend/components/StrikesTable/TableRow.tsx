@@ -10,7 +10,6 @@ type TableRowProps = {
 export const TableRow: React.FunctionComponent<TableRowProps> = styled.div`
     display: flex;
     width: 100%;
-    height: 48px;
     background: ${$backgroundLight};
     align-items: center;
     justify-content: center;
@@ -23,6 +22,7 @@ export const TableRow: React.FunctionComponent<TableRowProps> = styled.div`
 
     & + & {
         border-top: 1px solid ${$lineColor};
+        box-sizing: content-box;
     }
 
     &:hover {
