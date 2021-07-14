@@ -7,6 +7,7 @@ import StrikesTable from '../components/StrikesTable/StrikesTable';
 import { gql, useQuery } from '@apollo/client';
 import Layout from '../components/Layout/Layout';
 
+
 const GET_BASES = gql`
     query getBases {
         bases {

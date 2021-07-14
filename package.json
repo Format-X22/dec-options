@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build",
+    "build": "NODE_ENV=production nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -25,8 +25,9 @@
     "start:agg": "nest start opnions-aggregator",
     "start:prod:api": "node dist/apps/aggregation-api/main.js",
     "start:prod:agg": "node dist/apps/options-aggregator/main.js",
-    "pm2:start:api": "pm2 start yarn --interpreter bash --name api -- start:prod:api",
-    "pm2:start:agg": "pm2 start yarn --interpreter bash --name agg -- start:prod:agg",
+    "pm2:start:all": "yarn pm2:start:agg; yarn pm2:start:api;",
+    "pm2:start:api": "NODE_ENV=production pm2 start yarn --interpreter bash --name api -- start:prod:api",
+    "pm2:start:agg": "NODE_ENV=production pm2 start yarn --interpreter bash --name agg -- start:prod:agg",
     "pm2:stop:api": "pm2 stop api",
     "pm2:stop:agg": "pm2 stop agg",
     "pm2:kill:api": "pm2 kill api",
@@ -35,7 +36,8 @@
     "pm2:log:agg": "pm2 log agg",
     "pm2:kill": "pm2 kill",
     "pm2:monit": "pm2 monit",
-    "pm2:status": "pm2 status"
+    "pm2:status": "pm2 status",
+    "release": "yarn build:all && yarn pm2:stop:api; yarn pm2:stop:agg; yarn pm2:start:all"
   },
   "dependencies": {
     "@apollo/client": "^3.3.19",
