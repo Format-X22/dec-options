@@ -1,5 +1,5 @@
 module.exports = {
-    basePath: '',
+    basePath: process.env.NODE_ENV === 'production' ? '/opex' : '',
     future: {
         webpack5: true,
     },
