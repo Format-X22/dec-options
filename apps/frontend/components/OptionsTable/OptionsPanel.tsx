@@ -10,6 +10,7 @@ const PanelBodyWrap = styled.div`
     align-content: space-between;
     justify-content: flex-start;
     overflow: hidden;
+    flex: 100;
 
     & > div + div {
         margin-left: 5px;
