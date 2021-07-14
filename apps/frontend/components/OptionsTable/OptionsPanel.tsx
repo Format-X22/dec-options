@@ -1,6 +1,5 @@
 import React from 'react';
 import { GroupInfo } from './GroupInfo';
-import { Table } from './Table';
 import { OrderBook } from './OrderBook';
 import styled from 'styled-components';
 

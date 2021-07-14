@@ -1,20 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import styled from 'styled-components';
-import Header from '../components/Header';
 import Filters from '../components/Filters';
 import { ContextApp } from './_app';
 import { ActionType, ContextState, ESplashPanels } from './stateType';
 import StrikesTable from '../components/StrikesTable/StrikesTable';
 import { gql, useQuery } from '@apollo/client';
-import { OptionsPanel } from '../components/OptionsTable/OptionsPanel';
-
-const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-    min-height: 100vh;
-`;
+import Layout from '../components/Layout/Layout';
 
 const GET_BASES = gql`
     query getBases {
@@ -87,21 +78,11 @@ function Index(props): JSX.Element {
         }, 10000);
     }, []);
 
-    const isStrikesPanel: boolean =
-        !state.currentSplashPanel || state.currentSplashPanel === ESplashPanels.STRIKES_TABLE;
-    const isOptionsPanel: boolean = state.currentSplashPanel === ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK;
-
     return (
-        <Container>
-            <Header />
-            <div className={isStrikesPanel ? null : 'hidden'}>
-                <Filters />
-                <StrikesTable />
-            </div>
-            <div className={isOptionsPanel ? null : 'hidden'}>
-                <OptionsPanel />
-            </div>
-        </Container>
+      <Layout>
+        <Filters />
+        <StrikesTable />
+      </Layout>
     );
 }
 

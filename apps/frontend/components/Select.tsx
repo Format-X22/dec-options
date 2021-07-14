@@ -131,7 +131,7 @@ function Select({
             while (target && !document.body.isSameNode(target)) {
                 if (ref && typeof ref.current !== 'undefined') {
                     target = target.parentNode;
-                    if (target && ref.current.isSameNode(target)) {
+                    if (target && ref.current?.isSameNode(target)) {
                         return;
                     }
                 }

@@ -1,5 +1,6 @@
 import { gql, useQuery } from '@apollo/client';
-import React, { useContext } from 'react';
+import React from 'react';
+import { useRouter } from 'next/router';
 import format from 'date-fns/format';
 import { TableContainer } from './TableContainer';
 import { TablePart } from './TablePart';
@@ -9,8 +10,6 @@ import PutsIcon from '../PutsIcon';
 import { TableSide } from './TableSide';
 import { StrikeColumn } from './StrikeColumn';
 import { StrikeCell } from './StrikeCell';
-import { ActionType, ContextState, ESplashPanels } from '../../pages/stateType';
-import { ContextApp } from '../../pages/_app';
 
 const GET_STRIKES = gql`
     query getStrikes($type: OptionType, $base: String, $fromDate: DateTime, $toDate: DateTime) {
@@ -34,7 +33,7 @@ export function Table({
     base: string;
     openSubscribeModal: () => void;
 }): JSX.Element {
-    const { changeState }: Partial<ContextState> = useContext(ContextApp);
+    const router = useRouter();
 
     const fromDate = new Date(date);
     fromDate.setHours(0);
@@ -98,18 +97,14 @@ export function Table({
             <TablePart>
                 <TableSide
                     onRowClick={({ strike }: { strike: number }): void => {
-                        changeState({
-                            type: ActionType.SET_CURRENT_PANEL,
-                            payload: ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK,
-                        });
-                        changeState({
-                            type: ActionType.SET_SELECTED_OPTION_GROUP,
-                            payload: {
-                                date: new Date(date),
-                                type: 'call',
-                                strike,
-                                base,
-                            },
+                        router.push({
+                          pathname: `/order-book`,
+                          query: {
+                            date,
+                            strike,
+                            base,
+                            type: 'call',
+                          }
                         });
                     }}
                     data={callsDataByStrike}
@@ -130,18 +125,14 @@ export function Table({
             <TablePart reverse>
                 <TableSide
                     onRowClick={({ strike }: { strike: number }): void => {
-                        changeState({
-                            type: ActionType.SET_CURRENT_PANEL,
-                            payload: ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK,
-                        });
-                        changeState({
-                            type: ActionType.SET_SELECTED_OPTION_GROUP,
-                            payload: {
-                                date: new Date(date),
-                                type: 'put',
-                                strike,
-                                base,
-                            },
+                        router.push({
+                          pathname: `/order-book`,
+                          query: {
+                            date,
+                            strike,
+                            base,
+                            type: 'put',
+                          }
                         });
                     }}
                     data={putsDataByStrike}

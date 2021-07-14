@@ -1,14 +1,14 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { TableRow } from '../StrikesTable/TableRow';
 import { TableCell } from '../StrikesTable/TableCell';
 import { TitleText } from '../StrikesTable/TitleText';
 import { DocumentNode, gql, useQuery } from '@apollo/client';
 import { OrderBook as OrderBookModel, OrderBookOrder } from '../../../../libs/shared/src/orderbook.schema';
 import { QueryResult } from '@apollo/client/react/types/types';
-import { ContextState } from '../../pages/stateType';
-import { ContextApp } from '../../pages/_app';
 import styled from 'styled-components';
 import { Option, OptionGQL } from '../../../../libs/shared/src/option.schema';
+import { useRouter } from 'next/router';
+import { IOrderBookQuery } from '../../dtos/IOrderBookQuery';
 
 const GET_OPTIONS = gql`
     query getOptions(
@@ -80,14 +80,16 @@ const Divider: React.FunctionComponent = styled.div`
 `;
 
 export function OrderBook(): JSX.Element {
-    const { state }: Partial<ContextState> = useContext(ContextApp);
-    const fromExpirationDate = new Date(state.selectedOptionGroup?.date || 0);
+    const router = useRouter();
+    const {date, strike, base, type} = router.query as unknown as IOrderBookQuery;
+
+    const fromExpirationDate = new Date(date || 0);
 
     fromExpirationDate.setHours(0);
     fromExpirationDate.setMinutes(0);
     fromExpirationDate.setSeconds(0);
 
-    const toExpirationDate = new Date(state.selectedOptionGroup?.date || 0);
+    const toExpirationDate = new Date(date || 0);
 
     toExpirationDate.setHours(23);
     toExpirationDate.setMinutes(59);
@@ -96,9 +98,9 @@ export function OrderBook(): JSX.Element {
     const { data: optionGroupData, error: optionGroupError }: QueryResult<{ options: { data: Array<Option> } }> =
         useQuery(GET_OPTIONS, {
             variables: {
-                type: state.selectedOptionGroup?.type.toUpperCase() || 'CALL',
-                base: state.selectedOptionGroup?.base || '',
-                strike: state.selectedOptionGroup?.strike || 0,
+                type: type?.toUpperCase() || 'CALL',
+                base: base || '',
+                strike: +strike || 0,
                 fromExpirationDate,
                 toExpirationDate,
             },
