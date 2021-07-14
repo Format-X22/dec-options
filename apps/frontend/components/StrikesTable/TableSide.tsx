@@ -156,7 +156,7 @@ export function TableSide({
                         <TableRow
                             reverse={reverse}
                             key={item.strike + j + Math.random()}
-                            onClick={(): void => onRowClick(item)}
+                            onClick={(): void => onRowClick({strike: item.strike, type})}
                             className='data-row'
                         >
                             {showMarketColumn && (

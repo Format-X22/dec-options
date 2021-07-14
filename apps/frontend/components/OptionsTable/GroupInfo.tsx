@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../../theme';
 import Button from '../Button';
-import { ActionType, ContextState, ESplashPanels } from '../../pages/stateType';
-import { ContextApp } from '../../pages/_app';
 import format from 'date-fns/format';
+import { useRouter } from 'next/router';
+import { ITradeQuery } from '../../dtos/ITradeQuery';
 
 const StyledInfo = styled.div`
     width: 100%;
@@ -28,33 +28,24 @@ const Space = styled.span`
 `
 
 export function GroupInfo(): JSX.Element {
-    const { state, changeState }: Partial<ContextState> = useContext(ContextApp);
-    const dateString = format(state.selectedOptionGroup?.date || new Date(), 'dd MMMM');
+    const router = useRouter();
+    const {date, strike, base, type} = router.query as unknown as ITradeQuery;
+    const dateString = format(new Date(date) || new Date(), 'dd MMMM');
 
     return (
         <StyledInfo>
             <Button
-                onClick={(): void => {
-                    changeState({
-                        type: ActionType.SET_CURRENT_PANEL,
-                        payload: ESplashPanels.STRIKES_TABLE,
-                    });
-                    changeState({
-                        type: ActionType.SET_SELECTED_OPTION_FOR_ORDER_BOOK,
-                        payload: {
-                            optionMarketKey: null,
-                            optionId: null,
-                        },
-                    });
+                onClick={() => {
+                  router.back();
                 }}
             >
                 &lt;&lt;&lt; back
             </Button>
             <Space />
-            <Text>{state.selectedOptionGroup?.base}</Text>
+            <Text>{base}</Text>
             <Text>{dateString}</Text>
-            <Text>{state.selectedOptionGroup?.strike}</Text>
-            {state.selectedOptionGroup?.type === 'call' ? <Text>{'CALL'}</Text> : <Text>{'PUT'}</Text>}
+            <Text>{strike}</Text>
+            {type === 'call' ? <Text>{'CALL'}</Text> : <Text>{'PUT'}</Text>}
         </StyledInfo>
     );
 }

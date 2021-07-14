@@ -1,14 +1,14 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { TableRow } from '../StrikesTable/TableRow';
 import { TableCell } from '../StrikesTable/TableCell';
 import { TitleText } from '../StrikesTable/TitleText';
 import { DocumentNode, gql, useQuery } from '@apollo/client';
 import { OrderBook as OrderBookModel, OrderBookOrder } from '../../../../libs/shared/src/orderbook.schema';
 import { QueryResult } from '@apollo/client/react/types/types';
-import { ContextState } from '../../pages/stateType';
-import { ContextApp } from '../../pages/_app';
 import styled from 'styled-components';
 import { Option, OptionGQL } from '../../../../libs/shared/src/option.schema';
+import { useRouter } from 'next/router';
+import { ITradeQuery } from '../../dtos/ITradeQuery';
 
 const GET_OPTIONS = gql`
     query getOptions(
@@ -80,14 +80,16 @@ const Divider: React.FunctionComponent = styled.div`
 `;
 
 export function OrderBook(): JSX.Element {
-    const { state }: Partial<ContextState> = useContext(ContextApp);
-    const fromExpirationDate = new Date(state.selectedOptionGroup?.date || 0);
+    const router = useRouter();
+    const {date, strike, base, type} = router.query as unknown as ITradeQuery;
+
+    const fromExpirationDate = new Date(date || 0);
 
     fromExpirationDate.setHours(0);
     fromExpirationDate.setMinutes(0);
     fromExpirationDate.setSeconds(0);
 
-    const toExpirationDate = new Date(state.selectedOptionGroup?.date || 0);
+    const toExpirationDate = new Date(date || 0);
 
     toExpirationDate.setHours(23);
     toExpirationDate.setMinutes(59);
@@ -96,9 +98,9 @@ export function OrderBook(): JSX.Element {
     const { data: optionGroupData, error: optionGroupError }: QueryResult<{ options: { data: Array<Option> } }> =
         useQuery(GET_OPTIONS, {
             variables: {
-                type: state.selectedOptionGroup?.type.toUpperCase() || 'CALL',
-                base: state.selectedOptionGroup?.base || '',
-                strike: state.selectedOptionGroup?.strike || 0,
+                type: type?.toUpperCase() || 'CALL',
+                base: base || '',
+                strike: +strike || 0,
                 fromExpirationDate,
                 toExpirationDate,
             },
@@ -162,16 +164,16 @@ export function OrderBook(): JSX.Element {
                         .slice()
                         .reverse()
                         .map(
-                            (order: OrderBookOrder): JSX.Element => (
-                                <TableRow>
+                            ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
+                                <TableRow key={`asks-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
-                                        <AsksText>{order.price}</AsksText>
+                                        <AsksText>{price}</AsksText>
                                     </TableCell>
                                     <TableCell className={'TODO-order-book-column-size'}>
-                                        <TitleText>{order.amount}</TitleText>
+                                        <TitleText>{amount}</TitleText>
                                     </TableCell>
                                     <TableCell className={'TODO-order-book-column-size'}>
-                                        <TitleText>{order.marketName}</TitleText>
+                                        <TitleText>{marketName}</TitleText>
                                     </TableCell>
                                 </TableRow>
                             ),
@@ -179,16 +181,16 @@ export function OrderBook(): JSX.Element {
                     {asks.length === 0 && <TableRow>{'No asks...'}</TableRow>}
                     <Divider />
                     {bids.map(
-                        (order: OrderBookOrder): JSX.Element => (
-                            <TableRow>
+                        ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
+                            <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <BidsText>{order.price}</BidsText>
+                                    <BidsText>{price}</BidsText>
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{order.amount}</TitleText>
+                                    <TitleText>{amount}</TitleText>
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{order.marketName}</TitleText>
+                                    <TitleText>{marketName}</TitleText>
                                 </TableCell>
                             </TableRow>
                         ),
