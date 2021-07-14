@@ -164,16 +164,16 @@ export function OrderBook(): JSX.Element {
                         .slice()
                         .reverse()
                         .map(
-                            (order: OrderBookOrder): JSX.Element => (
-                                <TableRow>
+                            ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
+                                <TableRow key={`asks-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
-                                        <AsksText>{order.price}</AsksText>
+                                        <AsksText>{price}</AsksText>
                                     </TableCell>
                                     <TableCell className={'TODO-order-book-column-size'}>
-                                        <TitleText>{order.amount}</TitleText>
+                                        <TitleText>{amount}</TitleText>
                                     </TableCell>
                                     <TableCell className={'TODO-order-book-column-size'}>
-                                        <TitleText>{order.marketName}</TitleText>
+                                        <TitleText>{marketName}</TitleText>
                                     </TableCell>
                                 </TableRow>
                             ),
@@ -181,16 +181,16 @@ export function OrderBook(): JSX.Element {
                     {asks.length === 0 && <TableRow>{'No asks...'}</TableRow>}
                     <Divider />
                     {bids.map(
-                        (order: OrderBookOrder): JSX.Element => (
-                            <TableRow>
+                        ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
+                            <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <BidsText>{order.price}</BidsText>
+                                    <AsksText>{price}</AsksText>
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{order.amount}</TitleText>
+                                    <TitleText>{amount}</TitleText>
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{order.marketName}</TitleText>
+                                    <TitleText>{marketName}</TitleText>
                                 </TableCell>
                             </TableRow>
                         ),
