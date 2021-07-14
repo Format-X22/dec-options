@@ -1,9 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../../theme';
 import Button from '../Button';
-import { ActionType, ContextState, ESplashPanels } from '../../pages/stateType';
-import { ContextApp } from '../../pages/_app';
 import format from 'date-fns/format';
 import { useRouter } from 'next/router';
 import { IOrderBookQuery } from '../../dtos/IOrderBookQuery';

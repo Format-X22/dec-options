@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
 import format from 'date-fns/format';
 import { TableContainer } from './TableContainer';
@@ -83,6 +83,18 @@ export function Table({
         return data || null;
     });
 
+    const onRowClick = useCallback(({ strike, type }: { strike: number, type: string }): void => {
+      router.push({
+        pathname: `/order-book`,
+        query: {
+          date,
+          base,
+          strike,
+          type,
+        }
+      });
+  }, [date, base]);
+
     return (
         <TableContainer>
             <TablePart header>
@@ -96,17 +108,7 @@ export function Table({
             </TablePart>
             <TablePart>
                 <TableSide
-                    onRowClick={({ strike }: { strike: number }): void => {
-                        router.push({
-                          pathname: `/order-book`,
-                          query: {
-                            date,
-                            strike,
-                            base,
-                            type: 'call',
-                          }
-                        });
-                    }}
+                    onRowClick={onRowClick}
                     data={callsDataByStrike}
                     error={callsError}
                     type='call'
@@ -124,17 +126,7 @@ export function Table({
             </StrikeColumn>
             <TablePart reverse>
                 <TableSide
-                    onRowClick={({ strike }: { strike: number }): void => {
-                        router.push({
-                          pathname: `/order-book`,
-                          query: {
-                            date,
-                            strike,
-                            base,
-                            type: 'put',
-                          }
-                        });
-                    }}
+                    onRowClick={onRowClick}
                     data={putsDataByStrike}
                     error={putsError}
                     reverse
