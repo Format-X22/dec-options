@@ -1,4 +1,4 @@
-export interface IOrderBookQuery {
+export interface ITradeQuery {
   date: string;
   strike: string;
   base: string,

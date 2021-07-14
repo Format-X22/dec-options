@@ -8,7 +8,7 @@ import { QueryResult } from '@apollo/client/react/types/types';
 import styled from 'styled-components';
 import { Option, OptionGQL } from '../../../../libs/shared/src/option.schema';
 import { useRouter } from 'next/router';
-import { IOrderBookQuery } from '../../dtos/IOrderBookQuery';
+import { ITradeQuery } from '../../dtos/ITradeQuery';
 
 const GET_OPTIONS = gql`
     query getOptions(
@@ -81,7 +81,7 @@ const Divider: React.FunctionComponent = styled.div`
 
 export function OrderBook(): JSX.Element {
     const router = useRouter();
-    const {date, strike, base, type} = router.query as unknown as IOrderBookQuery;
+    const {date, strike, base, type} = router.query as unknown as ITradeQuery;
 
     const fromExpirationDate = new Date(date || 0);
 
@@ -184,13 +184,13 @@ export function OrderBook(): JSX.Element {
                         ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
                             <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <AsksText>{price}</AsksText>
+                                    <BidsText>{price}</BidsText>
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{amount}</TitleText>
+                                    <BidsText>{amount}</BidsText>
                                 </TableCell>
                                 <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{marketName}</TitleText>
+                                    <BidsText>{marketName}</BidsText>
                                 </TableCell>
                             </TableRow>
                         ),

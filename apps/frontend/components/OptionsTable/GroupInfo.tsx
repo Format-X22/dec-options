@@ -4,7 +4,7 @@ import { $backgroundLight } from '../../theme';
 import Button from '../Button';
 import format from 'date-fns/format';
 import { useRouter } from 'next/router';
-import { IOrderBookQuery } from '../../dtos/IOrderBookQuery';
+import { ITradeQuery } from '../../dtos/ITradeQuery';
 
 const StyledInfo = styled.div`
     width: 100%;
@@ -29,7 +29,7 @@ const Space = styled.span`
 
 export function GroupInfo(): JSX.Element {
     const router = useRouter();
-    const {date, strike, base, type} = router.query as unknown as IOrderBookQuery;
+    const {date, strike, base, type} = router.query as unknown as ITradeQuery;
     const dateString = format(new Date(date) || new Date(), 'dd MMMM');
 
     return (

@@ -85,7 +85,7 @@ export function Table({
 
     const onRowClick = useCallback(({ strike, type }: { strike: number, type: string }): void => {
       router.push({
-        pathname: `/order-book`,
+        pathname: `/trade`,
         query: {
           date,
           base,
