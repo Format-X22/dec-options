@@ -95,6 +95,11 @@ const SubTable: FC<{reverse?: boolean}> = styled.div`
     }
 `;
 
+const SubTablesWrapper: FC = styled.div`
+    overflow: hidden;
+    flex: 100;
+`;
+
 const Divider: FC = styled.div`
     width: 100%;
     border: 1px solid white;
@@ -180,7 +185,7 @@ export function OrderBook(): JSX.Element {
             {optionGroupError && <TableRow>{optionGroupError.toString()}</TableRow>}
             {!optionGroupError && error && <TableRow>{error.toString()}</TableRow>}
             {!optionGroupError && !error && (
-                <>
+                <SubTablesWrapper>
                   <SubTable reverse>
                       {asks
                         .slice()
@@ -220,7 +225,7 @@ export function OrderBook(): JSX.Element {
                     )}
                     {bids.length === 0 && <TableRow>{'No bids...'}</TableRow>}
                   </SubTable>
-                </>
+                </SubTablesWrapper>
             )}
         </>
     );

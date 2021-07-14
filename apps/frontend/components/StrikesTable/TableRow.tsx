@@ -15,15 +15,14 @@ export const TableRow: React.FunctionComponent<TableRowProps> = styled.div`
     justify-content: center;
     flex-direction: ${({ reverse }: TableRowProps) => (reverse ? 'row-reverse' : 'row')};
     position: relative;
+    border-top: 1px solid ${$lineColor};
+    flex: 1;
 
     &.data-row {
         cursor: pointer;
     }
 
-    & + & {
-        border-top: 1px solid ${$lineColor};
-        box-sizing: content-box;
-    }
+    
 
     &:hover {
         background: ${$tableRowHover};
