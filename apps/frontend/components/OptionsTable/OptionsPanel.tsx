@@ -4,19 +4,26 @@ import { OrderBook } from './OrderBook';
 import styled from 'styled-components';
 
 const PanelBodyWrap = styled.div`
-    margin-top: 4px;
+    margin: 4px 0;
     display: flex;
     flex-direction: row;
     align-content: space-between;
-    justify-content: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    flex: 100;
 
     & > div + div {
         margin-left: 5px;
     }
 `;
 const OrderBookWrap = styled.div`
-    width: 33%;
-    min-width: 400px;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+
+    @media screen and (max-width: 576px) {
+      width: 100%;
+    }
 `;
 
 export function OptionsPanel(): JSX.Element {

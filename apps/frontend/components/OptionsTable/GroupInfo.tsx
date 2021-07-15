@@ -14,6 +14,7 @@ const StyledInfo = styled.div`
     padding: 10px 24px;
     flex-direction: row;
     align-items: center;
+    flex: 1;
 `;
 
 const Text = styled.span`

@@ -4,13 +4,13 @@ import { OptionsPanel } from '../../components/OptionsTable/OptionsPanel';
 
 const Index = () => {
   return (
-    <Layout>
+    <Layout fixedScreenHeight={true}>
       <OptionsPanel />
     </Layout>
   );
 };
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps() {
   return {
     props: {}
   }
