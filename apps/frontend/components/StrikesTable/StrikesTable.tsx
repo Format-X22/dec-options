@@ -37,9 +37,10 @@ function StrikesTable(): JSX.Element {
     const closeModal = (): void => {
         setSubscribeModalIsVisible(false);
     };
-    const openModal = (): void => {
-        setSubscribeModalIsVisible(true);
-    };
+    // TODO currently we don't open modal anywhere
+    // const openModal = (): void => {
+    //     setSubscribeModalIsVisible(true);
+    // };
 
     const onChange = (value: string): void => {
         setValid(true);
@@ -79,7 +80,7 @@ function StrikesTable(): JSX.Element {
     return (
         <StyledContainer>
             {state.filter.currency && state.filter.date && (
-                <Table base={state.filter.currency} date={state.filter.date} openSubscribeModal={openModal} />
+                <Table base={state.filter.currency} date={state.filter.date} />
             )}
             <Modal
                 visible={subscribeModalIsVisible}

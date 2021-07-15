@@ -15,6 +15,9 @@ import { ApolloError } from '@apollo/client';
 
 type TTableData = {
     strike?: number;
+    markets?: { name: string }[];
+    // TODO probably never used
+    market?: { name: string };
     minAsk?: number;
     maxBid?: number;
     askQuote?: number;
@@ -40,18 +43,18 @@ export function TableSide({
     hideSourcesColumn,
     showMarketColumn,
 }: {
-    data: any;
+    data: TTableData[];
     error: ApolloError;
     reverse?: boolean;
     type: string;
     date: Date;
-    onRowClick: (item: any) => void;
+    onRowClick: ({ strike, type }: { strike: number; type: string }) => void;
     hideSourcesColumn?: boolean;
     showMarketColumn?: boolean;
 }): JSX.Element {
     const { state }: Partial<ContextState> = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
-    const [dataWithGreeks, setDataWithGreeks] = useState(null);
+    const [dataWithGreeks, setDataWithGreeks] = useState<TTableData[]>([]);
 
     function calcGreeks(): void {
         if (!data) {
@@ -105,7 +108,7 @@ export function TableSide({
     }
 
     useEffect((): void => {
-        setDataWithGreeks(null);
+        setDataWithGreeks([]);
         calcGreeks();
     }, [data]);
 

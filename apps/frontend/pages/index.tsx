@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Filters from '../components/Filters';
 import { ContextApp } from './_app';
-import { ActionType, ContextState, ESplashPanels } from './stateType';
+import { ActionType, ContextState } from './stateType';
 import StrikesTable from '../components/StrikesTable/StrikesTable';
 import { gql, useQuery } from '@apollo/client';
 import Layout from '../components/Layout/Layout';
@@ -24,10 +24,10 @@ const GET_PRICES = gql`
     }
 `;
 
-function Index(props): JSX.Element {
+function Index(): JSX.Element {
     const router = useRouter();
     const { base = 'ETH', date } = router.query;
-    const { state, changeState }: Partial<ContextState> = useContext(ContextApp);
+    const { changeState }: Partial<ContextState> = useContext(ContextApp);
 
     useEffect(() => {
         if (base && typeof base === 'string') {
@@ -41,6 +41,7 @@ function Index(props): JSX.Element {
         }
     }, [date]);
 
+    // TODO add error handling
     const { loading: loadingBases, data: dataBases, error: errorBases } = useQuery(GET_BASES);
     const { loading: loadingPrices, data: dataPrices, error: errorPrices, refetch } = useQuery(GET_PRICES);
 

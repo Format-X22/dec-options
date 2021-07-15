@@ -1,4 +1,4 @@
-import {ReactElement, useState} from 'react';
+import { ReactElement, useState } from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../theme';
 import Button from './Button';

@@ -1,4 +1,4 @@
-import { FC, useRef, useEffect } from 'react';
+import { FC, useRef, useEffect, Ref } from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../../theme';
 
@@ -8,7 +8,7 @@ type TablePartProps = {
     reverse?: boolean;
     header?: boolean;
     children: JSX.Element;
-    ref?: any;
+    ref?: Ref<HTMLDivElement>;
 };
 
 const TablePartContainer: FC<TablePartProps> = styled.div`

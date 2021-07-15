@@ -24,15 +24,18 @@ const GET_STRIKES = gql`
     }
 `;
 
-export function Table({
-    date,
-    base,
-    openSubscribeModal,
-}: {
-    date: string;
-    base: string;
-    openSubscribeModal: () => void;
-}): JSX.Element {
+interface IStrikeData {
+    strikes: {
+        strike: number;
+        markets: {
+            name: string;
+        }[];
+        maxBid: number;
+        minAsk: number;
+    }[];
+}
+
+export function Table({ date, base }: { date: string; base: string }): JSX.Element {
     const router = useRouter();
 
     const fromDate = new Date(date);
@@ -44,7 +47,7 @@ export function Table({
     toDate.setMinutes(59);
     toDate.setSeconds(59);
 
-    const { data: putsData, error: putsError } = useQuery(GET_STRIKES, {
+    const { data: putsData, error: putsError } = useQuery<IStrikeData>(GET_STRIKES, {
         variables: {
             type: 'PUT',
             base,
@@ -53,7 +56,7 @@ export function Table({
         },
     });
 
-    const { data: callsData, error: callsError } = useQuery(GET_STRIKES, {
+    const { data: callsData, error: callsError } = useQuery<IStrikeData>(GET_STRIKES, {
         variables: {
             type: 'CALL',
             base,
