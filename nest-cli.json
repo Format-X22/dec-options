@@ -3,10 +3,6 @@
   "sourceRoot": "apps/options-aggregator/src",
   "monorepo": true,
   "root": "apps/options-aggregator",
-  "compilerOptions": {
-    "webpack": true,
-    "tsConfigPath": "apps/options-aggregator/tsconfig.app.json"
-  },
   "projects": {
     "options-aggregator": {
       "type": "application",
