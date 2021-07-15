@@ -25,11 +25,13 @@ type TOptionsResponse = {
 
 type TRawOption = TOptionsResponse['data'][0];
 
-type TOptionsDepthResponse = {
+type TRawOrderBookOrder = [number, number];
+type TRawOrderBook = Array<TRawOrderBookOrder>;
+type TOptionsOrderBookResponse = {
     msg: string;
     data: {
-        bids: [[number, number]];
-        asks: [[number, number]];
+        asks: TRawOrderBook;
+        bids: TRawOrderBook;
     };
 };
 
@@ -54,21 +56,20 @@ export class BinanceService extends AggregatorAbstract<TRawOption> {
 
     protected async getOrderBook(rawOption: TRawOption): Promise<OrderBook> {
         const depthUrl: string = `${getOptionDepthApiUrl}?symbol=${rawOption.symbol}`;
-        const rawDepthResponse: TOptionsDepthResponse = await this.exchange.fetch(depthUrl, 'GET');
+        const rawDepthResponse: TOptionsOrderBookResponse = await this.exchange.fetch(depthUrl, 'GET');
 
         if (rawDepthResponse.msg !== 'success') {
             this.throwRequestError('depth', rawDepthResponse);
         }
 
+        const asks: TRawOrderBook = rawDepthResponse.data?.asks || [];
+        const bids: TRawOrderBook = rawDepthResponse.data?.bids || [];
+
         return {
             optionId: rawOption.id,
             optionMarketKey: EMarketKey.BINANCE,
-            asks: rawDepthResponse.data.asks.map(
-                ([price, amount]: [number, number]): OrderBookOrder => ({ price, amount }),
-            ),
-            bids: rawDepthResponse.data.bids.map(
-                ([price, amount]: [number, number]): OrderBookOrder => ({ price, amount }),
-            ),
+            asks: asks.map(([price, amount]: TRawOrderBookOrder): OrderBookOrder => ({ price, amount })),
+            bids: bids.map(([price, amount]: TRawOrderBookOrder): OrderBookOrder => ({ price, amount })),
         };
     }
 
