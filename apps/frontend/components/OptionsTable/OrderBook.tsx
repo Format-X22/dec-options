@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { TableRow } from '../StrikesTable/TableRow';
 import { TableCell } from '../StrikesTable/TableCell';
 import { TitleText } from '../StrikesTable/TitleText';
@@ -39,21 +39,6 @@ const GET_OPTIONS = gql`
     }
 `;
 
-const GET_ORDER_BOOK = gql`
-    query getOrderBook($optionId: String!, $optionMarketKey: MarketKey!) {
-        orderBook(optionId: $optionId, optionMarketKey: $optionMarketKey) {
-            asks {
-                price
-                amount
-            }
-            bids {
-                price
-                amount
-            }
-        }
-    }
-`;
-
 const AsksText: FC = styled.div`
     font-weight: 500;
     font-size: 12px;
@@ -81,7 +66,7 @@ const Divider: FC = styled.div`
 
 export function OrderBook(): JSX.Element {
     const router = useRouter();
-    const {date, strike, base, type} = router.query as unknown as ITradeQuery;
+    const { date, strike, base, type } = router.query as unknown as ITradeQuery;
 
     const fromExpirationDate = new Date(date || 0);
 
@@ -164,7 +149,7 @@ export function OrderBook(): JSX.Element {
                         .slice()
                         .reverse()
                         .map(
-                            ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
+                            ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
                                 <TableRow key={`asks-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <AsksText>{price}</AsksText>
@@ -181,7 +166,7 @@ export function OrderBook(): JSX.Element {
                     {asks.length === 0 && <TableRow>{'No asks...'}</TableRow>}
                     <Divider />
                     {bids.map(
-                        ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
+                        ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
                             <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
                                 <TableCell className={'TODO-order-book-column-size'}>
                                     <BidsText>{price}</BidsText>

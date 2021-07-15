@@ -41,7 +41,7 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
-        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-inferrable-types': 'off',
         '@typescript-eslint/no-unused-expressions': 'error',
         'dot-notation': 'off',
         'import/extensions': 'off',
@@ -66,5 +66,10 @@ module.exports = {
         'react/react-in-jsx-scope': 'off',
         'react/require-default-props': 'off',
         'react/static-property-placement': 'off'
-    }
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
 };

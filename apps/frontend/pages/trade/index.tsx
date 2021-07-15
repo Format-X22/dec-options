@@ -3,17 +3,17 @@ import Layout from '../../components/Layout/Layout';
 import { OptionsPanel } from '../../components/OptionsTable/OptionsPanel';
 
 const Index = () => {
-  return (
-    <Layout>
-      <OptionsPanel />
-    </Layout>
-  );
+    return (
+        <Layout>
+            <OptionsPanel />
+        </Layout>
+    );
 };
 
 export async function getServerSideProps(context) {
-  return {
-    props: {}
-  }
+    return {
+        props: {},
+    };
 }
 
 export default Index;

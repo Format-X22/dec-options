@@ -33,7 +33,7 @@ export class OptionResolver {
 
     @Query((): Array<typeof Base> => [Base])
     async bases(source: never, args: never, root: never, info: GraphQLResolveInfo): Promise<Array<Base>> {
-        let pricesRequired = false;
+        let pricesRequired: boolean = false;
 
         if ('usdPrice' in fieldsInfo(info)) {
             pricesRequired = true;

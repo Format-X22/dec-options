@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC, ReactElement, useEffect } from 'react';
 import styled from 'styled-components';
 import { $selectBackground, $selectBackgroundHover } from '../theme';
 
@@ -62,12 +62,12 @@ export function Modal({
     title,
     onClose,
 }: {
-    children?: React.ReactElement | string;
+    children?: ReactElement | string;
     visible: boolean;
     title?: string;
     onClose: () => void;
 }): JSX.Element {
-    React.useEffect((): void => {
+    useEffect((): void => {
         z++;
     }, []);
     return (

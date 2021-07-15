@@ -6,8 +6,8 @@ import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
 import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
-const getOptionsApiUrl = 'https://vapi.binance.com/vapi/v1/optionInfo';
-const getOptionDepthApiUrl = 'https://vapi.binance.com/vapi/v1/depth';
+const getOptionsApiUrl: string = 'https://vapi.binance.com/vapi/v1/optionInfo';
+const getOptionDepthApiUrl: string = 'https://vapi.binance.com/vapi/v1/depth';
 
 type TOptionsResponse = {
     msg: string;

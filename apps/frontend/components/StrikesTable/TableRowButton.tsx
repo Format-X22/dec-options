@@ -21,7 +21,7 @@ function TableRowButton({
     children,
     onClick,
 }: {
-    children: React.ReactElement | string;
+    children: ReactElement | string;
     onClick: () => void;
 }): JSX.Element {
     return <TableRowButtonComponent onClick={onClick}>{children}</TableRowButtonComponent>;

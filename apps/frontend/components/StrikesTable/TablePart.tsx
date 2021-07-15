@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../../theme';
 
@@ -42,9 +42,9 @@ const TablePartContent: FC<TablePartProps> = styled.div`
 
 export function TablePart(props: TablePartProps): JSX.Element {
     const { children, ...rest } = props;
-    const ref = React.useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLDivElement>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         function scrollToRight(): void {
             ref?.current?.scroll(1000, 0);
         }

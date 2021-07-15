@@ -1,6 +1,5 @@
 import { TableCell } from './TableCell';
 import { TitleText } from './TitleText';
-import { Lines } from './Lines';
 import React from 'react';
 
 export function PrintGreek({ strikeData, propKey, name }): JSX.Element {

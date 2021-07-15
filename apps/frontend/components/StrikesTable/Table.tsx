@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useRouter } from 'next/router';
 import format from 'date-fns/format';
 import { TableContainer } from './TableContainer';
@@ -83,17 +83,20 @@ export function Table({
         return data || null;
     });
 
-    const onRowClick = useCallback(({ strike, type }: { strike: number, type: string }): void => {
-      router.push({
-        pathname: `/trade`,
-        query: {
-          date,
-          base,
-          strike,
-          type,
-        }
-      });
-  }, [date, base]);
+    const onRowClick = useCallback(
+        ({ strike, type }: { strike: number; type: string }): void => {
+            router.push({
+                pathname: `/trade`,
+                query: {
+                    date,
+                    base,
+                    strike,
+                    type,
+                },
+            });
+        },
+        [date, base],
+    );
 
     return (
         <TableContainer>

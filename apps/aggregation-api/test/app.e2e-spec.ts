@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import * as superagent from 'superagent';
 
-const SUCCESS_CODE = 200;
+const SUCCESS_CODE: number = 200;
 
 describe('AggregationApiController (e2e)', (): void => {
     let app: INestApplication;

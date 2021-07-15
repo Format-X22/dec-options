@@ -32,7 +32,7 @@ const PAGE_SIZE = 1000;
 export class HegicService extends AggregatorAbstract<TRawOption> {
     protected readonly logger: Logger = new Logger(HegicService.name);
     protected readonly pageSize: number = 1000;
-    protected isGetWithPagination = true;
+    protected isGetWithPagination: boolean = true;
 
     protected get rateLimit(): number {
         return 1000;

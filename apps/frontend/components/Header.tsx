@@ -1,4 +1,4 @@
-import React from 'react';
+import {ReactElement, useState} from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../theme';
 import Button from './Button';
@@ -20,8 +20,8 @@ const Logo = styled.div`
     line-height: 22px;
 `;
 
-function Header({}: { children?: React.ReactElement | string }): JSX.Element {
-    const [connectModalIsVisible, setConnectModalIsVisible] = React.useState(false);
+function Header({}: { children?: ReactElement | string }): JSX.Element {
+    const [connectModalIsVisible, setConnectModalIsVisible] = useState(false);
     const closeModal = () => {
         setConnectModalIsVisible(false);
     };

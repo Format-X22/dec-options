@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
 import Header from '../Header';
@@ -10,16 +10,16 @@ const Container = styled.div`
 `;
 
 interface IProps {
-  children: ReactNode;
+    children: ReactNode;
 }
 
-const Layout: FC<IProps> = ({children}) => {
-  return (
-    <Container>
-      <Header />
-      {children}
-    </Container>
-  );
+const Layout: FC<IProps> = ({ children }) => {
+    return (
+        <Container>
+            <Header />
+            {children}
+        </Container>
+    );
 };
 
 export default Layout;

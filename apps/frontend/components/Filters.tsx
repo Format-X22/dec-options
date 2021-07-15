@@ -1,4 +1,4 @@
-import React from 'react';
+import {ReactElement} from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../theme';
 import { TimeTable } from './TimeTable';
@@ -24,7 +24,7 @@ const FiltersRow = styled.div`
     }
 `;
 
-function Filters({}: { children?: React.ReactElement | string }): JSX.Element {
+function Filters({}: { children?: ReactElement | string }): JSX.Element {
     return (
         <StyledFilters>
             <FiltersRow>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Filters from '../components/Filters';
 import { ContextApp } from './_app';
@@ -6,7 +6,6 @@ import { ActionType, ContextState, ESplashPanels } from './stateType';
 import StrikesTable from '../components/StrikesTable/StrikesTable';
 import { gql, useQuery } from '@apollo/client';
 import Layout from '../components/Layout/Layout';
-
 
 const GET_BASES = gql`
     query getBases {
@@ -30,13 +29,13 @@ function Index(props): JSX.Element {
     const { base = 'ETH', date } = router.query;
     const { state, changeState }: Partial<ContextState> = useContext(ContextApp);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (base && typeof base === 'string') {
             changeState({ type: ActionType.SET_FILTER_CURRENCY, payload: base });
         }
     }, [base]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (date && typeof date === 'string') {
             changeState({ type: ActionType.SET_FILTER_DATE, payload: date });
         }
@@ -80,10 +79,10 @@ function Index(props): JSX.Element {
     }, []);
 
     return (
-      <Layout>
-        <Filters />
-        <StrikesTable />
-      </Layout>
+        <Layout>
+            <Filters />
+            <StrikesTable />
+        </Layout>
     );
 }
 

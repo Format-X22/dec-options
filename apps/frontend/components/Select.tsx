@@ -1,13 +1,13 @@
-import React, { FC } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { $labelColor, $optionColor, $selectBackground, $selectBackgroundHover } from '../theme';
 import { IconUp } from './IconUp';
 import { IconDown } from './IconDown';
 import { DOMEvent } from '../types';
 
-export type Option = {
+export type Option<T = string> = {
     name: string;
-    value: any;
+    value: T;
 };
 
 const SelectAndLabelContainer = styled.div`
@@ -97,35 +97,32 @@ const Option: FC<OptionProps> = styled.div`
     }
 `;
 
-function Select({
+function Select<T = string>({
     value,
     options,
     onChange,
     label,
 }: {
-    // tslint:disable-next-line:no-any
-    value: any;
-    options: Option[];
-    // tslint:disable-next-line:no-any
-    onChange: (value: any) => void;
+    value: T;
+    options: Option<T>[];
+    onChange: (value: T) => void;
     label?: string;
 }): JSX.Element {
-    const ref = React.useRef<HTMLDivElement>(null);
-    const [open, setOpen] = React.useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const [open, setOpen] = useState(false);
 
     const toggle = (): void => {
         setOpen(!open);
     };
 
-    // tslint:disable-next-line:no-shadowed-variable no-any typedef
-    const optionClickHandler = (newValue: any) => (): void => {
+    const optionClickHandler = (newValue: T) => (): void => {
         onChange(newValue);
     };
 
     const valueOption = options.find(({ value: oValue }) => oValue === value);
     const valueString = valueOption ? valueOption.name : value || '\u00A0';
 
-    React.useEffect(() => {
+    useEffect(() => {
         const listener = (e: DOMEvent<Node>): void => {
             let target: Node = e.target;
             while (target && !document.body.isSameNode(target)) {
@@ -154,10 +151,10 @@ function Select({
                 {open ? <IconUp /> : <IconDown />}
                 <OptionsContainer open={open}>
                     {options.map(
-                        (option: Option): JSX.Element => (
+                        (option): JSX.Element => (
                             <Option
+                                key={option.value.toString()}
                                 active={option.value === value}
-                                key={option.value}
                                 onClick={optionClickHandler(option.value)}
                             >
                                 {option.name}

@@ -27,7 +27,7 @@ function Icon(): JSX.Element {
     );
 }
 
-function CallsIcon({large = false}: {large?: boolean}): JSX.Element {
+function CallsIcon({ large = false }: { large?: boolean }): JSX.Element {
     return (
         <Container>
             <Text style={large ? { fontSize: 20 } : { fontSize: 12 }}>Calls</Text>

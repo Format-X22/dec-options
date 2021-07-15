@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { TableSide } from '../StrikesTable/TableSide';
 import { ActionType, ContextState } from '../../pages/stateType';
 import { ContextApp } from '../../pages/_app';

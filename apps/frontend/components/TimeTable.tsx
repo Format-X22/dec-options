@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
-import React, { useContext } from 'react';
+import { useContext, FC, useState, useEffect } from 'react';
 import { ContextApp } from '../pages/_app';
 import { TSetter } from '../types';
 import { gql, useQuery } from '@apollo/client';
@@ -35,7 +35,7 @@ const DateTitle = styled.div`
 type DateElementProps = {
     active: boolean;
 };
-const DateElement: React.FunctionComponent<DateElementProps> = styled.div`
+const DateElement: FC<DateElementProps> = styled.div`
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -104,7 +104,7 @@ export function TimeTable(): JSX.Element {
         router.push(router);
     }
 
-    const [loadingTimeout, setLoadingTimeout]: [boolean, TSetter<boolean>] = React.useState(true);
+    const [loadingTimeout, setLoadingTimeout]: [boolean, TSetter<boolean>] = useState(true);
     const { loading, data, error } = useQuery(GET_EXPIRATIONS, {
         variables: {
             timezone: new Date().getTimezoneOffset() / 60,
@@ -112,13 +112,13 @@ export function TimeTable(): JSX.Element {
         },
     });
 
-    React.useEffect((): void => {
+    useEffect((): void => {
         setTimeout((): void => {
             setLoadingTimeout(false);
         }, 1000);
     }, []);
 
-    React.useEffect((): void => {
+    useEffect((): void => {
         if (data?.expirations?.length) {
             if (data && !value && onChange) {
                 onChange(getDateString(data.expirations[0].expirationDate));

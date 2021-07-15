@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { client, ContextApp } from '../../pages/_app';
 import { StyledContainer } from './StyledContainer';
 import { Table } from './Table';
@@ -28,11 +28,11 @@ const SUBSCRIBE = gql`
 function StrikesTable(): JSX.Element {
     const { state } = useContext(ContextApp);
 
-    const [thanksModalIsVisible, setThanksModalIsVisible] = React.useState(false);
-    const [subscribeModalIsVisible, setSubscribeModalIsVisible] = React.useState(false);
-    const [email, setEmail] = React.useState<string>('');
-    const [valid, setValid] = React.useState(true);
-    const [error, setError] = React.useState<string | null>(null);
+    const [thanksModalIsVisible, setThanksModalIsVisible] = useState(false);
+    const [subscribeModalIsVisible, setSubscribeModalIsVisible] = useState(false);
+    const [email, setEmail] = useState<string>('');
+    const [valid, setValid] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const closeModal = (): void => {
         setSubscribeModalIsVisible(false);

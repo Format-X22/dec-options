@@ -28,13 +28,13 @@ enum EApiMarkets {
     BINANCE = 'binance',
 }
 
-const API_POINT = 'https://api.3commas.io/public/api/ver1';
+const API_POINT: string = 'https://api.3commas.io/public/api/ver1';
 
 @Injectable()
 export class PriceService implements OnModuleInit, OnModuleDestroy {
     protected readonly logger: Logger = new Logger(PriceService.name);
     private interval: Timeout;
-    private inSync = false;
+    private inSync: boolean = false;
     private price: Map<ESymbol, number> = new Map([
         [ESymbol.USD, 1],
         [ESymbol.USDC, 1],

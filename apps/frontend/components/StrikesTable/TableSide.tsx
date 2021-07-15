@@ -1,5 +1,5 @@
 import { ContextState } from '../../pages/stateType';
-import React, { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { ContextApp } from '../../pages/_app';
 import { GreekValue } from '../../types';
 import { differenceInDays } from 'date-fns';
@@ -51,7 +51,7 @@ export function TableSide({
 }): JSX.Element {
     const { state }: Partial<ContextState> = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
-    const [dataWithGreeks, setDataWithGreeks] = React.useState(null);
+    const [dataWithGreeks, setDataWithGreeks] = useState(null);
 
     function calcGreeks(): void {
         if (!data) {
@@ -104,12 +104,12 @@ export function TableSide({
         setDataWithGreeks(newData);
     }
 
-    React.useEffect((): void => {
+    useEffect((): void => {
         setDataWithGreeks(null);
         calcGreeks();
     }, [data]);
 
-    React.useEffect((): void => {
+    useEffect((): void => {
         calcGreeks();
     }, [currentPrice]);
 
@@ -156,7 +156,7 @@ export function TableSide({
                         <TableRow
                             reverse={reverse}
                             key={item.strike + j + Math.random()}
-                            onClick={(): void => onRowClick({strike: item.strike, type})}
+                            onClick={(): void => onRowClick({ strike: item.strike, type })}
                             className='data-row'
                         >
                             {showMarketColumn && (
