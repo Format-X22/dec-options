@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { $labelColor, $optionColor, $selectBackground, $selectBackgroundHover } from '../theme';
 import { IconUp } from './IconUp';
@@ -30,7 +30,7 @@ type SelectContainerProps = {
     onClick: (e: Event) => void;
 };
 
-const SelectContainer: React.FunctionComponent<SelectContainerProps> = styled.div`
+const SelectContainer: FC<SelectContainerProps> = styled.div`
     position: relative;
     width: auto;
     min-width: 128px;
@@ -56,7 +56,7 @@ type OptionsContainerProps = {
     open: boolean;
 };
 
-const OptionsContainer: React.FunctionComponent<OptionsContainerProps> = styled.div`
+const OptionsContainer: FC<OptionsContainerProps> = styled.div`
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
@@ -75,7 +75,7 @@ type OptionProps = {
     onClick: () => void;
 };
 
-const Option: React.FunctionComponent<OptionProps> = styled.div`
+const Option: FC<OptionProps> = styled.div`
     width: 100%;
     font-style: normal;
     font-weight: 500;

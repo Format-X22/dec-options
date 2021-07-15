@@ -23,16 +23,16 @@ type TOptionsResponse = {
 
 type TRawOption = TOptionsResponse['hegicOptions'][0];
 
-const API: string = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
-const MS_MULTIPLY: number = 1000;
-const DECIMAL_DELIMITER: number = 100_000_000;
-const PAGE_SIZE: number = 1000;
+const API = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
+const MS_MULTIPLY = 1000;
+const DECIMAL_DELIMITER = 100_000_000;
+const PAGE_SIZE = 1000;
 
 @Injectable()
 export class HegicService extends AggregatorAbstract<TRawOption> {
     protected readonly logger: Logger = new Logger(HegicService.name);
     protected readonly pageSize: number = 1000;
-    protected isGetWithPagination: boolean = true;
+    protected isGetWithPagination = true;
 
     protected get rateLimit(): number {
         return 1000;
@@ -40,7 +40,7 @@ export class HegicService extends AggregatorAbstract<TRawOption> {
 
     protected async getRawOptions(): Promise<Array<TRawOption>> {
         const result: Array<TRawOption> = [];
-        let skip: number = 0;
+        let skip = 0;
 
         while (true) {
             const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery(skip));

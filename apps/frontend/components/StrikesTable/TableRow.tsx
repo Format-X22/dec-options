@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { $backgroundLight, $lineColor, $tableRowHover } from '../../theme';
 
@@ -7,7 +7,7 @@ type TableRowProps = {
     onClick?: () => void;
     className?: string;
 };
-export const TableRow: React.FunctionComponent<TableRowProps> = styled.div`
+export const TableRow: FC<TableRowProps> = styled.div`
     display: flex;
     width: 100%;
     height: 48px;

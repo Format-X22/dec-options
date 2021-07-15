@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { $backgroundDark, $lineColor, $tableTitleBackground } from '../../theme';
 
 type StrikeCellProps = {
     active?: boolean;
 };
-export const StrikeCell: React.FunctionComponent<StrikeCellProps> = styled.div`
+export const StrikeCell: FC<StrikeCellProps> = styled.div`
     background: ${$backgroundDark};
     width: 100%;
     height: 48px;

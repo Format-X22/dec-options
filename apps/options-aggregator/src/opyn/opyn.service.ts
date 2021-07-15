@@ -7,7 +7,7 @@ import * as puppeteer from 'puppeteer';
 import { Browser, Page } from 'puppeteer';
 import * as moment from 'moment';
 import { Moment } from 'moment';
-import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
+import { OrderBook } from '@app/shared/orderbook.schema';
 
 type TOptionsResponse = {
     otokens: Array<{
@@ -44,15 +44,15 @@ type TParsedPrices = Array<{
     type: 'CALL' | 'PUT';
 }>;
 
-const API: string = 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet';
-const MS_MULTIPLY: number = 1000;
-const PARSE_URL: string = 'https://v2.opyn.co/#/';
+const API = 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet';
+const MS_MULTIPLY = 1000;
+const PARSE_URL = 'https://v2.opyn.co/#/';
 
 @Injectable()
 export class OpynService extends AggregatorAbstract<TRawOption> implements OnModuleInit {
     protected readonly logger: Logger = new Logger(OpynService.name);
     protected readonly pageSize: number = 1000;
-    protected isGetWithPagination: boolean = true;
+    protected isGetWithPagination = true;
     private pricesCache: TParsedPrices = [];
     private browser: Browser;
 
@@ -197,9 +197,9 @@ export class OpynService extends AggregatorAbstract<TRawOption> implements OnMod
 
                     const expiration: string = getExpiration(expirationButton);
                     const rows: HTMLCollection = document.querySelector('.MuiGrid-root .MuiTableBody-root').children;
-                    const stepForFiltrateGreeks: number = 2;
+                    const stepForFiltrateGreeks = 2;
 
-                    for (let i: number = 0; i < rows.length; i += stepForFiltrateGreeks) {
+                    for (let i = 0; i < rows.length; i += stepForFiltrateGreeks) {
                         const row: HTMLTableRowElement = rows[i] as HTMLTableRowElement;
 
                         extractPricesForEachStrike(row, base, expiration);
@@ -258,14 +258,14 @@ export class OpynService extends AggregatorAbstract<TRawOption> implements OnMod
             }
 
             function sleep(): Promise<void> {
-                return new Promise((resolve: Function): number => setTimeout(resolve, 3000));
+                return new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, 3000));
             }
 
             function selectAll<T extends Element>(query: string, root: Element | Document = document): Array<T> {
                 return Array.from(root.querySelectorAll(query));
             }
         });
-        
+
         await page.close();
     }
 }

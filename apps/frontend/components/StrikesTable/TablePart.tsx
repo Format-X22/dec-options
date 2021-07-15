@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../../theme';
 
@@ -11,7 +11,7 @@ type TablePartProps = {
     ref?: any;
 };
 
-const TablePartContainer: React.FunctionComponent<TablePartProps> = styled.div`
+const TablePartContainer: FC<TablePartProps> = styled.div`
     display: flex;
     flex-direction: ${({ row }: TablePartProps) => (row ? 'row' : 'column')};
     width: 100%;
@@ -27,7 +27,7 @@ const TablePartContainer: React.FunctionComponent<TablePartProps> = styled.div`
     }
 `;
 
-const TablePartContent: React.FunctionComponent<TablePartProps> = styled.div`
+const TablePartContent: FC<TablePartProps> = styled.div`
     display: flex;
     flex-direction: inherit;
     width: 100%;

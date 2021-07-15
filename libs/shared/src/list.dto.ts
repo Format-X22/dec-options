@@ -2,8 +2,8 @@ import { ArgsType, Field, Int, ObjectType } from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
 import { Max, Min } from 'class-validator';
 
-export const DEFAULT_OFFSET: number = 0;
-export const DEFAULT_LIMIT: number = 20;
+export const DEFAULT_OFFSET = 0;
+export const DEFAULT_LIMIT = 20;
 
 @ObjectType()
 export class Pagination {

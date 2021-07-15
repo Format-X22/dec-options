@@ -28,13 +28,13 @@ enum EApiMarkets {
     BINANCE = 'binance',
 }
 
-const API_POINT: string = 'https://api.3commas.io/public/api/ver1';
+const API_POINT = 'https://api.3commas.io/public/api/ver1';
 
 @Injectable()
 export class PriceService implements OnModuleInit, OnModuleDestroy {
     protected readonly logger: Logger = new Logger(PriceService.name);
     private interval: Timeout;
-    private inSync: boolean = false;
+    private inSync = false;
     private price: Map<ESymbol, number> = new Map([
         [ESymbol.USD, 1],
         [ESymbol.USDC, 1],
@@ -136,7 +136,7 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
     }
 
     private async getPriceFrom2Commas(market: EApiMarkets, pair: string): Promise<number> {
-        const priceUrl: string = `${API_POINT}/accounts/currency_rates?market_code=${market}&pair=${pair}`;
+        const priceUrl = `${API_POINT}/accounts/currency_rates?market_code=${market}&pair=${pair}`;
         let priceResponse: AxiosResponse<TRaw3CommasPrice>;
 
         try {
@@ -150,7 +150,7 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
             const status: number = priceResponse.status;
             const statusText: string = priceResponse.statusText;
             const errorData: string = JSON.stringify(priceResponse.data || null, null, 2);
-            const responseErrorData: string = `${status}: ${statusText} (data: ${errorData})`;
+            const responseErrorData = `${status}: ${statusText} (data: ${errorData})`;
 
             Logger.error(`3Commas price error - ${responseErrorData}, pair ${pair}`);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { TableRow } from '../StrikesTable/TableRow';
 import { TableCell } from '../StrikesTable/TableCell';
 import { TitleText } from '../StrikesTable/TitleText';
@@ -54,7 +54,7 @@ const GET_ORDER_BOOK = gql`
     }
 `;
 
-const AsksText: React.FunctionComponent = styled.div`
+const AsksText: FC = styled.div`
     font-weight: 500;
     font-size: 12px;
     line-height: 20px;
@@ -64,7 +64,7 @@ const AsksText: React.FunctionComponent = styled.div`
     color: red;
 `;
 
-const BidsText: React.FunctionComponent = styled.div`
+const BidsText: FC = styled.div`
     font-weight: 500;
     font-size: 12px;
     line-height: 20px;
@@ -74,7 +74,7 @@ const BidsText: React.FunctionComponent = styled.div`
     color: green;
 `;
 
-const Divider: React.FunctionComponent = styled.div`
+const Divider: FC = styled.div`
     width: 100%;
     border: 1px solid white;
 `;

@@ -6,8 +6,8 @@ import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
 import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
-const getOptionsApiUrl: string = 'https://vapi.binance.com/vapi/v1/optionInfo';
-const getOptionDepthApiUrl: string = 'https://vapi.binance.com/vapi/v1/depth';
+const getOptionsApiUrl = 'https://vapi.binance.com/vapi/v1/optionInfo';
+const getOptionDepthApiUrl = 'https://vapi.binance.com/vapi/v1/depth';
 
 type TOptionsResponse = {
     msg: string;
@@ -53,7 +53,7 @@ export class BinanceService extends AggregatorAbstract<TRawOption> {
     }
 
     protected async getOrderBook(rawOption: TRawOption): Promise<OrderBook> {
-        const depthUrl: string = `${getOptionDepthApiUrl}?symbol=${rawOption.symbol}`;
+        const depthUrl = `${getOptionDepthApiUrl}?symbol=${rawOption.symbol}`;
         const rawDepthResponse: TOptionsDepthResponse = await this.exchange.fetch(depthUrl, 'GET');
 
         if (rawDepthResponse.msg !== 'success') {

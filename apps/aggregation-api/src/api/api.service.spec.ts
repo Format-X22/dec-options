@@ -11,31 +11,29 @@ describe('ApiService', (): void => {
     let service: ApiService;
     let module: TestingModule;
 
-    beforeEach(
-        async (): Promise<void> => {
-            module = await Test.createTestingModule({
-                imports: [
-                    HttpModule,
-                    ConfigModule.forRoot({
-                        isGlobal: true,
-                        cache: true,
+    beforeEach(async (): Promise<void> => {
+        module = await Test.createTestingModule({
+            imports: [
+                HttpModule,
+                ConfigModule.forRoot({
+                    isGlobal: true,
+                    cache: true,
+                }),
+                ApiModule,
+                MongooseModule.forRootAsync({
+                    imports: [ConfigModule],
+                    useFactory: (configService: ConfigService): MongooseModuleOptions => ({
+                        uri: configService.get<string>('OA_MONGO_CONNECT'),
                     }),
-                    ApiModule,
-                    MongooseModule.forRootAsync({
-                        imports: [ConfigModule],
-                        useFactory: (configService: ConfigService): MongooseModuleOptions => ({
-                            uri: configService.get<string>('OA_MONGO_CONNECT'),
-                        }),
-                        inject: [ConfigService],
-                    }),
-                    MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
-                ],
-                providers: [ApiService],
-            }).compile();
+                    inject: [ConfigService],
+                }),
+                MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
+            ],
+            providers: [ApiService],
+        }).compile();
 
-            service = module.get<ApiService>(ApiService);
-        },
-    );
+        service = module.get<ApiService>(ApiService);
+    });
 
     it('should be defined', (): void => {
         expect(service).toBeDefined();
