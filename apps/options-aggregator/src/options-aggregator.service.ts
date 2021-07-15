@@ -3,7 +3,6 @@ import { BinanceService } from './binance/binance.service';
 import { DeribitService } from './deribit/deribit.service';
 import { HegicService } from './hegic/hegic.service';
 import { OkexService } from './okex/okex.service';
-import { OpynService } from './opyn/opyn.service';
 import { ConfigService } from '@nestjs/config';
 import { AggregatorAbstract } from './aggregator.abstract';
 
@@ -18,11 +17,10 @@ export class OptionsAggregatorService {
         private readonly deribitService: DeribitService,
         private readonly hegicService: HegicService,
         private readonly okexService: OkexService,
-        private readonly opynService: OpynService,
     ) {}
 
     async start(): Promise<void> {
-        [this.binanceService, this.deribitService, this.hegicService, this.okexService, this.opynService].forEach(
+        [this.binanceService, this.deribitService, this.hegicService, this.okexService].forEach(
             this.startSync.bind(this),
         );
 

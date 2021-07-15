@@ -4,7 +4,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
 import { HegicService } from './hegic/hegic.service';
-import { OpynService } from './opyn/opyn.service';
 import { DeribitService } from './deribit/deribit.service';
 import { BinanceService } from './binance/binance.service';
 import { OkexService } from './okex/okex.service';
@@ -32,6 +31,6 @@ import { BasePrice, BasePriceSchema } from '@app/shared/base-price.schema';
         ]),
         HttpModule,
     ],
-    providers: [OptionsAggregatorService, HegicService, OpynService, DeribitService, BinanceService, OkexService],
+    providers: [OptionsAggregatorService, HegicService, DeribitService, BinanceService, OkexService],
 })
 export class OptionsAggregatorModule {}
