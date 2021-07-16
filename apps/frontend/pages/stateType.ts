@@ -9,14 +9,14 @@ export type State = {
     prices: {
         [key: string]: number;
     };
-    currentSplashPanel: ESplashPanels;
-    selectedOptionGroup: {
+    currentSplashPanel?: ESplashPanels;
+    selectedOptionGroup?: {
         date: Date;
         type: 'call' | 'put';
         strike: number;
         base: string;
     };
-    selectedOptionForOrderBook: {
+    selectedOptionForOrderBook?: {
         optionMarketKey: EMarketKey;
         optionId: string;
     };

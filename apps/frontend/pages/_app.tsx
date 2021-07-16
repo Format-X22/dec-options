@@ -23,7 +23,10 @@ export const initialState: State = {
     },
 };
 
-export const ContextApp = createContext<Partial<ContextState>>({});
+export const ContextApp = createContext<ContextState>({
+    state: initialState,
+    changeState: () => undefined,
+});
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
     const [state, changeState]: [State, Dispatch<Action>] = useReducer<Reducer<State, Action>>(

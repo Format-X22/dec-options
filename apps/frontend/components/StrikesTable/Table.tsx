@@ -24,16 +24,17 @@ const GET_STRIKES = gql`
     }
 `;
 
-interface IStrikeData {
-    strikes: {
-        strike: number;
-        markets: {
-            name: string;
-        }[];
-        maxBid: number;
-        minAsk: number;
+type Strike = {
+    strike: number;
+    markets: {
+        name: string;
     }[];
-}
+    maxBid: number;
+    minAsk: number;
+};
+type StrikeData = {
+    strikes: Strike[];
+};
 
 export function Table({ date, base }: { date: string; base: string }): JSX.Element {
     const router = useRouter();
@@ -47,7 +48,7 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
     toDate.setMinutes(59);
     toDate.setSeconds(59);
 
-    const { data: putsData, error: putsError } = useQuery<IStrikeData>(GET_STRIKES, {
+    const { data: putsData, error: putsError } = useQuery<StrikeData>(GET_STRIKES, {
         variables: {
             type: 'PUT',
             base,
@@ -56,7 +57,7 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
         },
     });
 
-    const { data: callsData, error: callsError } = useQuery<IStrikeData>(GET_STRIKES, {
+    const { data: callsData, error: callsError } = useQuery<StrikeData>(GET_STRIKES, {
         variables: {
             type: 'CALL',
             base,
@@ -68,22 +69,26 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
     const dateString = format(new Date(date), 'dd MMMM');
 
     const strikes = [
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         ...new Set([
             ...(callsData?.strikes || []).map(({ strike }) => strike),
             ...(putsData?.strikes || []).map(({ strike }) => strike),
         ]),
     ].sort((a, b) => (a > b ? 1 : -1));
 
-    const callsDataByStrike = strikes.map((s) => {
+    const callsDataByStrike: Strike[] = [];
+    strikes.forEach((s) => {
         const data = (callsData?.strikes || []).find(({ strike }) => strike === s);
-        return data || null;
+        if (data) {
+            callsDataByStrike.push(data);
+        }
     });
 
-    const putsDataByStrike = strikes.map((s) => {
+    const putsDataByStrike: Strike[] = [];
+    strikes.map((s) => {
         const data = (putsData?.strikes || []).find(({ strike }) => strike === s);
-        return data || null;
+        if (data) {
+            putsDataByStrike.push(data);
+        }
     });
 
     const onRowClick = useCallback(
