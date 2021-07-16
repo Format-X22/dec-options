@@ -56,12 +56,12 @@ export class ApiService {
         private priceService: PriceService,
     ) {}
 
-    async getOption(_id: Option['_id']): Promise<Option> {
+    async getOption(_id: Option['_id']): Promise<Option | null> {
         return this.optionsModel.findById(_id);
     }
 
     async subscribe({ email }: SubscribeGroupArgs): Promise<SubscribeResult> {
-        const result: Subscribers = await this.subscribersModel.findOne({ email });
+        const result: Subscribers | null = await this.subscribersModel.findOne({ email });
 
         if (result) {
             return { success: true };
@@ -146,7 +146,7 @@ export class ApiService {
         let result: Array<ExpirationGroup> = data.map(
             (raw: TRawExpirationGroup): ExpirationGroup => ({
                 expirationDate: raw.expirationDate,
-                markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
+                markets: raw.marketKeys.map((key: EMarketKey): Market | undefined => marketsMapByKey.get(key)),
                 strikes: raw.uniqueValues.length,
             }),
         );
