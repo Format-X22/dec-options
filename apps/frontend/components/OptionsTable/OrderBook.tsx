@@ -170,7 +170,7 @@ export function OrderBook(): JSX.Element {
 
     return (
         <>
-            <TableRow>{'ORDER BOOK'}</TableRow>
+            <TableRow><TableCell>ORDER BOOK</TableCell></TableRow>
             <TableRow>
                 <TableCell className={'TODO-order-book-column-size'}>
                     <TitleText>Price</TitleText>
@@ -204,7 +204,7 @@ export function OrderBook(): JSX.Element {
                                 </TableRow>
                             ),
                       )}
-                      {asks.length === 0 && <TableRow>{'No asks...'}</TableRow>}
+                      {asks.length === 0 && <TableRow><TableCell>No asks...</TableCell></TableRow>}
                   </SubTable>
                   <Divider />
                   <SubTable>
@@ -223,7 +223,7 @@ export function OrderBook(): JSX.Element {
                             </TableRow>
                         ),
                     )}
-                    {bids.length === 0 && <TableRow>{'No bids...'}</TableRow>}
+                    {bids.length === 0 && <TableRow><TableCell>No bids...</TableCell></TableRow>}
                   </SubTable>
                 </SubTablesWrapper>
             )}

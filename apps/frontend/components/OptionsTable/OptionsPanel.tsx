@@ -2,6 +2,7 @@ import React from 'react';
 import { GroupInfo } from './GroupInfo';
 import { OrderBook } from './OrderBook';
 import styled from 'styled-components';
+import Trade from './Trade';
 
 const PanelBodyWrap = styled.div`
     margin: 4px 0;
@@ -33,6 +34,9 @@ export function OptionsPanel(): JSX.Element {
             <PanelBodyWrap>
                 <OrderBookWrap>
                     <OrderBook />
+                </OrderBookWrap>
+                <OrderBookWrap>
+                  <Trade />
                 </OrderBookWrap>
             </PanelBodyWrap>
         </>
