@@ -7,6 +7,10 @@ import { HegicService } from './hegic/hegic.service';
 import { DeribitService } from './deribit/deribit.service';
 import { BinanceService } from './binance/binance.service';
 import { OkexService } from './okex/okex.service';
+import { AuctusService } from './auctus/auctus.service';
+import { FinnexusService } from './finnexus/finnexus.service';
+import { OpynService } from './opyn/opyn.service';
+import { SirenService } from './siren/siren.service';
 import { Option, OptionSchema } from '@app/shared/option.schema';
 import { OrderBook, OrderBookSchema } from '@app/shared/orderbook.schema';
 import { BasePrice, BasePriceSchema } from '@app/shared/base-price.schema';
@@ -31,6 +35,16 @@ import { BasePrice, BasePriceSchema } from '@app/shared/base-price.schema';
         ]),
         HttpModule,
     ],
-    providers: [OptionsAggregatorService, HegicService, DeribitService, BinanceService, OkexService],
+    providers: [
+        OptionsAggregatorService,
+        HegicService,
+        DeribitService,
+        BinanceService,
+        OkexService,
+        AuctusService,
+        FinnexusService,
+        OpynService,
+        SirenService,
+    ],
 })
 export class OptionsAggregatorModule {}
