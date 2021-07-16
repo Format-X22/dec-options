@@ -20,6 +20,10 @@ export abstract class AggregatorAbstract<TRawOption> {
     ) {}
 
     async startSyncLoop(): Promise<void> {
+        if (!this.rateLimit) {
+            return;
+        }
+
         try {
             await this.iteration();
         } catch (error) {
