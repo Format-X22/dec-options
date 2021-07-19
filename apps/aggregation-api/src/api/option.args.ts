@@ -114,6 +114,11 @@ export class StrikeGroupArgs {
     @IsString()
     base?: Option['base'];
 
+    @Field((): typeof EMarketType => EMarketType, { nullable: true })
+    @IsOptional()
+    @IsEnum(EMarketType)
+    marketType?: Option['marketType'];
+
     @Field((): typeof Date => Date, { nullable: true })
     @IsOptional()
     @IsInstance(Date)
