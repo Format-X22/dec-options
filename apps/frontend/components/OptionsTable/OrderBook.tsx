@@ -59,6 +59,31 @@ const BidsText: FC = styled.div`
     color: green;
 `;
 
+const SubTable: FC<{ reverse?: boolean }> = styled.div`
+    max-height: 50%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: ${({ reverse }: { reverse?: boolean }) => (reverse ? 'column-reverse' : 'column')};
+
+    &::-webkit-scrollbar-thumb {
+        background: #303030;
+        border-radius: 12px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
+    &::-webkit-scrollbar {
+        padding: 2px;
+        width: 12px;
+        height: 12px;
+        background: #000000;
+    }
+`;
+
+const SubTablesWrapper: FC = styled.div`
+    overflow: hidden;
+    flex: 100;
+`;
+
 const Divider: FC = styled.div`
     width: 100%;
     border: 1px solid white;
@@ -129,7 +154,9 @@ export function OrderBook(): JSX.Element {
 
     return (
         <>
-            <TableRow>{'ORDER BOOK'}</TableRow>
+            <TableRow>
+                <TableCell>ORDER BOOK</TableCell>
+            </TableRow>
             <TableRow>
                 <TableCell className={'TODO-order-book-column-size'}>
                     <TitleText>Price</TitleText>
@@ -144,11 +171,9 @@ export function OrderBook(): JSX.Element {
             {optionGroupError && <TableRow>{optionGroupError.toString()}</TableRow>}
             {!optionGroupError && error && <TableRow>{error.toString()}</TableRow>}
             {!optionGroupError && !error && (
-                <>
-                    {asks
-                        .slice()
-                        .reverse()
-                        .map(
+                <SubTablesWrapper>
+                    <SubTable reverse>
+                        {asks.slice().map(
                             ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
                                 <TableRow key={`asks-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
@@ -163,25 +188,36 @@ export function OrderBook(): JSX.Element {
                                 </TableRow>
                             ),
                         )}
-                    {asks.length === 0 && <TableRow>{'No asks...'}</TableRow>}
-                    <Divider />
-                    {bids.map(
-                        ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
-                            <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
-                                <TableCell className={'TODO-order-book-column-size'}>
-                                    <BidsText>{price}</BidsText>
-                                </TableCell>
-                                <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{amount}</TitleText>
-                                </TableCell>
-                                <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{marketName}</TitleText>
-                                </TableCell>
+                        {asks.length === 0 && (
+                            <TableRow>
+                                <TableCell>No asks...</TableCell>
                             </TableRow>
-                        ),
-                    )}
-                    {bids.length === 0 && <TableRow>{'No bids...'}</TableRow>}
-                </>
+                        )}
+                    </SubTable>
+                    <Divider />
+                    <SubTable>
+                        {bids.map(
+                            ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
+                                <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <BidsText>{price}</BidsText>
+                                    </TableCell>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <TitleText>{amount}</TitleText>
+                                    </TableCell>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <TitleText>{marketName}</TitleText>
+                                    </TableCell>
+                                </TableRow>
+                            ),
+                        )}
+                        {bids.length === 0 && (
+                            <TableRow>
+                                <TableCell>No bids...</TableCell>
+                            </TableRow>
+                        )}
+                    </SubTable>
+                </SubTablesWrapper>
             )}
         </>
     );

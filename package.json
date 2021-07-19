@@ -25,7 +25,7 @@
     "start:agg": "nest start opnions-aggregator",
     "start:prod:api": "node dist/apps/aggregation-api/main.js",
     "start:prod:agg": "node dist/apps/options-aggregator/main.js",
-    "pm2:start:all": "yarn pm2:start:agg; yarn pm2:start:api;",
+    "pm2:start:all": "yarn pm2:start:agg --env production; yarn pm2:start:api --env production;",
     "pm2:start:api": "NODE_ENV=production pm2 start yarn --interpreter bash --name api -- start:prod:api",
     "pm2:start:agg": "NODE_ENV=production pm2 start yarn --interpreter bash --name agg -- start:prod:agg",
     "pm2:stop:api": "pm2 stop api",

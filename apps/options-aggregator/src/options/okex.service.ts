@@ -3,7 +3,7 @@ import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market, OrderBook as CcxtOrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
-import { AggregatorAbstract } from '../aggregator.abstract';
+import { AggregatorAbstract } from './aggregator.abstract';
 import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
 type TOptionMarket = Market & {

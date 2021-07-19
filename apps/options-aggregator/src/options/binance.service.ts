@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, ESymbol, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
 import { Exchange } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
-import { AggregatorAbstract } from '../aggregator.abstract';
+import { AggregatorAbstract } from './aggregator.abstract';
 import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
 const getOptionsApiUrl: string = 'https://vapi.binance.com/vapi/v1/optionInfo';
@@ -25,11 +25,13 @@ type TOptionsResponse = {
 
 type TRawOption = TOptionsResponse['data'][0];
 
-type TOptionsDepthResponse = {
+type TRawOrderBookOrder = [number, number];
+type TRawOrderBook = Array<TRawOrderBookOrder>;
+type TOptionsOrderBookResponse = {
     msg: string;
     data: {
-        bids: [[number, number]];
-        asks: [[number, number]];
+        asks: TRawOrderBook;
+        bids: TRawOrderBook;
     };
 };
 
@@ -53,22 +55,21 @@ export class BinanceService extends AggregatorAbstract<TRawOption> {
     }
 
     protected async getOrderBook(rawOption: TRawOption): Promise<OrderBook> {
-        const depthUrl = `${getOptionDepthApiUrl}?symbol=${rawOption.symbol}`;
-        const rawDepthResponse: TOptionsDepthResponse = await this.exchange.fetch(depthUrl, 'GET');
+        const depthUrl: string = `${getOptionDepthApiUrl}?symbol=${rawOption.symbol}`;
+        const rawDepthResponse: TOptionsOrderBookResponse = await this.exchange.fetch(depthUrl, 'GET');
 
         if (rawDepthResponse.msg !== 'success') {
             this.throwRequestError('depth', rawDepthResponse);
         }
 
+        const asks: TRawOrderBook = rawDepthResponse.data?.asks || [];
+        const bids: TRawOrderBook = rawDepthResponse.data?.bids || [];
+
         return {
             optionId: rawOption.id,
             optionMarketKey: EMarketKey.BINANCE,
-            asks: rawDepthResponse.data.asks.map(
-                ([price, amount]: [number, number]): OrderBookOrder => ({ price, amount }),
-            ),
-            bids: rawDepthResponse.data.bids.map(
-                ([price, amount]: [number, number]): OrderBookOrder => ({ price, amount }),
-            ),
+            asks: asks.map(([price, amount]: TRawOrderBookOrder): OrderBookOrder => ({ price, amount })),
+            bids: bids.map(([price, amount]: TRawOrderBookOrder): OrderBookOrder => ({ price, amount })),
         };
     }
 
@@ -82,7 +83,7 @@ export class BinanceService extends AggregatorAbstract<TRawOption> {
             size: Number(rawOption.unit),
             strike: Number(rawOption.strikePrice),
             expirationDate: new Date(Number(rawOption.expiryDate)),
-            base: rawOption.underlying.replace(rawOption.quoteAsset, ''),
+            base: rawOption.underlying.replace(rawOption.quoteAsset, '') as ESymbol,
             quote: rawOption.quoteAsset,
             strikeAsset: rawOption.underlying.replace(rawOption.quoteAsset, ''),
             marketUrl: 'https://voptions.binance.com/en',

@@ -12,8 +12,9 @@ export enum EMarketKey {
     OKEX = 'OKEX',
     AUCTUS = 'AUCTUS',
     HEGIC = 'HEGIC',
-    OPYN = 'OPYN',
     SIREN = 'SIREN',
+    OPYN = 'OPYN',
+    FINNEXUS = 'FINNEXUS',
 }
 registerEnumType(EMarketKey, { name: 'MarketKey' });
 
@@ -56,14 +57,19 @@ export const markets: Array<Market> = [
         name: 'Hegic',
     },
     {
+        key: EMarketKey.SIREN,
+        type: EMarketType.DEX,
+        name: 'Siren',
+    },
+    {
         key: EMarketKey.OPYN,
         type: EMarketType.DEX,
         name: 'Opyn',
     },
     {
-        key: EMarketKey.SIREN,
+        key: EMarketKey.FINNEXUS,
         type: EMarketType.DEX,
-        name: 'Siren',
+        name: 'Finnexus',
     },
 ];
 
