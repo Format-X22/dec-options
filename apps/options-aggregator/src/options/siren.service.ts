@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Option } from '@app/shared/option.schema';
-import { AggregatorAbstract } from '../aggregator.abstract';
+import { AggregatorAbstract } from './aggregator.abstract';
 import { OrderBook } from '@app/shared/orderbook.schema';
 
 // TODO Implement
@@ -8,8 +8,8 @@ import { OrderBook } from '@app/shared/orderbook.schema';
 type TRawOption = Object;
 
 @Injectable()
-export class AuctusService extends AggregatorAbstract<TRawOption> {
-    protected readonly logger: Logger = new Logger(AuctusService.name);
+export class SirenService extends AggregatorAbstract<TRawOption> {
+    protected readonly logger: Logger = new Logger(SirenService.name);
 
     protected get rateLimit(): number {
         return null;
