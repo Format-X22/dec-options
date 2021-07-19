@@ -241,7 +241,7 @@ export class ApiService {
         for (const symbol of symbols) {
             if (symbol) {
                 if (pricesRequired) {
-                    const usdPrice = this.priceService.getPrice(symbol) || 0;
+                    const usdPrice = await this.priceService.getPrice(symbol) || 0;
                     result.push({ symbol, usdPrice });
                 } else {
                     result.push({ symbol, usdPrice: 0 });

@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionDeliveryType, EOptionStyleType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, ESymbol, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market, OrderBook as CcxtOrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
-import { AggregatorAbstract } from './aggregator.abstract';
+import { AggregatorAbstract } from '../aggregator.abstract';
 import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
 type TRawOption = Dictionary<Market>[0];
@@ -44,7 +44,7 @@ export class DeribitService extends AggregatorAbstract<TRawOption> {
             size: Number(rawOption.info.contract_size),
             strike: Number(rawOption.info.strike),
             expirationDate: new Date(Number(rawOption.info.expiration_timestamp)),
-            base: rawOption.base,
+            base: rawOption.base as ESymbol,
             quote: rawOption.quote,
             strikeAsset: rawOption.base,
             marketUrl: 'https://www.deribit.com/main#/options',

@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { HttpService, Logger } from '@nestjs/common';
 import * as sleep from 'sleep-promise';
 import { OrderBook, OrderBookDocument } from '@app/shared/orderbook.schema';
-import { BasePrice, BasePriceDocument } from '@app/shared/base-price.schema';
+import { PriceService } from '../price/price.service';
 
 export abstract class AggregatorAbstract<TRawOption> {
     protected logger: Logger;
@@ -15,8 +15,8 @@ export abstract class AggregatorAbstract<TRawOption> {
     constructor(
         @InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>,
         @InjectModel(OrderBook.name) private orderBookDataModel: Model<OrderBookDocument>,
-        @InjectModel(BasePrice.name) private basePriceModel: Model<BasePriceDocument>,
         protected httpService: HttpService,
+        protected priceService: PriceService,
     ) {}
 
     async startSyncLoop(): Promise<void> {
@@ -65,16 +65,6 @@ export abstract class AggregatorAbstract<TRawOption> {
 
             sleep(this.rateLimit);
         }
-    }
-
-    protected async getBasePrice(symbol: string): Promise<number> {
-        const result: BasePrice = await this.basePriceModel.findOne({ symbol }, { price: true });
-
-        if (!result) {
-            return 0;
-        }
-
-        return result.price;
     }
 
     private async saveOrderBook(orderBook: OrderBook): Promise<void> {

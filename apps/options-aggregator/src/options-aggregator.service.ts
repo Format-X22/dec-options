@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { BinanceService } from './options/binance.service';
-import { DeribitService } from './options/deribit.service';
-import { HegicService } from './options/hegic.service';
-import { OkexService } from './options/okex.service';
+import { BinanceService } from './options/binance/binance.service';
+import { DeribitService } from './options/deribit/deribit.service';
+import { HegicService } from './options/hegic/hegic.service';
+import { OkexService } from './options/okex/okex.service';
 import { ConfigService } from '@nestjs/config';
 import { AggregatorAbstract } from './options/aggregator.abstract';
 
