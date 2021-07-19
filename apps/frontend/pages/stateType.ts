@@ -1,5 +1,5 @@
 import { Dispatch } from 'react';
-import { EMarketKey } from '../../../libs/shared/src/market.schema';
+import { EMarketKey } from '@app/shared/market.schema';
 
 export type State = {
     filter: {

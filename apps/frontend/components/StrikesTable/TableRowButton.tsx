@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import styled from 'styled-components';
 import { $buttonBackground, $buttonBackgroundHover } from '../../theme';
 
@@ -17,7 +17,7 @@ const TableRowButtonComponent = styled.button`
     }
 `;
 
-function TableRowButton({ children, onClick }: { children: ReactElement | string; onClick: () => void }): JSX.Element {
+function TableRowButton({ children, onClick }: { children: ReactNode; onClick: () => void }): JSX.Element {
     return <TableRowButtonComponent onClick={onClick}>{children}</TableRowButtonComponent>;
 }
 

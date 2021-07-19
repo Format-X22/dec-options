@@ -42,8 +42,8 @@ function Index(): JSX.Element {
     }, [date]);
 
     // TODO add error handling
-    const { loading: loadingBases, data: dataBases, error: errorBases } = useQuery(GET_BASES);
-    const { loading: loadingPrices, data: dataPrices, error: errorPrices, refetch } = useQuery(GET_PRICES);
+    const { loading: loadingBases, data: dataBases } = useQuery(GET_BASES);
+    const { loading: loadingPrices, data: dataPrices, refetch } = useQuery(GET_PRICES);
 
     useEffect(() => {
         if (!loadingBases && dataBases?.bases) {

@@ -3,10 +3,10 @@ import { TableRow } from '../StrikesTable/TableRow';
 import { TableCell } from '../StrikesTable/TableCell';
 import { TitleText } from '../StrikesTable/TitleText';
 import { DocumentNode, gql, useQuery } from '@apollo/client';
-import { OrderBook as OrderBookModel, OrderBookOrder } from '../../../../libs/shared/src/orderbook.schema';
+import { OrderBook as OrderBookModel, OrderBookOrder } from '@app/shared/orderbook.schema';
 import { QueryResult } from '@apollo/client/react/types/types';
 import styled from 'styled-components';
-import { Option, OptionGQL } from '../../../../libs/shared/src/option.schema';
+import { OptionGQL } from '@app/shared/option.schema';
 import { useRouter } from 'next/router';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
 
@@ -80,7 +80,7 @@ export function OrderBook(): JSX.Element {
     toExpirationDate.setMinutes(59);
     toExpirationDate.setSeconds(59);
 
-    const { data: optionGroupData, error: optionGroupError }: QueryResult<{ options: { data: Array<Option> } }> =
+    const { data: optionGroupData, error: optionGroupError }: QueryResult<{ options: { data: Array<OptionGQL> } }> =
         useQuery(GET_OPTIONS, {
             variables: {
                 type: type?.toUpperCase() || 'CALL',
@@ -187,10 +187,10 @@ export function OrderBook(): JSX.Element {
     );
 }
 
-function makeOrderBookQuery(options: Array<Option> = []): DocumentNode {
+function makeOrderBookQuery(options: Array<OptionGQL> = []): DocumentNode {
     let body: string = '';
 
-    options.forEach((option: OptionGQL, index: number): void => {
+    options.forEach((option: OptionGQL, index: number) => {
         body += `
             id${index}_${option.market.name}: orderBook(optionId: "${option.id}", optionMarketKey: ${option.market.key}) {
                 optionMarketKey

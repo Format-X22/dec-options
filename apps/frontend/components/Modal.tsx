@@ -57,7 +57,7 @@ const ModalChildren = styled.div`
 `;
 
 export function Modal({
-    children = null,
+    children,
     visible,
     title,
     onClose,

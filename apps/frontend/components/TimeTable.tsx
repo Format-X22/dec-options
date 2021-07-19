@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
-import { useContext, FC, useState, useEffect } from 'react';
+import { useContext, FC, useState, useEffect, useCallback } from 'react';
 import { ContextApp } from '../pages/_app';
-import { TSetter } from '../types';
 import { gql, useQuery } from '@apollo/client';
 import format from 'date-fns/format';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -48,10 +47,11 @@ const DateElement: FC<DateElementProps> = styled.div`
     overflow: hidden;
 
     ${({ active }: DateElementProps): string =>
-        active &&
-        `${DateTitle} {
+        active
+            ? `${DateTitle} {
         color: #000;
-    }`}
+    }`
+            : ``}
 `;
 const ErrorText = styled.div`
     margin-top: 16px;
@@ -104,8 +104,17 @@ export function TimeTable(): JSX.Element {
         router.push(router);
     }
 
-    const [loadingTimeout, setLoadingTimeout]: [boolean, TSetter<boolean>] = useState(true);
-    const { loading, data, error } = useQuery(GET_EXPIRATIONS, {
+    const [loadingTimeout, setLoadingTimeout] = useState(true);
+    const { loading, data, error } = useQuery<{
+        expirations: {
+            expirationDate: string;
+            markets: {
+                name: string;
+            }[];
+            strikes: number;
+            barsValue: number;
+        }[];
+    }>(GET_EXPIRATIONS, {
         variables: {
             timezone: new Date().getTimezoneOffset() / 60,
             base,
@@ -117,6 +126,8 @@ export function TimeTable(): JSX.Element {
             setLoadingTimeout(false);
         }, 1000);
     }, []);
+
+    console.log(data);
 
     useEffect((): void => {
         if (data?.expirations?.length) {
@@ -156,23 +167,28 @@ export function TimeTable(): JSX.Element {
                   return _;
               })
             : null;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     const barsValues = [...new Set(parsedData?.map(({ barsValue }) => barsValue))];
     const maxBarsValue = Math.max.apply(null, barsValues);
     const minBarsValue = Math.min.apply(null, barsValues);
 
-    function getBarsCount(count: number, max: number): number {
-        if (count === maxBarsValue) return max;
-        if (count === minBarsValue) return 1;
-
-        for (let i = max; i >= 1; i--) {
-            if (count > (maxBarsValue / max) * i) {
-                return i;
+    const getBarsCount = useCallback(
+        (count: number, max: number): number => {
+            if (count === maxBarsValue) {
+                return max;
             }
-        }
-        return 1;
-    }
+            if (count === minBarsValue) {
+                return 1;
+            }
+
+            for (let i = max; i >= 1; i--) {
+                if (count > (maxBarsValue / max) * i) {
+                    return i;
+                }
+            }
+            return 1;
+        },
+        [maxBarsValue, minBarsValue],
+    );
 
     return (
         <>

@@ -44,7 +44,7 @@ const Button = styled.button`
         background: ${$buttonBackgroundHover};
     }
 
-    & + ${InputElement} {
+    & + input {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
     }
@@ -66,7 +66,7 @@ function Input({
     onButtonClick = (): void => {},
     error,
 }: {
-    value;
+    value: string;
     placeholder?: string;
     buttonText?: string;
     onChange: (value: string) => void;

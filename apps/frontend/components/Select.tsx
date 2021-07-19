@@ -1,13 +1,13 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { $labelColor, $optionColor, $selectBackground, $selectBackgroundHover } from '../theme';
 import { IconUp } from './IconUp';
 import { IconDown } from './IconDown';
-import { DOMEvent } from '../types';
+import { useClickOutside } from '../hooks/useClickOutside';
 
-export type Option<T = string> = {
+export type Option = {
     name: string;
-    value: T;
+    value: string;
 };
 
 const SelectAndLabelContainer = styled.div`
@@ -97,15 +97,15 @@ const Option: FC<OptionProps> = styled.div`
     }
 `;
 
-function Select<T = string>({
+function Select({
     value,
     options,
     onChange,
     label,
 }: {
-    value: T;
-    options: Option<T>[];
-    onChange: (value: T) => void;
+    value: string;
+    options: Option[];
+    onChange: (value: string) => void;
     label?: string;
 }): JSX.Element {
     const ref = useRef<HTMLDivElement>(null);
@@ -115,33 +115,14 @@ function Select<T = string>({
         setOpen(!open);
     };
 
-    const optionClickHandler = (newValue: T) => (): void => {
+    const optionClickHandler = (newValue: string) => (): void => {
         onChange(newValue);
     };
 
     const valueOption = options.find(({ value: oValue }) => oValue === value);
     const valueString = valueOption ? valueOption.name : value || '\u00A0';
 
-    useEffect(() => {
-        const listener = (e: DOMEvent<Node>): void => {
-            let target: Node = e.target;
-            while (target && !document.body.isSameNode(target)) {
-                if (ref && typeof ref.current !== 'undefined') {
-                    target = target.parentNode;
-                    if (target && ref.current?.isSameNode(target)) {
-                        return;
-                    }
-                }
-            }
-            setOpen(false);
-        };
-
-        window.addEventListener('click', listener);
-
-        return (): void => {
-            window.removeEventListener('click', listener);
-        };
-    }, []);
+    useClickOutside(ref, () => setOpen(false));
 
     return (
         <SelectAndLabelContainer ref={ref}>
@@ -153,7 +134,7 @@ function Select<T = string>({
                     {options.map(
                         (option): JSX.Element => (
                             <Option
-                                key={option.value.toString()}
+                                key={option.value}
                                 active={option.value === value}
                                 onClick={optionClickHandler(option.value)}
                             >
