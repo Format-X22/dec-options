@@ -8,29 +8,27 @@ import { Option, OptionSchema } from '@app/shared/option.schema';
 describe('OkexService', (): void => {
     let service: OkexService;
 
-    beforeEach(
-        async (): Promise<void> => {
-            const module: TestingModule = await Test.createTestingModule({
-                imports: [
-                    ConfigModule.forRoot({
-                        isGlobal: true,
-                        cache: true,
+    beforeEach(async (): Promise<void> => {
+        const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                ConfigModule.forRoot({
+                    isGlobal: true,
+                    cache: true,
+                }),
+                MongooseModule.forRootAsync({
+                    imports: [ConfigModule],
+                    useFactory: (configService: ConfigService): MongooseModuleOptions => ({
+                        uri: configService.get<string>('OA_MONGO_CONNECT'),
                     }),
-                    MongooseModule.forRootAsync({
-                        imports: [ConfigModule],
-                        useFactory: (configService: ConfigService): MongooseModuleOptions => ({
-                            uri: configService.get<string>('OA_MONGO_CONNECT'),
-                        }),
-                        inject: [ConfigService],
-                    }),
-                    MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
-                ],
-                providers: [OkexService],
-            }).compile();
+                    inject: [ConfigService],
+                }),
+                MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
+            ],
+            providers: [OkexService],
+        }).compile();
 
-            service = module.get<OkexService>(OkexService);
-        },
-    );
+        service = module.get<OkexService>(OkexService);
+    });
 
     it('should be defined', (): void => {
         expect(service).toBeDefined();

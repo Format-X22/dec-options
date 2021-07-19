@@ -1,13 +1,13 @@
-import React from 'react';
+import { FC, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { $labelColor, $optionColor, $selectBackground, $selectBackgroundHover } from '../theme';
 import { IconUp } from './IconUp';
 import { IconDown } from './IconDown';
-import { DOMEvent } from '../types';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 export type Option = {
     name: string;
-    value: any;
+    value: string;
 };
 
 const SelectAndLabelContainer = styled.div`
@@ -30,7 +30,7 @@ type SelectContainerProps = {
     onClick: (e: Event) => void;
 };
 
-const SelectContainer: React.FunctionComponent<SelectContainerProps> = styled.div`
+const SelectContainer: FC<SelectContainerProps> = styled.div`
     position: relative;
     width: auto;
     min-width: 128px;
@@ -56,7 +56,7 @@ type OptionsContainerProps = {
     open: boolean;
 };
 
-const OptionsContainer: React.FunctionComponent<OptionsContainerProps> = styled.div`
+const OptionsContainer: FC<OptionsContainerProps> = styled.div`
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
@@ -75,7 +75,7 @@ type OptionProps = {
     onClick: () => void;
 };
 
-const Option: React.FunctionComponent<OptionProps> = styled.div`
+const Option: FC<OptionProps> = styled.div`
     width: 100%;
     font-style: normal;
     font-weight: 500;
@@ -103,48 +103,26 @@ function Select({
     onChange,
     label,
 }: {
-    // tslint:disable-next-line:no-any
-    value: any;
+    value: string;
     options: Option[];
-    // tslint:disable-next-line:no-any
-    onChange: (value: any) => void;
+    onChange: (value: string) => void;
     label?: string;
 }): JSX.Element {
-    const ref = React.useRef<HTMLDivElement>(null);
-    const [open, setOpen] = React.useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const [open, setOpen] = useState(false);
 
     const toggle = (): void => {
         setOpen(!open);
     };
 
-    // tslint:disable-next-line:no-shadowed-variable no-any typedef
-    const optionClickHandler = (newValue: any) => (): void => {
+    const optionClickHandler = (newValue: string) => (): void => {
         onChange(newValue);
     };
 
     const valueOption = options.find(({ value: oValue }) => oValue === value);
     const valueString = valueOption ? valueOption.name : value || '\u00A0';
 
-    React.useEffect(() => {
-        const listener = (e: DOMEvent<Node>): void => {
-            let target: Node = e.target;
-            while (target && !document.body.isSameNode(target)) {
-                if (ref && typeof ref.current !== 'undefined') {
-                    target = target.parentNode;
-                    if (target && ref.current?.isSameNode(target)) {
-                        return;
-                    }
-                }
-            }
-            setOpen(false);
-        };
-
-        window.addEventListener('click', listener);
-
-        return (): void => {
-            window.removeEventListener('click', listener);
-        };
-    }, []);
+    useClickOutside(ref, () => setOpen(false));
 
     return (
         <SelectAndLabelContainer ref={ref}>
@@ -154,10 +132,10 @@ function Select({
                 {open ? <IconUp /> : <IconDown />}
                 <OptionsContainer open={open}>
                     {options.map(
-                        (option: Option): JSX.Element => (
+                        (option): JSX.Element => (
                             <Option
-                                active={option.value === value}
                                 key={option.value}
+                                active={option.value === value}
                                 onClick={optionClickHandler(option.value)}
                             >
                                 {option.name}

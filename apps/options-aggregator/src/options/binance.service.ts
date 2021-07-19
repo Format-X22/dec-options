@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, ESymbol, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
 import { Exchange } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
@@ -83,7 +83,7 @@ export class BinanceService extends AggregatorAbstract<TRawOption> {
             size: Number(rawOption.unit),
             strike: Number(rawOption.strikePrice),
             expirationDate: new Date(Number(rawOption.expiryDate)),
-            base: rawOption.underlying.replace(rawOption.quoteAsset, ''),
+            base: rawOption.underlying.replace(rawOption.quoteAsset, '') as ESymbol,
             quote: rawOption.quoteAsset,
             strikeAsset: rawOption.underlying.replace(rawOption.quoteAsset, ''),
             marketUrl: 'https://voptions.binance.com/en',

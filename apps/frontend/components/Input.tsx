@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { $blue, $buttonBackgroundHover, $colorRed } from '../theme';
 
@@ -17,7 +17,7 @@ type InputElementProps = {
     onChange: (e: { target: { value: string } }) => void;
 };
 
-const InputElement: React.FunctionComponent<InputElementProps> = styled.input`
+const InputElement: FC<InputElementProps> = styled.input`
     border: 1px solid ${({ valid }: InputElementProps) => (valid ? $blue : $colorRed)};
     background: transparent;
     outline: none;
@@ -44,7 +44,7 @@ const Button = styled.button`
         background: ${$buttonBackgroundHover};
     }
 
-    & + ${InputElement} {
+    & + input {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
     }
@@ -66,7 +66,7 @@ function Input({
     onButtonClick = (): void => {},
     error,
 }: {
-    value;
+    value: string;
     placeholder?: string;
     buttonText?: string;
     onChange: (value: string) => void;

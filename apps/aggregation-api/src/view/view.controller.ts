@@ -16,9 +16,9 @@ export class ViewController {
             return;
         }
 
-        const handle: ReturnType<
-            NextServer['getRequestHandler']
-        > = this.viewService.getNextServer().getRequestHandler();
+        const handle: ReturnType<NextServer['getRequestHandler']> = this.viewService
+            .getNextServer()
+            .getRequestHandler();
 
         await handle(req, res);
     }

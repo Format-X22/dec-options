@@ -5,19 +5,7 @@ import { AxiosResponse } from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BasePrice, BasePriceDocument } from '@app/shared/base-price.schema';
-
-enum ESymbol {
-    USD = 'USD',
-    USDC = 'USDC',
-    BTC = 'BTC',
-    WBTC = 'WBTC',
-    ETH = 'ETH',
-    WETH = 'WETH',
-    EOS = 'EOS',
-    SUSHI = 'SUSHI',
-    UNI = 'UNI',
-    YFI = 'YFI',
-}
+import { ESymbol } from '@app/shared/option.schema';
 
 type TRaw3CommasPrice = {
     last: string;
@@ -33,7 +21,7 @@ const API_POINT: string = 'https://api.3commas.io/public/api/ver1';
 @Injectable()
 export class PriceService implements OnModuleInit, OnModuleDestroy {
     protected readonly logger: Logger = new Logger(PriceService.name);
-    private interval: Timeout;
+    private interval?: Timeout;
     private inSync: boolean = false;
     private price: Map<ESymbol, number> = new Map([
         [ESymbol.USD, 1],
@@ -65,12 +53,14 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
         }, Number(this.configService.get('OA_PRICE_SYNC_INTERVAL')) || 3000);
     }
 
-    getPrice(symbol: string): number {
-        return this.price.get(symbol as ESymbol);
+    getPrice(symbol: ESymbol): number | undefined {
+        return this.price.get(symbol);
     }
 
     async onModuleDestroy(): Promise<void> {
-        clearInterval(this.interval);
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
     }
 
     private async syncPrice(): Promise<void> {
@@ -136,7 +126,7 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
     }
 
     private async getPriceFrom2Commas(market: EApiMarkets, pair: string): Promise<number> {
-        const priceUrl: string = `${API_POINT}/accounts/currency_rates?market_code=${market}&pair=${pair}`;
+        const priceUrl = `${API_POINT}/accounts/currency_rates?market_code=${market}&pair=${pair}`;
         let priceResponse: AxiosResponse<TRaw3CommasPrice>;
 
         try {
@@ -150,7 +140,7 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
             const status: number = priceResponse.status;
             const statusText: string = priceResponse.statusText;
             const errorData: string = JSON.stringify(priceResponse.data || null, null, 2);
-            const responseErrorData: string = `${status}: ${statusText} (data: ${errorData})`;
+            const responseErrorData = `${status}: ${statusText} (data: ${errorData})`;
 
             Logger.error(`3Commas price error - ${responseErrorData}, pair ${pair}`);
 

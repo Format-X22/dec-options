@@ -1,11 +1,11 @@
-import React from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { $tableTitleBackground } from '../../theme';
 
 type TitleTextProps = {
     active?: boolean;
 };
-export const TitleText: React.FunctionComponent<TitleTextProps> = styled.div`
+export const TitleText: FC<TitleTextProps> = styled.div`
     font-weight: 500;
     font-size: 12px;
     line-height: 20px;

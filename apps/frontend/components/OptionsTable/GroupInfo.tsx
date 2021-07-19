@@ -25,19 +25,19 @@ const Text = styled.span`
 `;
 
 const Space = styled.span`
-  margin-left: 25px;
-`
+    margin-left: 25px;
+`;
 
 export function GroupInfo(): JSX.Element {
     const router = useRouter();
-    const {date, strike, base, type} = router.query as unknown as ITradeQuery;
+    const { date, strike, base, type } = router.query as unknown as ITradeQuery;
     const dateString = format(new Date(date) || new Date(), 'dd MMMM');
 
     return (
         <StyledInfo>
             <Button
                 onClick={() => {
-                  router.back();
+                    router.back();
                 }}
             >
                 &lt;&lt;&lt; back

@@ -23,6 +23,20 @@ export enum EOptionStyleType {
 }
 registerEnumType(EOptionStyleType, { name: 'OptionStyleType' });
 
+export enum ESymbol {
+    USD = 'USD',
+    USDC = 'USDC',
+    BTC = 'BTC',
+    WBTC = 'WBTC',
+    ETH = 'ETH',
+    WETH = 'WETH',
+    EOS = 'EOS',
+    SUSHI = 'SUSHI',
+    UNI = 'UNI',
+    YFI = 'YFI',
+}
+registerEnumType(ESymbol, { name: 'Symbol' });
+
 @Schema({ versionKey: false })
 @ObjectType({ isAbstract: true })
 export class Option {
@@ -46,7 +60,7 @@ export class Option {
 
     @Prop({ enum: EOptionType, type: String })
     @Field((): typeof EOptionType => EOptionType)
-    type: EOptionType;
+    type?: EOptionType;
 
     @Prop({ enum: EOptionDeliveryType, type: String })
     @Field((): typeof EOptionDeliveryType => EOptionDeliveryType)
@@ -74,7 +88,7 @@ export class Option {
 
     @Prop()
     @Field()
-    base: string;
+    base?: ESymbol;
 
     @Prop()
     @Field()

@@ -9,7 +9,7 @@ import { BasePrice, BasePriceDocument } from '@app/shared/base-price.schema';
 export abstract class AggregatorAbstract<TRawOption> {
     protected logger: Logger;
     protected abstract get rateLimit(): number;
-    protected isGetWithPagination: boolean = false;
+    protected isGetWithPagination = false;
     protected readonly pageSize: number = null;
 
     constructor(
@@ -85,13 +85,13 @@ export abstract class AggregatorAbstract<TRawOption> {
         await this.optionsDataModel.updateOne({ id: data.id }, data, { upsert: true });
     }
 
-    throwRequestError(type: string, data: Object): never {
+    throwRequestError(type: string, data: Record<string, unknown>): never {
         throw new Error(`Invalid response - ${type} - ${JSON.stringify(data, null, 2)}`);
     }
 
     private async getRawOptionsWithPagination(): Promise<Array<TRawOption>> {
         const result: Array<TRawOption> = [];
-        let skip: number = 0;
+        let skip = 0;
 
         while (true) {
             const data: Array<TRawOption> = await this.getRawOptions(skip);

@@ -1,12 +1,12 @@
-import React, { FC, useEffect, useRef } from 'react';
+import { FC } from 'react';
 import { TableRow } from '../StrikesTable/TableRow';
 import { TableCell } from '../StrikesTable/TableCell';
 import { TitleText } from '../StrikesTable/TitleText';
 import { DocumentNode, gql, useQuery } from '@apollo/client';
-import { OrderBook as OrderBookModel, OrderBookOrder } from '../../../../libs/shared/src/orderbook.schema';
+import { OrderBook as OrderBookModel, OrderBookOrder } from '@app/shared/orderbook.schema';
 import { QueryResult } from '@apollo/client/react/types/types';
 import styled from 'styled-components';
-import { Option, OptionGQL } from '../../../../libs/shared/src/option.schema';
+import { OptionGQL } from '@app/shared/option.schema';
 import { useRouter } from 'next/router';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
 
@@ -39,21 +39,6 @@ const GET_OPTIONS = gql`
     }
 `;
 
-const GET_ORDER_BOOK = gql`
-    query getOrderBook($optionId: String!, $optionMarketKey: MarketKey!) {
-        orderBook(optionId: $optionId, optionMarketKey: $optionMarketKey) {
-            asks {
-                price
-                amount
-            }
-            bids {
-                price
-                amount
-            }
-        }
-    }
-`;
-
 const AsksText: FC = styled.div`
     font-weight: 500;
     font-size: 12px;
@@ -74,24 +59,23 @@ const BidsText: FC = styled.div`
     color: green;
 `;
 
-
-const SubTable: FC<{reverse?: boolean}> = styled.div`
+const SubTable: FC<{ reverse?: boolean }> = styled.div`
     max-height: 50%;
     overflow-y: auto;
     display: flex;
-    flex-direction: ${({ reverse }: {reverse?: boolean}) => (reverse ? 'column-reverse' : 'column')};
+    flex-direction: ${({ reverse }: { reverse?: boolean }) => (reverse ? 'column-reverse' : 'column')};
 
     &::-webkit-scrollbar-thumb {
-      background: #303030;
-      border-radius: 12px;
-      border: 2px solid transparent;
-      background-clip: content-box;
+        background: #303030;
+        border-radius: 12px;
+        border: 2px solid transparent;
+        background-clip: content-box;
     }
     &::-webkit-scrollbar {
-      padding: 2px;
-      width: 12px;
-      height: 12px;
-      background: #000000;
+        padding: 2px;
+        width: 12px;
+        height: 12px;
+        background: #000000;
     }
 `;
 
@@ -107,7 +91,7 @@ const Divider: FC = styled.div`
 
 export function OrderBook(): JSX.Element {
     const router = useRouter();
-    const {date, strike, base, type} = router.query as unknown as ITradeQuery;
+    const { date, strike, base, type } = router.query as unknown as ITradeQuery;
 
     const fromExpirationDate = new Date(date || 0);
 
@@ -121,7 +105,7 @@ export function OrderBook(): JSX.Element {
     toExpirationDate.setMinutes(59);
     toExpirationDate.setSeconds(59);
 
-    const { data: optionGroupData, error: optionGroupError }: QueryResult<{ options: { data: Array<Option> } }> =
+    const { data: optionGroupData, error: optionGroupError }: QueryResult<{ options: { data: Array<OptionGQL> } }> =
         useQuery(GET_OPTIONS, {
             variables: {
                 type: type?.toUpperCase() || 'CALL',
@@ -170,7 +154,9 @@ export function OrderBook(): JSX.Element {
 
     return (
         <>
-            <TableRow><TableCell>ORDER BOOK</TableCell></TableRow>
+            <TableRow>
+                <TableCell>ORDER BOOK</TableCell>
+            </TableRow>
             <TableRow>
                 <TableCell className={'TODO-order-book-column-size'}>
                     <TitleText>Price</TitleText>
@@ -186,11 +172,9 @@ export function OrderBook(): JSX.Element {
             {!optionGroupError && error && <TableRow>{error.toString()}</TableRow>}
             {!optionGroupError && !error && (
                 <SubTablesWrapper>
-                  <SubTable reverse>
-                      {asks
-                        .slice()
-                        .map(
-                            ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
+                    <SubTable reverse>
+                        {asks.slice().map(
+                            ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
                                 <TableRow key={`asks-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <AsksText>{price}</AsksText>
@@ -203,38 +187,46 @@ export function OrderBook(): JSX.Element {
                                     </TableCell>
                                 </TableRow>
                             ),
-                      )}
-                      {asks.length === 0 && <TableRow><TableCell>No asks...</TableCell></TableRow>}
-                  </SubTable>
-                  <Divider />
-                  <SubTable>
-                    {bids.map(
-                        ({price, amount, marketName}: OrderBookOrder, index): JSX.Element => (
-                            <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
-                                <TableCell className={'TODO-order-book-column-size'}>
-                                    <BidsText>{price}</BidsText>
-                                </TableCell>
-                                <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{amount}</TitleText>
-                                </TableCell>
-                                <TableCell className={'TODO-order-book-column-size'}>
-                                    <TitleText>{marketName}</TitleText>
-                                </TableCell>
+                        )}
+                        {asks.length === 0 && (
+                            <TableRow>
+                                <TableCell>No asks...</TableCell>
                             </TableRow>
-                        ),
-                    )}
-                    {bids.length === 0 && <TableRow><TableCell>No bids...</TableCell></TableRow>}
-                  </SubTable>
+                        )}
+                    </SubTable>
+                    <Divider />
+                    <SubTable>
+                        {bids.map(
+                            ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
+                                <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <BidsText>{price}</BidsText>
+                                    </TableCell>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <TitleText>{amount}</TitleText>
+                                    </TableCell>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <TitleText>{marketName}</TitleText>
+                                    </TableCell>
+                                </TableRow>
+                            ),
+                        )}
+                        {bids.length === 0 && (
+                            <TableRow>
+                                <TableCell>No bids...</TableCell>
+                            </TableRow>
+                        )}
+                    </SubTable>
                 </SubTablesWrapper>
             )}
         </>
     );
 }
 
-function makeOrderBookQuery(options: Array<Option> = []): DocumentNode {
+function makeOrderBookQuery(options: Array<OptionGQL> = []): DocumentNode {
     let body: string = '';
 
-    options.forEach((option: OptionGQL, index: number): void => {
+    options.forEach((option: OptionGQL, index: number) => {
         body += `
             id${index}_${option.market.name}: orderBook(optionId: "${option.id}", optionMarketKey: ${option.market.key}) {
                 optionMarketKey

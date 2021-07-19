@@ -1,7 +1,7 @@
 import App, { AppContext, AppInitialProps, AppProps } from 'next/app';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
-import React, { Dispatch, useReducer } from 'react';
+import { Dispatch, useReducer, createContext, Reducer } from 'react';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react';
 import 'antd/dist/antd.css';
@@ -23,10 +23,13 @@ export const initialState: State = {
     },
 };
 
-export const ContextApp = React.createContext<Partial<ContextState>>({});
+export const ContextApp = createContext<ContextState>({
+    state: initialState,
+    changeState: () => undefined,
+});
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
-    const [state, changeState]: [State, Dispatch<Action>] = useReducer<React.Reducer<State, Action>>(
+    const [state, changeState]: [State, Dispatch<Action>] = useReducer<Reducer<State, Action>>(
         rootReducer,
         initialState,
     );

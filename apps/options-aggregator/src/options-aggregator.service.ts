@@ -27,7 +27,7 @@ export class OptionsAggregatorService {
         this.logger.verbose('Sync loops started');
     }
 
-    private startSync(service: AggregatorAbstract<Object>): void {
+    private startSync(service: AggregatorAbstract<Record<string, unknown>>): void {
         service.startSyncLoop().catch(this.makeErrorHandlerSyncError(Object.getPrototypeOf(service).constructor));
     }
 

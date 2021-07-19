@@ -1,14 +1,16 @@
 import { TableCell } from './TableCell';
 import { TitleText } from './TitleText';
-import { Lines } from './Lines';
-import React from 'react';
+import { FC } from 'react';
 
-export function PrintGreek({ strikeData, propKey, name }): JSX.Element {
+interface IPrintGreekProps {
+    name: string;
+    value?: number;
+}
+
+export const PrintGreek: FC<IPrintGreekProps> = ({ value, name }) => {
     return (
         <TableCell data-name={name}>
-            <TitleText>
-                {Number.isFinite(strikeData[propKey]) ? strikeData[propKey].toFixed(2) : <TitleText>-</TitleText>}
-            </TitleText>
+            <TitleText>{value && Number.isFinite(value) ? value.toFixed(2) : <TitleText>-</TitleText>}</TitleText>
         </TableCell>
     );
-}
+};
