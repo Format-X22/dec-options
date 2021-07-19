@@ -1,18 +1,18 @@
 import { HttpModule, Module } from '@nestjs/common';
-import { HegicService } from './hegic.service';
-import { DeribitService } from './deribit.service';
-import { BinanceService } from './binance.service';
-import { OkexService } from './okex.service';
-import { AuctusService } from './auctus.service';
-import { FinnexusService } from './finnexus.service';
-import { OpynService } from './opyn.service';
-import { SirenService } from './siren.service';
+import { HegicService } from './hegic/hegic.service';
+import { DeribitService } from './deribit/deribit.service';
+import { BinanceService } from './binance/binance.service';
+import { OkexService } from './okex/okex.service';
+import { AuctusService } from './auctus/auctus.service';
+import { FinnexusService } from './finnexus/finnexus.service';
+import { OpynService } from './opyn/opyn.service';
+import { SirenService } from './siren/siren.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
 import { Option, OptionSchema } from '@app/shared/option.schema';
 import { OrderBook, OrderBookSchema } from '@app/shared/orderbook.schema';
-import { BasePrice, BasePriceSchema } from '@app/shared/base-price.schema';
+import { PriceModule } from '../price/price.module';
 
 @Module({
     imports: [
@@ -26,8 +26,8 @@ import { BasePrice, BasePriceSchema } from '@app/shared/base-price.schema';
         MongooseModule.forFeature([
             { name: Option.name, schema: OptionSchema },
             { name: OrderBook.name, schema: OrderBookSchema },
-            { name: BasePrice.name, schema: BasePriceSchema },
         ]),
+        PriceModule,
         HttpModule,
     ],
     providers: [

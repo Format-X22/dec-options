@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Option } from '@app/shared/option.schema';
-import { AggregatorAbstract } from './aggregator.abstract';
+import { AggregatorAbstract } from '../aggregator.abstract';
 import { OrderBook } from '@app/shared/orderbook.schema';
 
 // TODO Implement

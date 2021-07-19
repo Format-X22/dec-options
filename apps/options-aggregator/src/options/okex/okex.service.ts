@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, ESymbol, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market, OrderBook as CcxtOrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
-import { AggregatorAbstract } from './aggregator.abstract';
+import { AggregatorAbstract } from '../aggregator.abstract';
 import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
 type TOptionMarket = Market & {
@@ -48,7 +48,7 @@ export class OkexService extends AggregatorAbstract<TRawOption> {
             size: Number(rawOption.info.lot_size),
             strike: Number(rawOption.info.strike),
             expirationDate: new Date(rawOption.info.delivery),
-            base: rawOption.base,
+            base: rawOption.base as ESymbol,
             quote: rawOption.quote,
             strikeAsset: rawOption.base,
             marketUrl: 'https://www.okex.com/en/trade-option/' + rawOption.id,

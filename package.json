@@ -22,7 +22,7 @@
     "build:all": "nest build options-aggregator && nest build aggregation-api && nest build shared",
     "start:db": "docker compose up",
     "start:api": "nest start aggregation-api",
-    "start:agg": "nest start opnions-aggregator",
+    "start:agg": "nest start options-aggregator",
     "start:prod:api": "node dist/apps/aggregation-api/main.js",
     "start:prod:agg": "node dist/apps/options-aggregator/main.js",
     "pm2:start:all": "yarn pm2:start:agg --env production; yarn pm2:start:api --env production;",

@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, ESymbol, Option } from '@app/shared/option.schema';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
-import { AggregatorAbstract } from './aggregator.abstract';
+import { AggregatorAbstract } from '../aggregator.abstract';
 import * as sleep from 'sleep-promise';
 import BigNumber from 'bignumber.js';
 import { OrderBook } from '@app/shared/orderbook.schema';
@@ -11,7 +11,7 @@ type TOptionsResponse = {
     hegicOptions: Array<{
         id: string;
         underlying: {
-            symbol: string;
+            symbol: ESymbol;
             decimals: number;
         };
         strike: string;
@@ -63,7 +63,7 @@ export class HegicService extends AggregatorAbstract<TRawOption> {
         const premium: BigNumber = new BigNumber(rawOption.premium);
         const decimals: BigNumber = new BigNumber(rawOption.underlying.decimals);
         const askInBase: number = premium.div(new BigNumber(10).pow(decimals)).toNumber();
-        const btcUsdPrice: number = await this.getBasePrice('BTC');
+        const btcUsdPrice: number = await this.priceService.getPrice(ESymbol.BTC);
 
         return {
             optionId: rawOption.id,

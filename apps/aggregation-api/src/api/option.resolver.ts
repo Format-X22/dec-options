@@ -48,7 +48,7 @@ export class OptionResolver {
     }
 
     @ResolveField((): typeof Number => Number, { nullable: true })
-    bidBase(@Parent() option: Option): number | null {
+    async bidBase(@Parent() option: Option): Promise<number | null> {
         if (Number.isFinite(option.bidBase)) {
             return option.bidBase;
         }
@@ -57,7 +57,7 @@ export class OptionResolver {
             return null;
         }
 
-        const basePrice = this.priceService.getPrice(option.base);
+        const basePrice = await this.priceService.getPrice(option.base);
 
         if (!basePrice) {
             return null;
@@ -67,7 +67,7 @@ export class OptionResolver {
     }
 
     @ResolveField((): typeof Number => Number, { nullable: true })
-    bidQuote(@Parent() option: Option): number | null {
+    async bidQuote(@Parent() option: Option): Promise<number | null> {
         if (Number.isFinite(option.bidQuote)) {
             return option.bidQuote;
         }
@@ -76,7 +76,7 @@ export class OptionResolver {
             return null;
         }
 
-        const basePrice = this.priceService.getPrice(option.base);
+        const basePrice = await this.priceService.getPrice(option.base);
         if (!basePrice) {
             return null;
         }
@@ -85,7 +85,7 @@ export class OptionResolver {
     }
 
     @ResolveField((): typeof Number => Number, { nullable: true })
-    askBase(@Parent() option: Option): number | null {
+    async askBase(@Parent() option: Option): Promise<number | null> {
         if (Number.isFinite(option.askBase)) {
             return option.askBase;
         }
@@ -94,7 +94,7 @@ export class OptionResolver {
             return null;
         }
 
-        const basePrice = this.priceService.getPrice(option.base);
+        const basePrice = await this.priceService.getPrice(option.base);
 
         if (!basePrice) {
             return null;
@@ -104,7 +104,7 @@ export class OptionResolver {
     }
 
     @ResolveField((): typeof Number => Number, { nullable: true })
-    askQuote(@Parent() option: Option): number | null {
+    async askQuote(@Parent() option: Option): Promise<number | null> {
         if (Number.isFinite(option.askQuote)) {
             return option.askQuote;
         }
@@ -113,7 +113,7 @@ export class OptionResolver {
             return null;
         }
 
-        const basePrice = this.priceService.getPrice(option.base);
+        const basePrice = await this.priceService.getPrice(option.base);
 
         if (!basePrice) {
             return null;

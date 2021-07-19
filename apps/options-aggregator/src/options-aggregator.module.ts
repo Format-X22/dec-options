@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { OptionsAggregatorService } from './options-aggregator.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OptionModule } from './options/option.module';
-import { MetadataModule } from './metadata/metadata.module';
+import { PriceModule } from './price/price.module';
 
 @Module({
     imports: [
@@ -11,7 +11,7 @@ import { MetadataModule } from './metadata/metadata.module';
             cache: true,
         }),
         OptionModule,
-        MetadataModule,
+        PriceModule,
     ],
     providers: [OptionsAggregatorService],
 })
