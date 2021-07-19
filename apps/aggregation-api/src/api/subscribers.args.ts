@@ -7,5 +7,5 @@ export class SubscribeGroupArgs {
     @IsString()
     @MinLength(4)
     @MaxLength(256)
-    email: string;
+    email?: string;
 }
