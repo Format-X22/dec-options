@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
-import { AggregatorAbstract } from '../aggregator.abstract';
+import { AggregatorAbstract } from './aggregator.abstract';
 import * as sleep from 'sleep-promise';
 import BigNumber from 'bignumber.js';
 import { OrderBook } from '@app/shared/orderbook.schema';
