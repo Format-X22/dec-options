@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { EMarketKey, Market, markets, marketsMapByKey } from '@app/shared/market.schema';
 import { EPackByDateSize, ESortDirection, ExpirationGroupArgs, OptionListArgs, StrikeGroupArgs } from './option.args';
-import moment from 'moment';
+import * as moment from 'moment';
 import { unitOfTime } from 'moment';
 import { Paginated } from '@app/shared/list.dto';
 import { SubscribeGroupArgs } from './subscribers.args';

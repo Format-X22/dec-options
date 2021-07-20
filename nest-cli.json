@@ -20,7 +20,7 @@
       "entryFile": "main",
       "sourceRoot": "apps/aggregation-api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/aggregation-api/tsconfig.json",
+        "tsConfigPath": "apps/aggregation-api/tsconfig.app.json",
         "assets": [".env"]
       }
     },
