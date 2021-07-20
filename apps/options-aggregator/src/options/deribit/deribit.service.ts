@@ -6,7 +6,12 @@ import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
 import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
-type TRawOption = Dictionary<Market>[0];
+type TRawOption = Dictionary<Market>[0] & {
+    info: {
+        maker_commission: string;
+        taker_commission: string;
+    };
+};
 
 @Injectable()
 export class DeribitService extends AggregatorAbstract<TRawOption> {
@@ -54,6 +59,10 @@ export class DeribitService extends AggregatorAbstract<TRawOption> {
             bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
+            fees: {
+                makerPercent: Number(rawOption.info.maker_commission) * 100,
+                takerPercent: Number(rawOption.info.taker_commission) * 100,
+            },
         };
     }
 }

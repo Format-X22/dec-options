@@ -20,6 +20,8 @@ type TOptionsResponse = {
         expiryDate: string;
         underlying: string;
         quoteAsset: string;
+        makerFeeRate: string;
+        takerFeeRate: string;
     }>;
 };
 
@@ -93,6 +95,10 @@ export class BinanceService extends AggregatorAbstract<TRawOption> {
             bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
+            fees: {
+                makerPercent: Number(rawOption.makerFeeRate) * 100,
+                takerPercent: Number(rawOption.takerFeeRate) * 100,
+            },
         };
     }
 }

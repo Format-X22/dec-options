@@ -1,4 +1,4 @@
-import fieldsInfo from 'graphql-fields';
+import * as fieldsInfo from 'graphql-fields';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Base, ExpirationGroup, Option, OptionGQL, OptionList, StrikeGroup } from '@app/shared/option.schema';
 import { ApiService } from './api.service';

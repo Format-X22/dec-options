@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { OptionsAggregatorService } from './options-aggregator.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { OptionModule } from './options/option.module';
 import { PriceModule } from './price/price.module';
 
