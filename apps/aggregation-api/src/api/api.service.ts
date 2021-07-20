@@ -176,6 +176,10 @@ export class ApiService {
             filter.base = args.base;
         }
 
+        if (args.marketType) {
+            filter.marketType = args.marketType;
+        }
+
         if (args.fromDate || args.toDate) {
             filter.expirationDate = {};
 
@@ -241,7 +245,8 @@ export class ApiService {
         for (const symbol of symbols) {
             if (symbol) {
                 if (pricesRequired) {
-                    const usdPrice = await this.priceService.getPrice(symbol) || 0;
+                    const usdPrice = (await this.priceService.getPrice(symbol)) || 0;
+                    
                     result.push({ symbol, usdPrice });
                 } else {
                     result.push({ symbol, usdPrice: 0 });
