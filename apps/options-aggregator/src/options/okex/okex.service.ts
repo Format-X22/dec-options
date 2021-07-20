@@ -58,6 +58,10 @@ export class OkexService extends AggregatorAbstract<TRawOption> {
             bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
+            fees: {
+                makerPercent: rawOption.maker * 100,
+                takerPercent: rawOption.taker * 100,
+            }
         };
     }
 
