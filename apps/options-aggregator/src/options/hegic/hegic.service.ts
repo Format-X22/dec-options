@@ -28,6 +28,7 @@ const API = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
 const MS_MULTIPLY = 1000;
 const DECIMAL_DELIMITER = 100_000_000;
 const PAGE_SIZE = 1000;
+const TRANSACTION_GAS_AMOUNT = 14_250_000;
 
 @Injectable()
 export class HegicService extends AggregatorAbstract<TRawOption> {
@@ -73,7 +74,11 @@ export class HegicService extends AggregatorAbstract<TRawOption> {
         };
     }
 
-    protected constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Option {
+    protected async constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Promise<Option> {
+        const ethPrice: number = await this.priceService.getPrice(ESymbol.ETH);
+        const { standard: gwei }: GweiPrice = await this.priceService.getGwei();
+        const takerTransactionUsd: number = TRANSACTION_GAS_AMOUNT * gwei * ethPrice;
+
         return {
             id: rawOption.id,
             name: rawOption.id,
@@ -93,6 +98,9 @@ export class HegicService extends AggregatorAbstract<TRawOption> {
             bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.AMERICAN,
+            fees: {
+                takerTransactionUsd,
+            },
         };
     }
 
