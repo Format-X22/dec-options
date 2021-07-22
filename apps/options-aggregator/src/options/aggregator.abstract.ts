@@ -9,7 +9,6 @@ import { PriceService } from '../price/price.service';
 export abstract class AggregatorAbstract<TRawOption> {
     protected logger: Logger;
     protected abstract get rateLimit(): number;
-    protected isGetWithPagination = false;
     protected readonly pageSize: number = null;
 
     constructor(
@@ -34,31 +33,13 @@ export abstract class AggregatorAbstract<TRawOption> {
     }
 
     protected async iteration(): Promise<void> {
-        let rawOptions: Array<TRawOption>;
-
-        if (this.isGetWithPagination) {
-            if (!this.pageSize) {
-                this.logger.error(`Invalid page size = ${this.pageSize}`);
-                sleep(this.rateLimit * 10);
-                return;
-            }
-
-            rawOptions = await this.getRawOptionsWithPagination();
-        } else {
-            if (this.pageSize) {
-                this.logger.error(`Page size unacceptable = ${this.pageSize}`);
-                sleep(this.rateLimit * 10);
-                return;
-            }
-
-            rawOptions = await this.getRawOptions();
-        }
+        const rawOptions: Array<TRawOption> = await this.getRawOptions();
 
         sleep(this.rateLimit);
 
         for (const raw of rawOptions) {
             const orderBook: OrderBook = await this.getOrderBook(raw);
-            const option: Option = this.constructOptionData(raw, orderBook);
+            const option: Option = await this.constructOptionData(raw, orderBook);
 
             await this.saveOrderBook(orderBook);
             await this.saveResult(option);
@@ -101,5 +82,5 @@ export abstract class AggregatorAbstract<TRawOption> {
 
     protected abstract getRawOptions(skip?: number): Promise<Array<TRawOption>>;
     protected abstract getOrderBook(rawOption: TRawOption): Promise<OrderBook>;
-    protected abstract constructOptionData(rawOption: TRawOption, depth: OrderBook): Option;
+    protected abstract constructOptionData(rawOption: TRawOption, depth: OrderBook): Option | Promise<Option>;
 }

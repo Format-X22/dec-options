@@ -6,6 +6,7 @@ import { AggregatorAbstract } from '../aggregator.abstract';
 import * as sleep from 'sleep-promise';
 import BigNumber from 'bignumber.js';
 import { OrderBook } from '@app/shared/orderbook.schema';
+import { GweiPrice } from '@app/shared/price.schema';
 
 type TOptionsResponse = {
     hegicOptions: Array<{
@@ -32,7 +33,6 @@ const PAGE_SIZE = 1000;
 export class HegicService extends AggregatorAbstract<TRawOption> {
     protected readonly logger: Logger = new Logger(HegicService.name);
     protected readonly pageSize: number = 1000;
-    protected isGetWithPagination: boolean = true;
 
     protected get rateLimit(): number {
         return 1000;
