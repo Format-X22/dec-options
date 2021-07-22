@@ -1,0 +1,32 @@
+default:
+  tags: ["docker"]
+  image: keymetrics/pm2:6
+
+stages:
+  - deploy
+
+deploy_prod:
+  stage: deploy
+  script:
+    - echo "====== Deploy to production server ======"
+    - apk update && apk upgrade
+    - apk add git openssh bash
+    # Add target server`s secret key
+    - mkdir ~/.ssh
+    - cat $TARGET_SERVER_SECRET_KEY_BASE64 >> ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
+    - echo "Test ssh connection"
+    - chmod 0600 $TARGET_SERVER_SECRET_KEY_BASE64
+    - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $TARGET_SERVER_SECRET_KEY_BASE64 -T "$TARGET_SERVER_USER@$TARGET_SERVER_HOST"
+    # Delploy
+    - echo "Setup tagget server directories"
+    - CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG} pm2 deploy ecosystem.config.js production setup 2>&1 || true
+    - echo "make deploy"
+    - CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG} pm2 deploy ecosystem.config.js production
+  environment:
+    name: deploying
+  variables:
+    branch: ${CI_COMMIT_REF_SLUG}
+  only:
+    - master
+    - develop
