@@ -4,7 +4,7 @@ import Timeout = NodeJS.Timeout;
 import { AxiosResponse } from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BasePrice, BasePriceDocument } from '@app/shared/base-price.schema';
+import { BasePrice, BasePriceDocument, GweiPrice, GweiPriceDocument } from '@app/shared/price.schema';
 import { ESymbol } from '@app/shared/option.schema';
 
 type TRaw3CommasPrice = {
@@ -16,16 +16,20 @@ enum EApiMarkets {
     BINANCE = 'binance',
 }
 
-const API_POINT: string = 'https://api.3commas.io/public/api/ver1';
+const COMMAS_API_POINT: string = 'https://api.3commas.io/public/api/ver1';
+const GAS_API_POINT: string = 'https://www.gasnow.org/api/v3/gas/price';
+const GWEI_SIZE = 1_000_000_000;
 
 @Injectable()
 export class PriceService implements OnModuleInit, OnModuleDestroy {
     protected readonly logger: Logger = new Logger(PriceService.name);
-    private interval?: Timeout;
-    private inSync: boolean = false;
+    private basePriceInterval?: Timeout;
+    private gweiInterval?: Timeout;
+    private basePriceInSync: boolean = false;
 
     constructor(
         @InjectModel(BasePrice.name) private basePriceModel: Model<BasePriceDocument>,
+        @InjectModel(GweiPrice.name) private gweiPriceModel: Model<GweiPriceDocument>,
         private configService: ConfigService,
         private httpService: HttpService,
     ) {}
@@ -36,32 +40,50 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
         return result?.price || 0;
     }
 
+    async getGwei(): Promise<GweiPrice> {
+        const result: GweiPrice = await this.gweiPriceModel.findOne({});
+
+        return result || { slow: 0, standard: 0, fast: 0 };
+    }
+
     async onModuleInit(): Promise<void> {
-        this.interval = setInterval(async (): Promise<void> => {
-            if (this.inSync) {
+        this.basePriceInterval = setInterval(async (): Promise<void> => {
+            if (this.basePriceInSync) {
                 return;
             }
 
             try {
-                this.inSync = true;
+                this.basePriceInSync = true;
 
-                await this.syncPrice();
+                await this.syncBasePrice();
 
-                this.inSync = false;
+                this.basePriceInSync = false;
             } catch (error) {
                 this.logger.error(error);
-                this.inSync = false;
+                this.basePriceInSync = false;
             }
-        }, Number(this.configService.get('OA_PRICE_SYNC_INTERVAL')) || 3000);
+        }, Number(this.configService.get('OA_PRICE_SYNC_INTERVAL')) || 3_000);
+
+        this.gweiInterval = setInterval(async (): Promise<void> => {
+            try {
+                await this.syncGwei();
+            } catch (error) {
+                this.logger.error(error);
+            }
+        }, Number(this.configService.get('OA_GWEI_SYNC_INTERVAL')) || 30_000);
     }
 
     async onModuleDestroy(): Promise<void> {
-        if (this.interval) {
-            clearInterval(this.interval);
+        if (this.basePriceInterval) {
+            clearInterval(this.basePriceInterval);
+        }
+
+        if (this.gweiInterval) {
+            clearInterval(this.gweiInterval);
         }
     }
 
-    private async syncPrice(): Promise<void> {
+    private async syncBasePrice(): Promise<void> {
         const handled: Set<string> = new Set();
 
         for (const symbol of Object.keys(ESymbol)) {
@@ -118,12 +140,37 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
         }
     }
 
+    private async syncGwei(): Promise<void> {
+        let gweiResponse: AxiosResponse<{ data: GweiPrice }>;
+
+        try {
+            gweiResponse = await this.httpService.get<{ data: GweiPrice }>(GAS_API_POINT).toPromise();
+        } catch (error) {
+            Logger.error(`Gwei sync FATAL error - ${error}`);
+            return;
+        }
+
+        const absoluteWei: GweiPrice = gweiResponse.data.data;
+
+        await this.gweiPriceModel.updateOne(
+            {},
+            {
+                $set: {
+                    slow: absoluteWei.slow / GWEI_SIZE / GWEI_SIZE,
+                    standard: absoluteWei.standard / GWEI_SIZE / GWEI_SIZE,
+                    fast: absoluteWei.fast / GWEI_SIZE / GWEI_SIZE,
+                },
+            },
+            { upsert: true },
+        );
+    }
+
     private async savePrice(symbol: ESymbol, price: number): Promise<void> {
         await this.basePriceModel.updateOne({ symbol }, { $set: { symbol, price: price || 0 } }, { upsert: true });
     }
 
     private async getPriceFrom2Commas(market: EApiMarkets, pair: string): Promise<number> {
-        const priceUrl = `${API_POINT}/accounts/currency_rates?market_code=${market}&pair=${pair}`;
+        const priceUrl = `${COMMAS_API_POINT}/accounts/currency_rates?market_code=${market}&pair=${pair}`;
         let priceResponse: AxiosResponse<TRaw3CommasPrice>;
 
         try {

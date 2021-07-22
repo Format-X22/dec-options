@@ -15,3 +15,21 @@ export const BasePriceSchema: mongoose.Schema<BasePriceDocument> = SchemaFactory
     BasePrice,
     BasePriceDocument
 >(BasePrice);
+
+@Schema({ versionKey: false })
+export class GweiPrice {
+    @Prop()
+    slow: number;
+
+    @Prop()
+    standard: number;
+
+    @Prop()
+    fast: number;
+}
+
+export type GweiPriceDocument = GweiPrice & mongoose.Document;
+export const GweiPriceSchema: mongoose.Schema<GweiPriceDocument> = SchemaFactory.createForClass<
+    GweiPrice,
+    GweiPriceDocument
+>(GweiPrice);
