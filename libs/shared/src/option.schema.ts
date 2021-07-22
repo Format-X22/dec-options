@@ -149,7 +149,7 @@ export class Option {
     bidQuote: number;
 
     @Prop({ type: OptionFeesSchema })
-    @Field((): typeof OptionFees => OptionFees)
+    @Field((): typeof OptionFees => OptionFees, { nullable: true })
     fees?: OptionFees;
 }
 

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BasePrice, BasePriceDocument } from '@app/shared/base-price.schema';
+import { BasePrice, BasePriceDocument } from '@app/shared/price.schema';
 import { ESymbol } from '@app/shared/option.schema';
 
 @Injectable()
