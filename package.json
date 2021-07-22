@@ -28,16 +28,9 @@
     "pm2:start:all:production": "yarn pm2:start:agg:production; yarn pm2:start:api:production;",
     "pm2:start:api:production": "NODE_ENV=production pm2 stop opex_api; pm2 delete opex_api; pm2 start ecosystem.config.js --only opex_api",
     "pm2:start:agg:production": "NODE_ENV=production pm2 stop opex_agg; pm2 delete opex_agg; pm2 start ecosystem.config.js --only opex_agg",
-    "pm2:stop:api": "pm2 stop api",
-    "pm2:stop:agg": "pm2 stop agg",
-    "pm2:kill:api": "pm2 kill api",
-    "pm2:kill:agg": "pm2 stop agg",
-    "pm2:log:api": "pm2 log api",
-    "pm2:log:agg": "pm2 log agg",
-    "pm2:kill": "pm2 kill",
-    "pm2:monit": "pm2 monit",
-    "pm2:status": "pm2 status",
-    "release": "yarn build:all && yarn pm2:stop:api; yarn pm2:stop:agg; yarn pm2:start:all"
+    "pm2:start:all:staging": "yarn pm2:start:agg:staging; yarn pm2:start:api:staging;",
+    "pm2:start:api:staging": "NODE_ENV=production pm2 stop opex_api_staging; pm2 delete opex_api_staging; pm2 start ecosystem.config.js --only opex_api_staging",
+    "pm2:start:agg:staging": "NODE_ENV=production pm2 stop opex_agg_staging; pm2 delete opex_agg_staging; pm2 start ecosystem.config.js --only opex_agg_staging"
   },
   "dependencies": {
     "@apollo/client": "^3.3.19",
