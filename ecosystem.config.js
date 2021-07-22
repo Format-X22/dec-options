@@ -58,7 +58,7 @@ module.exports = {
             name: 'opex_agg_staging',
             script: 'yarn',
             interpreter: 'none',
-            args: 'run start:prod:api',
+            args: 'run start:prod:agg',
             env: {
                 NODE_ENV: 'production',
             },
