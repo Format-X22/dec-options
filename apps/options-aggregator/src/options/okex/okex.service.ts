@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, ESymbol, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market, OrderBook as CcxtOrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
@@ -48,7 +48,7 @@ export class OkexService extends AggregatorAbstract<TRawOption> {
             size: Number(rawOption.info.lot_size),
             strike: Number(rawOption.info.strike),
             expirationDate: new Date(rawOption.info.delivery),
-            base: rawOption.base,
+            base: rawOption.base as ESymbol,
             quote: rawOption.quote,
             strikeAsset: rawOption.base,
             marketUrl: 'https://www.okex.com/en/trade-option/' + rawOption.id,
@@ -58,6 +58,10 @@ export class OkexService extends AggregatorAbstract<TRawOption> {
             bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
+            fees: {
+                makerPercent: rawOption.maker * 100,
+                takerPercent: rawOption.taker * 100,
+            }
         };
     }
 

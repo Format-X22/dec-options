@@ -1,17 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionDeliveryType, EOptionStyleType, EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, EOptionType, ESymbol, Option } from '@app/shared/option.schema';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
 import * as sleep from 'sleep-promise';
 import BigNumber from 'bignumber.js';
 import { OrderBook } from '@app/shared/orderbook.schema';
+import { GweiPrice } from '@app/shared/price.schema';
 
 type TOptionsResponse = {
     hegicOptions: Array<{
         id: string;
         underlying: {
-            symbol: string;
+            symbol: ESymbol;
             decimals: number;
         };
         strike: string;
@@ -23,16 +24,16 @@ type TOptionsResponse = {
 
 type TRawOption = TOptionsResponse['hegicOptions'][0];
 
-const API: string = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
-const MS_MULTIPLY: number = 1000;
-const DECIMAL_DELIMITER: number = 100_000_000;
-const PAGE_SIZE: number = 1000;
+const API = 'https://api.thegraph.com/subgraphs/name/cvauclair/hegic';
+const MS_MULTIPLY = 1000;
+const DECIMAL_DELIMITER = 100_000_000;
+const PAGE_SIZE = 1000;
+const TRANSACTION_GAS_AMOUNT = 14_250_000;
 
 @Injectable()
 export class HegicService extends AggregatorAbstract<TRawOption> {
     protected readonly logger: Logger = new Logger(HegicService.name);
     protected readonly pageSize: number = 1000;
-    protected isGetWithPagination: boolean = true;
 
     protected get rateLimit(): number {
         return 1000;
@@ -40,7 +41,7 @@ export class HegicService extends AggregatorAbstract<TRawOption> {
 
     protected async getRawOptions(): Promise<Array<TRawOption>> {
         const result: Array<TRawOption> = [];
-        let skip: number = 0;
+        let skip = 0;
 
         while (true) {
             const rawOptionsResponse: TOptionsResponse = await request(API, this.getQuery(skip));
@@ -63,7 +64,7 @@ export class HegicService extends AggregatorAbstract<TRawOption> {
         const premium: BigNumber = new BigNumber(rawOption.premium);
         const decimals: BigNumber = new BigNumber(rawOption.underlying.decimals);
         const askInBase: number = premium.div(new BigNumber(10).pow(decimals)).toNumber();
-        const btcUsdPrice: number = await this.getBasePrice('BTC');
+        const btcUsdPrice: number = await this.priceService.getPrice(ESymbol.BTC);
 
         return {
             optionId: rawOption.id,
@@ -73,7 +74,11 @@ export class HegicService extends AggregatorAbstract<TRawOption> {
         };
     }
 
-    protected constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Option {
+    protected async constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Promise<Option> {
+        const ethPrice: number = await this.priceService.getPrice(ESymbol.ETH);
+        const { standard: gwei }: GweiPrice = await this.priceService.getGwei();
+        const takerTransactionUsd: number = TRANSACTION_GAS_AMOUNT * gwei * ethPrice;
+
         return {
             id: rawOption.id,
             name: rawOption.id,
@@ -93,6 +98,9 @@ export class HegicService extends AggregatorAbstract<TRawOption> {
             bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.AMERICAN,
+            fees: {
+                takerTransactionUsd,
+            },
         };
     }
 

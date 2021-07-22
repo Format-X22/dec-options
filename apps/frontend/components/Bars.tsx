@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { $barBackground, $blue } from '../theme';
 
@@ -22,7 +22,7 @@ type BarsContainerProps = {
     readonly max: number;
 };
 
-const BarsContainer: React.FunctionComponent<BarsContainerProps> = styled.div`
+const BarsContainer: FC<BarsContainerProps> = styled.div`
     display: flex;
     flex-direction: ${({ align }: BarsContainerProps): string => (align === 'left' ? 'row' : 'row-reverse')};
     ${({ max }: BarsContainerProps): string => `width: ${(max + 1) * 4 + (max + 1 - 1) * 2}px`};
@@ -39,7 +39,7 @@ type BarProps = {
     readonly className: string;
 };
 
-const Bar: React.FunctionComponent<BarProps> = styled.div`
+const Bar: FC<BarProps> = styled.div`
     background: ${({ active }: BarProps): string => (active ? $blue : $barBackground)};
     width: 4px;
     height: 16px;

@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactElement } from 'react';
 import styled from 'styled-components';
 import { $backgroundLight, $blue } from '../theme';
 
@@ -33,12 +33,14 @@ function Button({
     onClick,
     disabled = false,
 }: {
-    children: React.ReactElement | string;
+    children: ReactElement | string;
     onClick?: () => void;
     disabled?: boolean;
 }): JSX.Element {
     function onClickHandler(): void {
-        onClick && onClick();
+        if (onClick) {
+            onClick();
+        }
     }
 
     return (

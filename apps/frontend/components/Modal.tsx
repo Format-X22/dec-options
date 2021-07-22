@@ -1,6 +1,6 @@
-import React from 'react';
+import { FC, ReactElement, useEffect } from 'react';
 import styled from 'styled-components';
-import { $backgroundDark, $backgroundLight, $selectBackground, $selectBackgroundHover } from '../theme';
+import { $selectBackground, $selectBackgroundHover } from '../theme';
 
 let z = 99;
 
@@ -8,7 +8,7 @@ type ModalContainerProps = {
     visible: boolean;
 };
 
-const ModalContainer: React.FunctionComponent<ModalContainerProps> = styled.div`
+const ModalContainer: FC<ModalContainerProps> = styled.div`
     position: fixed;
     top: 0;
     left: 0;
@@ -57,17 +57,17 @@ const ModalChildren = styled.div`
 `;
 
 export function Modal({
-    children = null,
+    children,
     visible,
     title,
     onClose,
 }: {
-    children?: React.ReactElement | string;
+    children?: ReactElement | string;
     visible: boolean;
     title?: string;
     onClose: () => void;
 }): JSX.Element {
-    React.useEffect((): void => {
+    useEffect((): void => {
         z++;
     }, []);
     return (

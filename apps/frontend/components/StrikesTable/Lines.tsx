@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Lines(): JSX.Element {
+export function Lines() {
     return (
         <svg width='17' height='2' viewBox='0 0 17 2' fill='none' xmlns='http://www.w3.org/2000/svg'>
             <path

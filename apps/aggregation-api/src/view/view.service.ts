@@ -5,7 +5,7 @@ import next from 'next';
 @Injectable()
 export class ViewService implements OnModuleInit, OnModuleDestroy {
     private readonly logger: Logger = new Logger(ViewService.name);
-    private server: NextServer;
+    private server?: NextServer;
 
     async onModuleInit(): Promise<void> {
         try {
@@ -18,10 +18,13 @@ export class ViewService implements OnModuleInit, OnModuleDestroy {
     }
 
     async onModuleDestroy(): Promise<void> {
-        await this.server.close();
+        if (this.server) {
+            await this.server.close();
+        }
     }
 
     getNextServer(): NextServer {
-        return this.server;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return this.server!;
     }
 }

@@ -1,12 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EOptionDeliveryType, EOptionStyleType, Option } from '@app/shared/option.schema';
+import { EOptionDeliveryType, EOptionStyleType, ESymbol, Option } from '@app/shared/option.schema';
 import * as ccxt from 'ccxt';
 import { Dictionary, Exchange, Market, OrderBook as CcxtOrderBook } from 'ccxt';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 import { AggregatorAbstract } from '../aggregator.abstract';
 import { OrderBook, OrderBookOrder } from '@app/shared/orderbook.schema';
 
-type TRawOption = Dictionary<Market>[0];
+type TRawOption = Dictionary<Market>[0] & {
+    info: {
+        maker_commission: string;
+        taker_commission: string;
+    };
+};
 
 @Injectable()
 export class DeribitService extends AggregatorAbstract<TRawOption> {
@@ -44,7 +49,7 @@ export class DeribitService extends AggregatorAbstract<TRawOption> {
             size: Number(rawOption.info.contract_size),
             strike: Number(rawOption.info.strike),
             expirationDate: new Date(Number(rawOption.info.expiration_timestamp)),
-            base: rawOption.base,
+            base: rawOption.base as ESymbol,
             quote: rawOption.quote,
             strikeAsset: rawOption.base,
             marketUrl: 'https://www.deribit.com/main#/options',
@@ -54,6 +59,10 @@ export class DeribitService extends AggregatorAbstract<TRawOption> {
             bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
+            fees: {
+                makerPercent: Number(rawOption.info.maker_commission) * 100,
+                takerPercent: Number(rawOption.info.taker_commission) * 100,
+            },
         };
     }
 }

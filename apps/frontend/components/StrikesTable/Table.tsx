@@ -1,5 +1,6 @@
 import { gql, useQuery } from '@apollo/client';
-import React, { useContext } from 'react';
+import { useCallback } from 'react';
+import { useRouter } from 'next/router';
 import format from 'date-fns/format';
 import { TableContainer } from './TableContainer';
 import { TablePart } from './TablePart';
@@ -9,8 +10,6 @@ import PutsIcon from '../PutsIcon';
 import { TableSide } from './TableSide';
 import { StrikeColumn } from './StrikeColumn';
 import { StrikeCell } from './StrikeCell';
-import { ActionType, ContextState, ESplashPanels } from '../../pages/stateType';
-import { ContextApp } from '../../pages/_app';
 
 const GET_STRIKES = gql`
     query getStrikes($type: OptionType, $base: String, $fromDate: DateTime, $toDate: DateTime) {
@@ -25,16 +24,20 @@ const GET_STRIKES = gql`
     }
 `;
 
-export function Table({
-    date,
-    base,
-    openSubscribeModal,
-}: {
-    date: string;
-    base: string;
-    openSubscribeModal: () => void;
-}): JSX.Element {
-    const { changeState }: Partial<ContextState> = useContext(ContextApp);
+type Strike = {
+    strike: number;
+    markets: {
+        name: string;
+    }[];
+    maxBid: number;
+    minAsk: number;
+};
+type StrikeData = {
+    strikes: Strike[];
+};
+
+export function Table({ date, base }: { date: string; base: string }): JSX.Element {
+    const router = useRouter();
 
     const fromDate = new Date(date);
     fromDate.setHours(0);
@@ -45,7 +48,7 @@ export function Table({
     toDate.setMinutes(59);
     toDate.setSeconds(59);
 
-    const { data: putsData, error: putsError } = useQuery(GET_STRIKES, {
+    const { data: putsData, error: putsError } = useQuery<StrikeData>(GET_STRIKES, {
         variables: {
             type: 'PUT',
             base,
@@ -54,7 +57,7 @@ export function Table({
         },
     });
 
-    const { data: callsData, error: callsError } = useQuery(GET_STRIKES, {
+    const { data: callsData, error: callsError } = useQuery<StrikeData>(GET_STRIKES, {
         variables: {
             type: 'CALL',
             base,
@@ -66,23 +69,42 @@ export function Table({
     const dateString = format(new Date(date), 'dd MMMM');
 
     const strikes = [
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         ...new Set([
             ...(callsData?.strikes || []).map(({ strike }) => strike),
             ...(putsData?.strikes || []).map(({ strike }) => strike),
         ]),
     ].sort((a, b) => (a > b ? 1 : -1));
 
-    const callsDataByStrike = strikes.map((s) => {
+    const callsDataByStrike: Strike[] = [];
+    strikes.forEach((s) => {
         const data = (callsData?.strikes || []).find(({ strike }) => strike === s);
-        return data || null;
+        if (data) {
+            callsDataByStrike.push(data);
+        }
     });
 
-    const putsDataByStrike = strikes.map((s) => {
+    const putsDataByStrike: Strike[] = [];
+    strikes.map((s) => {
         const data = (putsData?.strikes || []).find(({ strike }) => strike === s);
-        return data || null;
+        if (data) {
+            putsDataByStrike.push(data);
+        }
     });
+
+    const onRowClick = useCallback(
+        ({ strike, type }: { strike: number; type: string }): void => {
+            router.push({
+                pathname: `/trade`,
+                query: {
+                    date,
+                    base,
+                    strike,
+                    type,
+                },
+            });
+        },
+        [date, base],
+    );
 
     return (
         <TableContainer>
@@ -97,21 +119,7 @@ export function Table({
             </TablePart>
             <TablePart>
                 <TableSide
-                    onRowClick={({ strike }: { strike: number }): void => {
-                        changeState({
-                            type: ActionType.SET_CURRENT_PANEL,
-                            payload: ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK,
-                        });
-                        changeState({
-                            type: ActionType.SET_SELECTED_OPTION_GROUP,
-                            payload: {
-                                date: new Date(date),
-                                type: 'call',
-                                strike,
-                                base,
-                            },
-                        });
-                    }}
+                    onRowClick={onRowClick}
                     data={callsDataByStrike}
                     error={callsError}
                     type='call'
@@ -129,21 +137,7 @@ export function Table({
             </StrikeColumn>
             <TablePart reverse>
                 <TableSide
-                    onRowClick={({ strike }: { strike: number }): void => {
-                        changeState({
-                            type: ActionType.SET_CURRENT_PANEL,
-                            payload: ESplashPanels.OPTIONS_TABLE_WITH_ORDER_BOOK,
-                        });
-                        changeState({
-                            type: ActionType.SET_SELECTED_OPTION_GROUP,
-                            payload: {
-                                date: new Date(date),
-                                type: 'put',
-                                strike,
-                                base,
-                            },
-                        });
-                    }}
+                    onRowClick={onRowClick}
                     data={putsDataByStrike}
                     error={putsError}
                     reverse

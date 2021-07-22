@@ -23,6 +23,54 @@ export enum EOptionStyleType {
 }
 registerEnumType(EOptionStyleType, { name: 'OptionStyleType' });
 
+export enum ESymbol {
+    USD = 'USD',
+    USDC = 'USDC',
+    BTC = 'BTC',
+    WBTC = 'WBTC',
+    ETH = 'ETH',
+    WETH = 'WETH',
+    EOS = 'EOS',
+    SUSHI = 'SUSHI',
+    UNI = 'UNI',
+    YFI = 'YFI',
+}
+registerEnumType(ESymbol, { name: 'Symbol' });
+
+@Schema({ versionKey: false })
+@ObjectType()
+export class OptionFees {
+    @Prop()
+    @Field({ nullable: true })
+    makerPercent?: number;
+
+    @Prop()
+    @Field({ nullable: true })
+    takerPercent?: number;
+
+    @Prop()
+    @Field({ nullable: true })
+    makerFixedUsd?: number;
+
+    @Prop()
+    @Field({ nullable: true })
+    takerFixedUsd?: number;
+
+    @Prop()
+    @Field({ nullable: true })
+    makerTransactionUsd?: number;
+
+    @Prop()
+    @Field({ nullable: true })
+    takerTransactionUsd?: number;
+}
+
+export type OptionFeesDocument = OptionFees & Document;
+export const OptionFeesSchema: mongoose.Schema<OptionFeesDocument> = SchemaFactory.createForClass<
+    OptionFees,
+    OptionFeesDocument
+>(OptionFees);
+
 @Schema({ versionKey: false })
 @ObjectType({ isAbstract: true })
 export class Option {
@@ -46,7 +94,7 @@ export class Option {
 
     @Prop({ enum: EOptionType, type: String })
     @Field((): typeof EOptionType => EOptionType)
-    type: EOptionType;
+    type?: EOptionType;
 
     @Prop({ enum: EOptionDeliveryType, type: String })
     @Field((): typeof EOptionDeliveryType => EOptionDeliveryType)
@@ -74,7 +122,7 @@ export class Option {
 
     @Prop()
     @Field()
-    base: string;
+    base?: ESymbol;
 
     @Prop()
     @Field()
@@ -99,6 +147,10 @@ export class Option {
     @Prop()
     @Field({ nullable: true })
     bidQuote: number;
+
+    @Prop({ type: OptionFeesSchema })
+    @Field((): typeof OptionFees => OptionFees, { nullable: true })
+    fees?: OptionFees;
 }
 
 @ObjectType('Option')

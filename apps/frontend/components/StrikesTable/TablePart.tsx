@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, useRef, useEffect, Ref } from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../../theme';
 
@@ -8,10 +8,10 @@ type TablePartProps = {
     reverse?: boolean;
     header?: boolean;
     children: JSX.Element;
-    ref?: any;
+    ref?: Ref<HTMLDivElement>;
 };
 
-const TablePartContainer: React.FunctionComponent<TablePartProps> = styled.div`
+const TablePartContainer: FC<TablePartProps> = styled.div`
     display: flex;
     flex-direction: ${({ row }: TablePartProps) => (row ? 'row' : 'column')};
     width: 100%;
@@ -27,7 +27,7 @@ const TablePartContainer: React.FunctionComponent<TablePartProps> = styled.div`
     }
 `;
 
-const TablePartContent: React.FunctionComponent<TablePartProps> = styled.div`
+const TablePartContent: FC<TablePartProps> = styled.div`
     display: flex;
     flex-direction: inherit;
     width: 100%;
@@ -42,9 +42,9 @@ const TablePartContent: React.FunctionComponent<TablePartProps> = styled.div`
 
 export function TablePart(props: TablePartProps): JSX.Element {
     const { children, ...rest } = props;
-    const ref = React.useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLDivElement>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         function scrollToRight(): void {
             ref?.current?.scroll(1000, 0);
         }

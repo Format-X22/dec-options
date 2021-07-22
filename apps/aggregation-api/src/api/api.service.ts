@@ -49,6 +49,15 @@ type TRawStrikeGroup = {
 export class ApiService {
     protected readonly logger: Logger = new Logger(ApiService.name);
 
+    protected mapMarketKeys = (marketKeys: EMarketKey[]) => {
+        return (
+            marketKeys
+                .filter((key: EMarketKey) => marketsMapByKey.has(key))
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                .map((key: EMarketKey) => marketsMapByKey.get(key)!)
+        );
+    };
+
     constructor(
         @InjectModel(Option.name) private optionsModel: Model<OptionDocument>,
         @InjectModel(Subscribers.name) private subscribersModel: Model<SubscribersDocument>,
@@ -56,12 +65,12 @@ export class ApiService {
         private priceService: PriceService,
     ) {}
 
-    async getOption(_id: Option['_id']): Promise<Option> {
+    async getOption(_id: Option['_id']): Promise<Option | null> {
         return this.optionsModel.findById(_id);
     }
 
     async subscribe({ email }: SubscribeGroupArgs): Promise<SubscribeResult> {
-        const result: Subscribers = await this.subscribersModel.findOne({ email });
+        const result: Subscribers | null = await this.subscribersModel.findOne({ email });
 
         if (result) {
             return { success: true };
@@ -79,8 +88,6 @@ export class ApiService {
     }
 
     async getOptions(requestQuery: OptionListArgs): Promise<Paginated<Option>> {
-        console.log('PM2 FAIL');
-
         const dbQuery: TOptionsQuery = this.makeOptionsQuery(requestQuery);
         const dbSort: TOptionsSort = this.makeOptionsSort(requestQuery);
         const data: Array<OptionDocument> = await this.optionsModel.find(dbQuery, null, {
@@ -146,12 +153,12 @@ export class ApiService {
         let result: Array<ExpirationGroup> = data.map(
             (raw: TRawExpirationGroup): ExpirationGroup => ({
                 expirationDate: raw.expirationDate,
-                markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
+                markets: this.mapMarketKeys(raw.marketKeys),
                 strikes: raw.uniqueValues.length,
             }),
         );
 
-        if (args.packByDateSize) {
+        if (args.packByDateSize && args.timezone) {
             result = this.packExpirationsByDateSize(result, args.packByDateSize, args.timezone);
         }
 
@@ -167,6 +174,10 @@ export class ApiService {
 
         if (args.base) {
             filter.base = args.base;
+        }
+
+        if (args.marketType) {
+            filter.marketType = args.marketType;
         }
 
         if (args.fromDate || args.toDate) {
@@ -218,7 +229,7 @@ export class ApiService {
         return data.map(
             (raw: TRawStrikeGroup): StrikeGroup => ({
                 strike: raw.strike,
-                markets: raw.marketKeys.map((key: EMarketKey): Market => marketsMapByKey.get(key)),
+                markets: this.mapMarketKeys(raw.marketKeys),
                 type: args.type,
                 base: args.base,
                 minAsk: raw.minAsk,
@@ -232,17 +243,21 @@ export class ApiService {
         const result: Array<Base> = [];
 
         for (const symbol of symbols) {
-            if (pricesRequired) {
-                result.push({ symbol, usdPrice: this.priceService.getPrice(symbol) });
-            } else {
-                result.push({ symbol, usdPrice: 0 });
+            if (symbol) {
+                if (pricesRequired) {
+                    const usdPrice = (await this.priceService.getPrice(symbol)) || 0;
+                    
+                    result.push({ symbol, usdPrice });
+                } else {
+                    result.push({ symbol, usdPrice: 0 });
+                }
             }
         }
 
         return result;
     }
 
-    async getOrderBook(optionMarketKey: EMarketKey, optionId: string): Promise<OrderBook> {
+    async getOrderBook(optionMarketKey: EMarketKey, optionId: string): Promise<OrderBook | null> {
         return this.orderBookModel.findOne({ optionMarketKey, optionId });
     }
 
@@ -271,14 +286,14 @@ export class ApiService {
 
         if (requestQuery.filterByExpirationDateFrom || requestQuery.filterByExpirationDateTo) {
             dbQuery.expirationDate = {};
-        }
 
-        if (requestQuery.filterByExpirationDateFrom) {
-            dbQuery.expirationDate.$gt = requestQuery.filterByExpirationDateFrom;
-        }
+            if (requestQuery.filterByExpirationDateFrom) {
+                dbQuery.expirationDate.$gt = requestQuery.filterByExpirationDateFrom;
+            }
 
-        if (requestQuery.filterByExpirationDateTo) {
-            dbQuery.expirationDate.$lt = requestQuery.filterByExpirationDateTo;
+            if (requestQuery.filterByExpirationDateTo) {
+                dbQuery.expirationDate.$lt = requestQuery.filterByExpirationDateTo;
+            }
         }
 
         if (!dbQuery.expirationDate) {

@@ -2,7 +2,7 @@ import { ArgsType, Field, Float, Int, registerEnumType } from '@nestjs/graphql';
 import { PaginationArgs } from '@app/shared/list.dto';
 import { IsEnum, IsInstance, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
-import { EOptionType, Option } from '@app/shared/option.schema';
+import { EOptionType, ESymbol, Option } from '@app/shared/option.schema';
 
 export enum ESortDirection {
     ASC = 'ASC',
@@ -34,7 +34,7 @@ export class OptionListArgs extends PaginationArgs {
 
     @Field((): typeof String => String)
     @IsOptional()
-    filterByBase?: string;
+    filterByBase?: ESymbol;
 
     @Field((): typeof Date => Date, { nullable: true })
     @IsOptional()
@@ -113,6 +113,11 @@ export class StrikeGroupArgs {
     @IsOptional()
     @IsString()
     base?: Option['base'];
+
+    @Field((): typeof EMarketType => EMarketType, { nullable: true })
+    @IsOptional()
+    @IsEnum(EMarketType)
+    marketType?: Option['marketType'];
 
     @Field((): typeof Date => Date, { nullable: true })
     @IsOptional()

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { ContextApp } from '../pages/_app';
 import Select from './Select';
 

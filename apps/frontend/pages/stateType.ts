@@ -1,5 +1,5 @@
 import { Dispatch } from 'react';
-import { EMarketKey } from '../../../libs/shared/src/market.schema';
+import { EMarketKey } from '@app/shared/market.schema';
 
 export type State = {
     filter: {
@@ -9,14 +9,14 @@ export type State = {
     prices: {
         [key: string]: number;
     };
-    currentSplashPanel: ESplashPanels;
-    selectedOptionGroup: {
+    currentSplashPanel?: ESplashPanels;
+    selectedOptionGroup?: {
         date: Date;
         type: 'call' | 'put';
         strike: number;
         base: string;
     };
-    selectedOptionForOrderBook: {
+    selectedOptionForOrderBook?: {
         optionMarketKey: EMarketKey;
         optionId: string;
     };

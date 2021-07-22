@@ -1,5 +1,4 @@
-import { ContextState } from '../../pages/stateType';
-import React, { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { ContextApp } from '../../pages/_app';
 import { GreekValue } from '../../types';
 import { differenceInDays } from 'date-fns';
@@ -13,8 +12,11 @@ import greeks from 'greeks';
 import iv from 'implied-volatility';
 import { ApolloError } from '@apollo/client';
 
-type TTableData = {
-    strike?: number;
+export type TTableData = {
+    strike: number;
+    markets?: { name: string }[];
+    // TODO probably never used
+    market?: { name: string };
     minAsk?: number;
     maxBid?: number;
     askQuote?: number;
@@ -26,7 +28,7 @@ type TTableData = {
     vega?: number;
 };
 
-function checkGreek(value: number): GreekValue {
+function checkGreek(value: GreekValue): GreekValue {
     return `${value}`.includes('e') ? null : value;
 }
 
@@ -40,18 +42,18 @@ export function TableSide({
     hideSourcesColumn,
     showMarketColumn,
 }: {
-    data: any;
-    error: ApolloError;
+    data: TTableData[];
+    error?: ApolloError;
     reverse?: boolean;
     type: string;
     date: Date;
-    onRowClick: (item: any) => void;
+    onRowClick: ({ strike, type }: { strike: number; type: string }) => void;
     hideSourcesColumn?: boolean;
     showMarketColumn?: boolean;
 }): JSX.Element {
-    const { state }: Partial<ContextState> = useContext(ContextApp);
+    const { state } = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
-    const [dataWithGreeks, setDataWithGreeks] = React.useState(null);
+    const [dataWithGreeks, setDataWithGreeks] = useState<TTableData[]>([]);
 
     function calcGreeks(): void {
         if (!data) {
@@ -90,11 +92,11 @@ export function TableSide({
                 vega = greeks.getVega(...greeksArgs);
             }
 
-            elementData.volatility = checkGreek(volatility);
-            elementData.delta = checkGreek(delta);
-            elementData.gamma = checkGreek(gamma);
-            elementData.theta = checkGreek(theta);
-            elementData.vega = checkGreek(vega);
+            elementData.volatility = checkGreek(volatility) || undefined;
+            elementData.delta = checkGreek(delta) || undefined;
+            elementData.gamma = checkGreek(gamma) || undefined;
+            elementData.theta = checkGreek(theta) || undefined;
+            elementData.vega = checkGreek(vega) || undefined;
             elementData.maxBid = maxBid;
             elementData.minAsk = minAsk;
 
@@ -104,12 +106,12 @@ export function TableSide({
         setDataWithGreeks(newData);
     }
 
-    React.useEffect((): void => {
-        setDataWithGreeks(null);
+    useEffect((): void => {
+        setDataWithGreeks([]);
         calcGreeks();
     }, [data]);
 
-    React.useEffect((): void => {
+    useEffect((): void => {
         calcGreeks();
     }, [currentPrice]);
 
@@ -156,7 +158,7 @@ export function TableSide({
                         <TableRow
                             reverse={reverse}
                             key={item.strike + j + Math.random()}
-                            onClick={(): void => onRowClick(item)}
+                            onClick={(): void => onRowClick({ strike: item.strike, type })}
                             className='data-row'
                         >
                             {showMarketColumn && (
@@ -164,22 +166,22 @@ export function TableSide({
                                     <TitleText>{item.market?.name}</TitleText>
                                 </TableCell>
                             )}
-                            <PrintGreek propKey='volatility' strikeData={item} name='param' />
-                            <PrintGreek propKey='delta' strikeData={item} name='param' />
-                            <PrintGreek propKey='gamma' strikeData={item} name='greek' />
-                            <PrintGreek propKey='theta' strikeData={item} name='greek' />
-                            <PrintGreek propKey='vega' strikeData={item} name='greek' />
+                            <PrintGreek value={item.volatility} name='param' />
+                            <PrintGreek value={item.delta} name='param' />
+                            <PrintGreek value={item.gamma} name='greek' />
+                            <PrintGreek value={item.theta} name='greek' />
+                            <PrintGreek value={item.vega} name='greek' />
                             <TableCell>
                                 <TitleText active>
-                                    {Number.isFinite(item.minAsk) ? item.minAsk.toFixed(2) : <Lines />}
+                                    {item.minAsk && Number.isFinite(item.minAsk) ? item.minAsk.toFixed(2) : <Lines />}
                                 </TitleText>
                             </TableCell>
                             <TableCell>
                                 <TitleText active>
-                                    {Number.isFinite(item.maxBid) ? item.maxBid.toFixed(2) : <Lines />}
+                                    {item.maxBid && Number.isFinite(item.maxBid) ? item.maxBid.toFixed(2) : <Lines />}
                                 </TitleText>
                             </TableCell>
-                            {!hideSourcesColumn && (
+                            {item.markets && !hideSourcesColumn && (
                                 <TableCell>
                                     <TitleText active>
                                         <Bars max={7} value={item.markets.length} align={reverse ? 'left' : 'right'} />
