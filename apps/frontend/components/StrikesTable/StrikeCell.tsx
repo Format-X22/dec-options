@@ -8,6 +8,7 @@ type StrikeCellProps = {
 export const StrikeCell: FC<StrikeCellProps> = styled.div`
     background: ${$backgroundDark};
     width: 100%;
+    max-height: 48px;
     font-size: 12px;
     line-height: 20px;
     text-align: center;

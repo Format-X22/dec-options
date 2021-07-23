@@ -10,6 +10,7 @@ type TableRowProps = {
 export const TableRow: FC<TableRowProps> = styled.div`
     display: flex;
     width: 100%;
+    max-height: 48px;
     background: ${$backgroundLight};
     align-items: center;
     justify-content: center;
@@ -21,8 +22,6 @@ export const TableRow: FC<TableRowProps> = styled.div`
     &.data-row {
         cursor: pointer;
     }
-
-    
 
     &:hover {
         background: ${$tableRowHover};
