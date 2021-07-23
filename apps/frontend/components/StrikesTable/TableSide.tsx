@@ -42,7 +42,7 @@ export function TableSide({
     hideSourcesColumn,
     showMarketColumn,
 }: {
-    data: TTableData[];
+    data: (TTableData | undefined)[];
     error?: ApolloError;
     reverse?: boolean;
     type: string;
@@ -53,16 +53,16 @@ export function TableSide({
 }): JSX.Element {
     const { state } = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
-    const [dataWithGreeks, setDataWithGreeks] = useState<TTableData[]>([]);
+    const [dataWithGreeks, setDataWithGreeks] = useState<(TTableData | undefined)[]>([]);
 
     function calcGreeks(): void {
         if (!data) {
             return;
         }
 
-        const newData = data.map((item: TTableData): TTableData => {
+        const newData = data.map((item) => {
             if (!item) {
-                return item;
+                return;
             }
 
             const elementData: TTableData = { ...item };
