@@ -20,7 +20,7 @@ export class OptionsAggregatorService {
     ) {}
 
     async start(): Promise<void> {
-        [this.binanceService, this.deribitService, this.hegicService, this.okexService].forEach(
+        [this.binanceService, this.deribitService, this.okexService].forEach(
             this.startSync.bind(this),
         );
 
