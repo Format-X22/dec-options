@@ -75,20 +75,16 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
         ]),
     ].sort((a, b) => (a > b ? 1 : -1));
 
-    const callsDataByStrike: Strike[] = [];
+    const callsDataByStrike: (Strike | undefined)[] = [];
     strikes.forEach((s) => {
         const data = (callsData?.strikes || []).find(({ strike }) => strike === s);
-        if (data) {
-            callsDataByStrike.push(data);
-        }
+        callsDataByStrike.push(data);
     });
 
-    const putsDataByStrike: Strike[] = [];
+    const putsDataByStrike: (Strike | undefined)[] = [];
     strikes.map((s) => {
         const data = (putsData?.strikes || []).find(({ strike }) => strike === s);
-        if (data) {
-            putsDataByStrike.push(data);
-        }
+        putsDataByStrike.push(data);
     });
 
     const onRowClick = useCallback(

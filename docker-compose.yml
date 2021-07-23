@@ -12,7 +12,7 @@ services:
     volumes:
       - options-aggregator-mongodb-vol:/data/db
     ports:
-      - 127.0.0.1:27018:27017
+      - 127.0.0.1:27017:27017
     networks:
       - services-tier
 
