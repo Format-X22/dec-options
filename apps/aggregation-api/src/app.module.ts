@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
-import { ApiModule } from './api/api.module';
+import { OptionModule } from './option/option.module';
 import { ViewModule } from './view/view.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { PriceModule } from './price/price.module';
 
 @Module({
     imports: [
-        ApiModule,
+        OptionModule,
         ViewModule,
         ConfigModule.forRoot({
             isGlobal: true,
