@@ -6,6 +6,7 @@ import { OptionModule } from './option/option.module';
 import { ViewModule } from './view/view.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { PriceModule } from './price/price.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
     imports: [
@@ -27,6 +28,7 @@ import { PriceModule } from './price/price.module';
             autoSchemaFile: true,
         }),
         PriceModule,
+        StatsModule,
     ],
     controllers: [],
     providers: [],

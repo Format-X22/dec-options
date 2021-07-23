@@ -3,6 +3,7 @@ import { OptionsAggregatorService } from './options-aggregator.service';
 import { ConfigModule } from '@nestjs/config';
 import { OptionModule } from './options/option.module';
 import { PriceModule } from './price/price.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import { PriceModule } from './price/price.module';
         }),
         OptionModule,
         PriceModule,
+        StatsModule,
     ],
     providers: [OptionsAggregatorService],
 })
