@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { $backgroundLight } from '../theme';
 import { TimeTable } from './TimeTable';
 import { CurrencySelector } from './CurrencySelector';
+import { MarketSelector } from './MarketSelector';
 
 const StyledFilters = styled.div`
     width: 100%;
@@ -29,6 +30,7 @@ function Filters({}: { children?: ReactElement | string }): JSX.Element {
         <StyledFilters>
             <FiltersRow>
                 <CurrencySelector />
+                <MarketSelector />
             </FiltersRow>
             <FiltersRow>
                 <TimeTable />
