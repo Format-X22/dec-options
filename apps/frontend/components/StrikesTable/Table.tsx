@@ -10,10 +10,17 @@ import PutsIcon from '../PutsIcon';
 import { TableSide } from './TableSide';
 import { StrikeColumn } from './StrikeColumn';
 import { StrikeCell } from './StrikeCell';
+import { EMarketType } from '@app/shared/market.schema';
 
 const GET_STRIKES = gql`
-    query getStrikes($type: OptionType, $base: String, $fromDate: DateTime, $toDate: DateTime) {
-        strikes(type: $type, base: $base, fromDate: $fromDate, toDate: $toDate) {
+    query getStrikes(
+        $type: OptionType
+        $base: String
+        $marketType: MarketType
+        $fromDate: DateTime
+        $toDate: DateTime
+    ) {
+        strikes(type: $type, base: $base, marketType: $marketType, fromDate: $fromDate, toDate: $toDate) {
             strike
             markets {
                 name
@@ -36,7 +43,15 @@ type StrikeData = {
     strikes: Strike[];
 };
 
-export function Table({ date, base }: { date: string; base: string }): JSX.Element {
+export function Table({
+    date,
+    base,
+    marketType,
+}: {
+    date: string;
+    base: string;
+    marketType?: EMarketType | 'ALL';
+}): JSX.Element {
     const router = useRouter();
 
     const fromDate = new Date(date);
@@ -52,6 +67,7 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
         variables: {
             type: 'PUT',
             base,
+            marketType: marketType !== 'ALL' ? marketType : undefined,
             fromDate: fromDate.toString(),
             toDate: toDate.toString(),
         },
@@ -61,6 +77,7 @@ export function Table({ date, base }: { date: string; base: string }): JSX.Eleme
         variables: {
             type: 'CALL',
             base,
+            marketType: marketType !== 'ALL' ? marketType : undefined,
             fromDate: fromDate.toString(),
             toDate: toDate.toString(),
         },

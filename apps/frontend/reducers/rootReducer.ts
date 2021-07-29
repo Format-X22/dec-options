@@ -1,3 +1,4 @@
+import { EMarketType } from '@app/shared/market.schema';
 import { Action, ActionType, State } from '../pages/stateType';
 
 export const rootReducer = (state: State, action: Action): State => {
@@ -6,6 +7,8 @@ export const rootReducer = (state: State, action: Action): State => {
             return { ...state, filter: { ...state.filter, date: action.payload } };
         case ActionType.SET_FILTER_CURRENCY:
             return { ...state, filter: { ...state.filter, currency: action.payload } };
+        case ActionType.SET_FILTER_MARKET_TYPE:
+            return { ...state, filter: { ...state.filter, marketType: action.payload as EMarketType } };
         case ActionType.SET_PRICE:
             return { ...state, prices: { ...state.prices, [action.payload.key]: action.payload.price } };
         case ActionType.SET_PRICES:
