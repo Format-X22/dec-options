@@ -26,7 +26,7 @@ const GET_PRICES = gql`
 
 function Index(): JSX.Element {
     const router = useRouter();
-    const { base = 'ETH', date } = router.query;
+    const { base = 'ETH', date, marketType = 'ALL' } = router.query;
     const { changeState }: Partial<ContextState> = useContext(ContextApp);
 
     useEffect(() => {
@@ -40,6 +40,12 @@ function Index(): JSX.Element {
             changeState({ type: ActionType.SET_FILTER_DATE, payload: date });
         }
     }, [date]);
+
+    useEffect(() => {
+        if (marketType && typeof marketType === 'string') {
+            changeState({ type: ActionType.SET_FILTER_MARKET_TYPE, payload: marketType });
+        }
+    }, [marketType]);
 
     // TODO add error handling
     const { loading: loadingBases, data: dataBases } = useQuery(GET_BASES);

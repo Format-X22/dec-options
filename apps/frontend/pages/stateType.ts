@@ -1,10 +1,11 @@
 import { Dispatch } from 'react';
-import { EMarketKey } from '@app/shared/market.schema';
+import { EMarketKey, EMarketType } from '@app/shared/market.schema';
 
 export type State = {
     filter: {
         date: string;
         currency: string;
+        marketType?: EMarketType | 'ALL';
     };
     prices: {
         [key: string]: number;
@@ -25,6 +26,7 @@ export type State = {
 export enum ActionType {
     SET_FILTER_DATE = 'SET_FILTER_DATE',
     SET_FILTER_CURRENCY = 'SET_FILTER_CURRENCY',
+    SET_FILTER_MARKET_TYPE = 'SET_FILTER_MARKET_TYPE',
     SET_PRICE = 'SET_PRICE',
     SET_PRICES = 'SET_PRICES',
     SET_CURRENT_PANEL = 'SET_CURRENT_PANEL',
@@ -38,7 +40,7 @@ export enum ESplashPanels {
 }
 
 type ActionStringPayload = {
-    type: ActionType.SET_FILTER_DATE | ActionType.SET_FILTER_CURRENCY;
+    type: ActionType.SET_FILTER_DATE | ActionType.SET_FILTER_CURRENCY | ActionType.SET_FILTER_MARKET_TYPE;
     payload: string;
 };
 
