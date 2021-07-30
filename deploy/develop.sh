@@ -29,4 +29,4 @@ cp -r /var/www/opex/stage/source/* /var/www/opex/stage/current
 cp /var/www/opex/stage/source/.env /var/www/opex/stage/current
 
 echo "Start new process"
-cd /var/www/opex/stage/current && yarn yarn pm2:start:all:staging
+cd /var/www/opex/stage/current && yarn pm2:start:all:staging
