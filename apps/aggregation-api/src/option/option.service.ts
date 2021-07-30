@@ -46,8 +46,8 @@ type TRawStrikeGroup = {
 };
 
 @Injectable()
-export class ApiService {
-    protected readonly logger: Logger = new Logger(ApiService.name);
+export class OptionService {
+    protected readonly logger: Logger = new Logger(OptionService.name);
 
     protected mapMarketKeys = (marketKeys: EMarketKey[]) => {
         return (

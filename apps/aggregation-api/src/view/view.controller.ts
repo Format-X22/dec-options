@@ -3,7 +3,7 @@ import { ViewService } from './view.service';
 import { NextFunction, Request, Response } from 'express';
 import { NextServer } from 'next/dist/server/next';
 
-const EXCLUDE_PATH: Array<string> = ['/api', '/graphql'];
+const EXCLUDE_PATH: Array<string> = ['/option', '/graphql'];
 
 @Controller()
 export class ViewController {

@@ -7,7 +7,7 @@
 Options aggregator with api.
 
 ## Installation
-                
+
 1 - Install NodeJS (LTS)
 
 https://nodejs.org/
@@ -27,7 +27,7 @@ https://www.docker.com/get-started
 ```bash
 $ npm install
 ```
-              
+
 ## Configuration
 
 Create .env file like .env.example
@@ -35,8 +35,7 @@ Create .env file like .env.example
 Variables:
 
 `OA_MONGO_CONNECT` - Mongo connection path.  
-`OA_AGG_API_PORT` - Aggregation api port.  
-`OA_SYNC_INTERVAL_MS` - Aggregation sync interval in milliseconds.
+`OA_AGG_API_PORT` - Aggregation api port.
 
 In dev mode use vars from example file.
 
@@ -60,7 +59,7 @@ $ npm run start:agg
 $ npm run start:prod:api
 $ npm run start:prod:agg
 ```
-                        
+
 # Tests
 
 ```bash
@@ -68,10 +67,10 @@ $ npm run start:prod:agg
 $ npm run test
 
 # e2e
-$ npm run test:e2e:api 
+$ npm run test:e2e:api
 ```
 
 ## Api
-                               
-App - http://localhost:3000/   
+
+App - http://localhost:3000/  
 GraphQL - http://localhost:3000/graphql/

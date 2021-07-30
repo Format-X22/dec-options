@@ -18,18 +18,6 @@ describe('AggregationApiController (e2e)', (): void => {
         await app.init();
     });
 
-    it('/ (GET) - success code', (): superagent.SuperAgentRequest => {
-        return request(app.getHttpServer()).get('/').expect(SUCCESS_CODE);
-    });
-
-    it('/api (GET) - success code', (): superagent.SuperAgentRequest => {
-        return request(app.getHttpServer()).get('/api').expect(SUCCESS_CODE);
-    });
-
-    it('/api/options-params (GET) - success code', (): superagent.SuperAgentRequest => {
-        return request(app.getHttpServer()).get('/api/options-params').expect(SUCCESS_CODE);
-    });
-
     afterEach(async (): Promise<void> => {
         await app.close();
     });

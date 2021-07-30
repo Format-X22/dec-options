@@ -43,7 +43,7 @@ export class BinanceService extends AggregatorAbstract<TRawOption> {
     private readonly exchange: Exchange = new ccxt.binance();
 
     protected get rateLimit(): number {
-        return this.exchange.rateLimit;
+        return this.exchange.rateLimit * 2;
     }
 
     protected async getRawOptions(): Promise<Array<TRawOption>> {
