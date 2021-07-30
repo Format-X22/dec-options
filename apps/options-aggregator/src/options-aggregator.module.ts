@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { OptionModule } from './options/option.module';
 import { PriceModule } from './price/price.module';
 import { StatsModule } from './stats/stats.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
     imports: [
@@ -11,6 +12,7 @@ import { StatsModule } from './stats/stats.module';
             isGlobal: true,
             cache: true,
         }),
+        ScheduleModule.forRoot(),
         OptionModule,
         PriceModule,
         StatsModule,
