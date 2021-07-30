@@ -13,7 +13,8 @@ node -v
 nvm use 14
 
 echo "Stop old process"
-pm2 --silent stop tools_backend_staging
+pm2 --silent stop opex_api_staging
+pm2 --silent stop opex_agg_staging
 echo "Stopped"
 set -e
 echo "Move old directory"
