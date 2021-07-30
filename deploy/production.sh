@@ -24,6 +24,7 @@ echo "clear old directory"
 rm -rf /var/www/opex/production/current/*
 
 echo "Copy source to directory"
+cd /var/www/opex/stage/source/ && yarn
 mkdir /var/www/opex/production/current
 cp -r /var/www/opex/production/source/* /var/www/opex/production/current
 cp /var/www/opex/production/source/.env /var/www/opex/production/current

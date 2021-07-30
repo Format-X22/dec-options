@@ -19,7 +19,6 @@ build_stage:
     - CI=false yarn build:all
     - mkdir bundle
     - mv dist bundle/
-    - mv node_modules bundle/
     - mv deploy bundle/
     - mv package.json bundle/
     - mv ecosystem.config.js bundle/
@@ -42,7 +41,6 @@ build_production:
     - CI=false yarn build:all
     - mkdir bundle
     - mv dist bundle/
-    - mv node_modules bundle/
     - mv deploy bundle/
     - mv package.json bundle/
     - mv ecosystem.config.js bundle/
