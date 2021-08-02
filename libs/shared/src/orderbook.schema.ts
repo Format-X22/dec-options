@@ -2,6 +2,7 @@ import { Field, Float, ObjectType } from '@nestjs/graphql';
 import mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { EMarketKey } from '@app/shared/market.schema';
+import { OptionFees } from '@app/shared/option.schema';
 
 @Schema({ versionKey: false })
 @ObjectType()
@@ -15,6 +16,7 @@ export class OrderBookOrder {
     amount: number;
 
     marketName?: string;
+    fees?: OptionFees;
 }
 
 export type OrderBookOrderDocument = OrderBookOrder & mongoose.Document;
