@@ -54,6 +54,8 @@
     "graphql-request": "^3.4.0",
     "graphql-tools": "^7.0.5",
     "greeks": "^1.0.0",
+    "highcharts": "^9.1.2",
+    "highcharts-react-official": "^3.0.0",
     "i": "^0.3.6",
     "implied-volatility": "^1.0.0",
     "lodash": "^4.17.21",
