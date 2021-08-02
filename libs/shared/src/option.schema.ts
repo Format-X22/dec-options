@@ -122,7 +122,7 @@ export class Option {
 
     @Prop()
     @Field()
-    base?: ESymbol;
+    base: ESymbol;
 
     @Prop()
     @Field()

@@ -1,25 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ApiService } from './api.service';
+import { OptionResolver } from './option.resolver';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ApiModule } from './api.module';
+import { OptionModule } from './option.module';
+import { HttpModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
 import { Option, OptionSchema } from '@app/shared/option.schema';
-import { HttpModule } from '@nestjs/common';
+import { OptionService } from './option.service';
 
-describe('ApiService', (): void => {
-    let service: ApiService;
-    let module: TestingModule;
+describe('OptionResolver', (): void => {
+    let resolver: OptionResolver;
 
     beforeEach(async (): Promise<void> => {
-        module = await Test.createTestingModule({
+        const module: TestingModule = await Test.createTestingModule({
             imports: [
-                HttpModule,
                 ConfigModule.forRoot({
                     isGlobal: true,
                     cache: true,
                 }),
-                ApiModule,
+                OptionModule,
+                HttpModule,
                 MongooseModule.forRootAsync({
                     imports: [ConfigModule],
                     useFactory: (configService: ConfigService): MongooseModuleOptions => ({
@@ -29,15 +29,13 @@ describe('ApiService', (): void => {
                 }),
                 MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
             ],
-            providers: [ApiService],
+            providers: [OptionService, OptionResolver],
         }).compile();
 
-        service = module.get<ApiService>(ApiService);
+        resolver = module.get<OptionResolver>(OptionResolver);
     });
 
     it('should be defined', (): void => {
-        expect(service).toBeDefined();
+        expect(resolver).toBeDefined();
     });
-
-    afterEach(async (): Promise<void> => module.close());
 });

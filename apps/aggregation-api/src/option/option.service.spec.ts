@@ -1,25 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OptionResolver } from './option.resolver';
+import { OptionService } from './option.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ApiModule } from './api.module';
-import { HttpModule } from '@nestjs/common';
+import { OptionModule } from './option.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
 import { Option, OptionSchema } from '@app/shared/option.schema';
-import { ApiService } from './api.service';
+import { HttpModule } from '@nestjs/common';
 
-describe('OptionResolver', (): void => {
-    let resolver: OptionResolver;
+describe('ApiService', (): void => {
+    let service: OptionService;
+    let module: TestingModule;
 
     beforeEach(async (): Promise<void> => {
-        const module: TestingModule = await Test.createTestingModule({
+        module = await Test.createTestingModule({
             imports: [
+                HttpModule,
                 ConfigModule.forRoot({
                     isGlobal: true,
                     cache: true,
                 }),
-                ApiModule,
-                HttpModule,
+                OptionModule,
                 MongooseModule.forRootAsync({
                     imports: [ConfigModule],
                     useFactory: (configService: ConfigService): MongooseModuleOptions => ({
@@ -29,13 +29,15 @@ describe('OptionResolver', (): void => {
                 }),
                 MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
             ],
-            providers: [ApiService, OptionResolver],
+            providers: [OptionService],
         }).compile();
 
-        resolver = module.get<OptionResolver>(OptionResolver);
+        service = module.get<OptionService>(OptionService);
     });
 
     it('should be defined', (): void => {
-        expect(resolver).toBeDefined();
+        expect(service).toBeDefined();
     });
+
+    afterEach(async (): Promise<void> => module.close());
 });

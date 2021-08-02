@@ -1,32 +1,91 @@
 default:
   tags: ["docker"]
-  image: keymetrics/pm2:6
+  image: node:lts
 
 stages:
+  - build
   - deploy
 
-deploy_prod:
+build_stage:
+  only:
+    refs:
+      - develop
+  image: node:lts
+  stage: build
+  script:
+    - yarn
+    - mv .env.example.staging .env
+    - cat .env
+    - CI=false yarn build:all
+    - mkdir bundle
+    - mv dist bundle/
+    - mv apps bundle/
+    - mv deploy bundle/
+    - mv package.json bundle/
+    - mv tsconfig.json bundle/
+    - mv ecosystem.config.js bundle/
+    - mv .env bundle/
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - bundle
+
+build_production:
+  only:
+    refs:
+      - master
+  image: node:lts
+  stage: build
+  script:
+    - yarn
+    - mv .env.example .env
+    - cat .env
+    - CI=false yarn build:all
+    - mkdir bundle
+    - mv dist bundle/
+    - mv apps bundle/
+    - mv deploy bundle/
+    - mv package.json bundle/
+    - mv tsconfig.json bundle/
+    - mv ecosystem.config.js bundle/
+    - mv .env bundle/
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - bundle
+
+deploy_stage:
   stage: deploy
   script:
+    - apt-get update -qq && apt-get install  -y -qq sshpass rsync
     - echo "====== Deploy to production server ======"
-    - apk update && apk upgrade
-    - apk add git openssh bash
-    # Add target server`s secret key
     - mkdir ~/.ssh
     - cat $TARGET_SERVER_SECRET_KEY_BASE64 >> ~/.ssh/id_rsa
-    - chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
-    - echo "Test ssh connection"
+    - chmod 0700 ~/.ssh && chmod 0600 ~/.ssh/*
     - chmod 0600 $TARGET_SERVER_SECRET_KEY_BASE64
-    - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $TARGET_SERVER_SECRET_KEY_BASE64 -T "$TARGET_SERVER_USER@$TARGET_SERVER_HOST"
-    # Delploy
-    - echo "Setup tagget server directories"
-    - CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG} pm2 deploy ecosystem.config.js production setup 2>&1 || true
-    - echo "make deploy"
-    - CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG} pm2 deploy ecosystem.config.js production
+    - rsync -avzh --no-perms --no-owner --no-group -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $TARGET_SERVER_SECRET_KEY_BASE64" --rsync-path="sudo rsync" --delete --progress bundle/ $TARGET_SERVER_USER@$TARGET_SERVER_HOST:/var/www/opex/stage/source
+    - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $TARGET_SERVER_SECRET_KEY_BASE64 -T "$TARGET_SERVER_USER@$TARGET_SERVER_HOST" "cd /var/www/opex/stage/source/deploy && ./develop.sh"
+  environment:
+    name: deploying
+  variables:
+    branch: ${CI_COMMIT_REF_SLUG}
+  only:
+    - develop
+
+deploy_production:
+  stage: deploy
+  script:
+    - apt-get update -qq && apt-get install  -y -qq sshpass rsync
+    - echo "====== Deploy to production server ======"
+    - mkdir ~/.ssh
+    - cat $TARGET_SERVER_SECRET_KEY_BASE64 >> ~/.ssh/id_rsa
+    - chmod 0700 ~/.ssh && chmod 0600 ~/.ssh/*
+    - chmod 0600 $TARGET_SERVER_SECRET_KEY_BASE64
+    - rsync -avzh --no-perms --no-owner --no-group -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $TARGET_SERVER_SECRET_KEY_BASE64" --rsync-path="sudo rsync" --delete --progress bundle/ $TARGET_SERVER_USER@$TARGET_SERVER_HOST:/var/www/opex/production/source
+    - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $TARGET_SERVER_SECRET_KEY_BASE64 -T "$TARGET_SERVER_USER@$TARGET_SERVER_HOST" "cd /var/www/opex/production/source/deploy && ./production.sh"
   environment:
     name: deploying
   variables:
     branch: ${CI_COMMIT_REF_SLUG}
   only:
     - master
-    - develop

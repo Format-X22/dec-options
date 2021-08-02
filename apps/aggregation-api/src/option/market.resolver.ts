@@ -1,13 +1,13 @@
 import { Query, Resolver } from '@nestjs/graphql';
 import { Market } from '@app/shared/market.schema';
-import { ApiService } from './api.service';
+import { OptionService } from './option.service';
 
 @Resolver((): typeof Market => Market)
 export class MarketResolver {
-    constructor(private readonly apiService: ApiService) {}
+    constructor(private readonly optionService: OptionService) {}
 
     @Query((): Array<typeof Market> => [Market])
     async markets(): Promise<Array<Market>> {
-        return this.apiService.getMarkets();
+        return this.optionService.getMarkets();
     }
 }

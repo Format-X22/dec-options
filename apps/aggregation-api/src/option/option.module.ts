@@ -1,5 +1,5 @@
 import { HttpModule, Module } from '@nestjs/common';
-import { ApiService } from './api.service';
+import { OptionService } from './option.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Option, OptionSchema } from '@app/shared/option.schema';
 import { OptionResolver } from './option.resolver';
@@ -20,6 +20,6 @@ import { OrderBookResolver } from './orderbook.resolver';
         HttpModule,
         PriceModule,
     ],
-    providers: [ApiService, OptionResolver, MarketResolver, SubscribersResolver, OrderBookResolver],
+    providers: [OptionService, OptionResolver, MarketResolver, SubscribersResolver, OrderBookResolver],
 })
-export class ApiModule {}
+export class OptionModule {}

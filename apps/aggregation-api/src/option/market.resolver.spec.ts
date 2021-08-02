@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MarketResolver } from './market.resolver';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ApiModule } from './api.module';
+import { OptionModule } from './option.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist/interfaces/mongoose-options.interface';
 import { Option, OptionSchema } from '@app/shared/option.schema';
-import { ApiService } from './api.service';
+import { OptionService } from './option.service';
 import { HttpModule } from '@nestjs/common';
 
 describe('MarketResolver', (): void => {
@@ -18,7 +18,7 @@ describe('MarketResolver', (): void => {
                     isGlobal: true,
                     cache: true,
                 }),
-                ApiModule,
+                OptionModule,
                 HttpModule,
                 MongooseModule.forRootAsync({
                     imports: [ConfigModule],
@@ -29,7 +29,7 @@ describe('MarketResolver', (): void => {
                 }),
                 MongooseModule.forFeature([{ name: Option.name, schema: OptionSchema }]),
             ],
-            providers: [ApiService, MarketResolver],
+            providers: [OptionService, MarketResolver],
         }).compile();
 
         resolver = module.get<MarketResolver>(MarketResolver);
