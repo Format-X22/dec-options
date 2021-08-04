@@ -9,7 +9,7 @@ export class StatsOpenInterestDetails {
     @Prop()
     expirationDate: Date;
 
-    @Field()
+    @Field({ nullable: true })
     @Prop()
     strike: number;
 
