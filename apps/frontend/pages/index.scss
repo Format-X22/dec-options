@@ -33,7 +33,11 @@ body {
 
 // TODO Fix this!
 .TODO-order-book-column-size {
-    width: calc(100% / 3) !important;
+    width: calc(100% / 4) !important;
+}
+
+.TODO-order-book-column-size-scroll-fix {
+  padding-right: 13px;
 }
 
 @for $i from 1 through 10 {

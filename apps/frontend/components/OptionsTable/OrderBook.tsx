@@ -6,7 +6,7 @@ import { DocumentNode, gql, useQuery } from '@apollo/client';
 import { OrderBook as OrderBookModel, OrderBookOrder } from '@app/shared/orderbook.schema';
 import { QueryResult } from '@apollo/client/react/types/types';
 import styled from 'styled-components';
-import { OptionGQL } from '@app/shared/option.schema';
+import { OptionFees, OptionGQL } from '@app/shared/option.schema';
 import { useRouter } from 'next/router';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
 
@@ -33,6 +33,10 @@ const GET_OPTIONS = gql`
                 market {
                     key
                     name
+                }
+                fees {
+                    takerPercent
+                    takerTransactionUsd
                 }
             }
         }
@@ -116,6 +120,12 @@ export function OrderBook(): JSX.Element {
             },
         });
 
+    const marketFeesMap: Map<string, OptionFees | undefined> = new Map();
+
+    for (const option of optionGroupData?.options.data || []) {
+        marketFeesMap.set(option.market.name, option?.fees);
+    }
+
     const asks: Array<OrderBookOrder> = [];
     const bids: Array<OrderBookOrder> = [];
 
@@ -129,8 +139,20 @@ export function OrderBook(): JSX.Element {
             let asksData: Array<OrderBookOrder> = orderBook?.asks || [];
             let bidsData: Array<OrderBookOrder> = orderBook?.bids || [];
 
-            asksData = asksData.map((order: OrderBookOrder): OrderBookOrder => ({ ...order, marketName }));
-            bidsData = bidsData.map((order: OrderBookOrder): OrderBookOrder => ({ ...order, marketName }));
+            asksData = asksData.map(
+                (order: OrderBookOrder): OrderBookOrder => ({
+                    ...order,
+                    marketName,
+                    fees: marketFeesMap.get(marketName),
+                }),
+            );
+            bidsData = bidsData.map(
+                (order: OrderBookOrder): OrderBookOrder => ({
+                    ...order,
+                    marketName,
+                    fees: marketFeesMap.get(marketName),
+                }),
+            );
 
             asks.push(...asksData);
             bids.push(...bidsData);
@@ -157,7 +179,7 @@ export function OrderBook(): JSX.Element {
             <TableRow>
                 <TableCell>ORDER BOOK</TableCell>
             </TableRow>
-            <TableRow>
+            <TableRow className={'TODO-order-book-column-size-scroll-fix'}>
                 <TableCell className={'TODO-order-book-column-size'}>
                     <TitleText>Price</TitleText>
                 </TableCell>
@@ -167,6 +189,9 @@ export function OrderBook(): JSX.Element {
                 <TableCell className={'TODO-order-book-column-size'}>
                     <TitleText>Source</TitleText>
                 </TableCell>
+                <TableCell className={'TODO-order-book-column-size'}>
+                    <TitleText>Fees</TitleText>
+                </TableCell>
             </TableRow>
             {optionGroupError && <TableRow>{optionGroupError.toString()}</TableRow>}
             {!optionGroupError && error && <TableRow>{error.toString()}</TableRow>}
@@ -174,7 +199,7 @@ export function OrderBook(): JSX.Element {
                 <SubTablesWrapper>
                     <SubTable reverse>
                         {asks.slice().map(
-                            ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
+                            ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
                                 <TableRow key={`asks-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <AsksText>{price}</AsksText>
@@ -184,6 +209,9 @@ export function OrderBook(): JSX.Element {
                                     </TableCell>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <TitleText>{marketName}</TitleText>
+                                    </TableCell>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <TitleText>{formatFees(fees)}</TitleText>
                                     </TableCell>
                                 </TableRow>
                             ),
@@ -197,7 +225,7 @@ export function OrderBook(): JSX.Element {
                     <Divider />
                     <SubTable>
                         {bids.map(
-                            ({ price, amount, marketName }: OrderBookOrder, index): JSX.Element => (
+                            ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
                                 <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <BidsText>{price}</BidsText>
@@ -207,6 +235,9 @@ export function OrderBook(): JSX.Element {
                                     </TableCell>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <TitleText>{marketName}</TitleText>
+                                    </TableCell>
+                                    <TableCell className={'TODO-order-book-column-size'}>
+                                        <TitleText>{formatFees(fees)}</TitleText>
                                     </TableCell>
                                 </TableRow>
                             ),
@@ -249,4 +280,22 @@ function makeOrderBookQuery(options: Array<OptionGQL> = []): DocumentNode {
             ${body}
         }
     `;
+}
+
+function formatFees(fees?: OptionFees): string {
+    if (!fees) {
+        return 'N/A';
+    }
+
+    let result: Array<string> = [];
+
+    if (fees.takerPercent) {
+        result.push(`${fees.takerPercent}%`);
+    }
+
+    if (fees.takerTransactionUsd) {
+        result.push(`$${fees.takerTransactionUsd} for gas`);
+    }
+
+    return result.join(' + ');
 }
