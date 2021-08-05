@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
+import { EMarketKey } from '@app/shared/market.schema';
 
 @ObjectType()
 @Schema({ versionKey: false })
@@ -9,13 +10,17 @@ export class StatsOpenInterestDetails {
     @Prop()
     expirationDate: Date;
 
-    @Field()
+    @Field({ nullable: true })
     @Prop()
     strike: number;
 
     @Field()
     @Prop()
-    openInterestChanges: number;
+    openInterest: number;
+
+    @Field()
+    @Prop()
+    volume: number;
 }
 
 export type StatsOpenInterestDetailsDocument = StatsOpenInterestDetails & mongoose.Document;
@@ -29,6 +34,10 @@ export class Stats {
     @Prop()
     base: string;
 
+    @Field((): typeof EMarketKey => EMarketKey)
+    @Prop({ enum: EMarketKey, type: String })
+    marketKey: EMarketKey;
+
     @Field()
     @Prop()
     date: Date;
@@ -39,7 +48,7 @@ export class Stats {
 
     @Field()
     @Prop()
-    openInterestChanges: number;
+    openInterest: number;
 
     @Field((): Array<typeof StatsOpenInterestDetails> => [StatsOpenInterestDetails])
     @Prop({ type: [StatsOpenInterestDetailsSchema] })
