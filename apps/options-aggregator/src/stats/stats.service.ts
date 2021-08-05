@@ -8,7 +8,7 @@ import { Model } from 'mongoose';
 import { EMarketKey } from '@app/shared/market.schema';
 import * as sleep from 'sleep-promise';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Stats, StatsDocument } from '@app/shared/stats.schema';
+import { Stats, StatsDocument, StatsOpenInterestDetails } from '@app/shared/stats.schema';
 
 type TOptionNamesWithMeta = Array<{
     name: string;
@@ -47,6 +47,19 @@ type TOkexInstrumentResponse = {
     open_interest: string;
 };
 
+type TDeribitCandleResponse = {
+    result: {
+        status: string;
+        volume: [number];
+    };
+};
+
+type TDeribitInstrumentResponse = {
+    result: {
+        open_interest: string;
+    };
+};
+
 type TCacheItem = {
     base: string;
     marketKey: EMarketKey;
@@ -75,8 +88,7 @@ export class StatsService {
         @InjectModel(Stats.name) private statsModel: Model<StatsDocument>,
     ) {}
 
-    // TODO -
-    @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_HOUR)
     private async iteration(): Promise<void> {
         if (this.inProcess) {
             return;
@@ -129,7 +141,7 @@ export class StatsService {
                     this.cache.push(result);
                 }
             } catch (error) {
-                // Do nothing
+                this.logger.error(error);
             }
 
             await sleep(rateLimit * 2);
@@ -142,7 +154,6 @@ export class StatsService {
     ): Promise<TCacheItem> {
         const candleStartTime: number = moment().startOf('hour').subtract(1, 'hour').valueOf();
         const candleEndTime: number = moment().startOf('hour').subtract(1, 'ms').valueOf();
-
         const candleResponse: TBinanceCandleResponse = await this.binanceExchange.fetch(
             `${BINANCE_API}/klines?interval=1h&symbol=${name}&startTime=${candleStartTime}&endTime=${candleEndTime}`,
             'GET',
@@ -184,7 +195,7 @@ export class StatsService {
             return;
         }
 
-        const volume = Number(candleResponse[0][5]);
+        const volume = Number(candleResponse[0][5]) || 0;
 
         const instrumentResponse: TOkexInstrumentResponse = await this.okexExchange.fetch(
             `${OKEX_API}/instruments/${base}-USD/summary/${name}`,
@@ -195,7 +206,7 @@ export class StatsService {
             return;
         }
 
-        const openInterest = Number(instrumentResponse.open_interest);
+        const openInterest = Number(instrumentResponse.open_interest) || 0;
 
         return {
             name,
@@ -212,8 +223,37 @@ export class StatsService {
         { name, base, expirationDate, strike }: TOptionNamesWithMeta[0],
         marketKey,
     ): Promise<TCacheItem> {
-        // TODO -
-        return;
+        const candleStartTime: number = moment().startOf('hour').subtract(1, 'hour').valueOf();
+        const candleEndTime: number = moment().startOf('hour').valueOf();
+
+        const candleResponse: TDeribitCandleResponse = await this.deribitExchange.fetch(
+            `${DERIBIT_API}/public/get_tradingview_chart_data?resolution=60` +
+                `&instrument_name=${name}&start_timestamp=${candleStartTime}&end_timestamp=${candleEndTime}`,
+            'GET',
+        );
+
+        let volume = 0;
+
+        if (candleResponse.result.status === 'ok') {
+            volume += Number(candleResponse.result.volume[0]) || 0;
+        }
+
+        const instrumentResponse: TDeribitInstrumentResponse = await this.deribitExchange.fetch(
+            `${DERIBIT_API}/public/get_book_summary_by_instrument?instrument_name=${name}`,
+            'GET',
+        );
+
+        const openInterest: number = Number(instrumentResponse.result.open_interest) || 0;
+
+        return {
+            name,
+            base,
+            expirationDate,
+            strike,
+            volume,
+            marketKey,
+            openInterest,
+        };
     }
 
     private async extractOptionNamesWithMeta(marketKey: EMarketKey): Promise<TOptionNamesWithMeta> {
@@ -232,8 +272,50 @@ export class StatsService {
 
     private async buildStats(): Promise<void> {
         for (const base of await this.getBases()) {
-            // TODO -
+            for (const marketKey of Object.values(EMarketKey)) {
+                const cached = this.cache.filter((item) => item.base === base && item.marketKey === marketKey);
+
+                await this.buildStatsFor(base, marketKey, cached);
+            }
         }
+    }
+
+    private async buildStatsFor(base: string, marketKey: EMarketKey, items: Array<TCacheItem>): Promise<void> {
+        let volume = 0;
+        let openInterest = 0;
+        const openInterestDetails: Array<StatsOpenInterestDetails> = [];
+
+        for (const item of items) {
+            volume += item.volume;
+            openInterest += item.openInterest;
+
+            let currentDetails = openInterestDetails.find(
+                (resultItem) => resultItem.expirationDate === item.expirationDate && resultItem.strike === item.strike,
+            );
+
+            if (!currentDetails) {
+                currentDetails = {
+                    expirationDate: item.expirationDate,
+                    strike: item.strike,
+                    openInterest: 0,
+                    volume: 0,
+                };
+
+                openInterestDetails.push(currentDetails);
+            }
+
+            currentDetails.volume += volume;
+            currentDetails.openInterest += openInterest;
+        }
+
+        await this.statsModel.create({
+            volume,
+            openInterest,
+            openInterestDetails,
+            base,
+            marketKey,
+            date: moment.utc().startOf('hour').toDate(),
+        });
     }
 
     private async getBases(): Promise<Array<string>> {
