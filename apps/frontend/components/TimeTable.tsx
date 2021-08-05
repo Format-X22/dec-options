@@ -127,8 +127,6 @@ export function TimeTable(): JSX.Element {
         }, 1000);
     }, []);
 
-    console.log(data);
-
     useEffect((): void => {
         if (data?.expirations?.length) {
             if (data && !value && onChange) {

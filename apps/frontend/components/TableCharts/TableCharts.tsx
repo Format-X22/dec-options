@@ -2,7 +2,7 @@ import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import styled from 'styled-components';
-import { gql } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 
 const options: Highcharts.Options = {
     title: {
@@ -191,16 +191,20 @@ const ChartsHeader = styled.div`
     }
 `;
 
-// const GET_STATS = gql`
-//     query getStats {
-//         stats {
-//             usdPrice
-//             symbol
-//         }
-//     }
-// `;
+const GET_STATS = gql`
+    query getStats {
+        stats {
+            base
+            date
+            volume
+            openInterestChanges
+        }
+    }
+`;
 
 const TableCharts = () => {
+    const { loading: loadingStats, data: dataStats } = useQuery(GET_STATS);
+    console.log(dataStats);
     return (
         <ChartsRow>
             <ChartsCol>
