@@ -10,13 +10,13 @@ build_stage:
   only:
     refs:
       - develop
-  image: node:lts
+  image: node:14-alpine
   stage: build
   script:
-    - npm i
+    - yarn
     - mv .env.example.staging .env
     - cat .env
-    - CI=false npm run build:all
+    - CI=false yarn build:all
     - mkdir bundle
     - mv dist bundle/
     - mv apps bundle/
@@ -34,13 +34,13 @@ build_production:
   only:
     refs:
       - master
-  image: node:lts
+  image: node:14-alpine
   stage: build
   script:
-    - npm i
+    - yarn
     - mv .env.example .env
     - cat .env
-    - CI=false npm run build:all
+    - CI=false yarn build:all
     - mkdir bundle
     - mv dist bundle/
     - mv apps bundle/
