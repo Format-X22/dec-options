@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -12,17 +12,13 @@ const options: Highcharts.Options = {
     },
     xAxis: {
         tickmarkPlacement: 'on',
-        title: {
-            enabled: false,
-        },
-        zoomType: 'x',
     },
     yAxis: {
         opposite: true,
         labels: {
             align: 'center',
             formatter: function () {
-                return this.value;
+                return `${this.value}`;
             },
         },
     },
@@ -156,6 +152,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
               }))
             : [];
     console.log(series);
+    const a = 2;
     return (
         <ChartsCol>
             <ChartsHeader>
@@ -163,6 +160,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
                 <div>
                     {baseList.map((base) => (
                         <button
+                            a={2}
                             key={base}
                             type='button'
                             className={selectedBase === base ? 'active' : ''}
