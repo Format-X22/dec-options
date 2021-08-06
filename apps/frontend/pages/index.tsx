@@ -6,6 +6,7 @@ import { ActionType, ContextState } from './stateType';
 import StrikesTable from '../components/StrikesTable/StrikesTable';
 import { gql, useQuery } from '@apollo/client';
 import Layout from '../components/Layout/Layout';
+import TableCharts from '../components/TableCharts/TableCharts';
 
 const GET_BASES = gql`
     query getBases {
@@ -88,6 +89,7 @@ function Index(): JSX.Element {
     return (
         <Layout>
             <Filters />
+            <TableCharts />
             <StrikesTable />
         </Layout>
     );
