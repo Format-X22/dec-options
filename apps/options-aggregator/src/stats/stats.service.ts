@@ -88,7 +88,7 @@ export class StatsService {
         @InjectModel(Stats.name) private statsModel: Model<StatsDocument>,
     ) {}
 
-    @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_HOUR)
     private async iteration(): Promise<void> {
         if (this.inProcess) {
             return;
