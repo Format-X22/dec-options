@@ -53,6 +53,11 @@ export class Stats {
     @Field((): Array<typeof StatsOpenInterestDetails> => [StatsOpenInterestDetails])
     @Prop({ type: [StatsOpenInterestDetailsSchema] })
     openInterestDetails: Array<StatsOpenInterestDetails>;
+
+    // TODO ?
+    @Field()
+    @Prop()
+    impliedVolatility: number;
 }
 
 export type StatsDocument = Stats & mongoose.Document;
