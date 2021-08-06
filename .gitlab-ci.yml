@@ -13,10 +13,10 @@ build_stage:
   image: node:lts
   stage: build
   script:
-    - yarn
+    - npm i
     - mv .env.example.staging .env
     - cat .env
-    - CI=false yarn build:all
+    - CI=false npm run build:all
     - mkdir bundle
     - mv dist bundle/
     - mv apps bundle/
@@ -37,10 +37,10 @@ build_production:
   image: node:lts
   stage: build
   script:
-    - yarn
+    - npm i
     - mv .env.example .env
     - cat .env
-    - CI=false yarn build:all
+    - CI=false npm run build:all
     - mkdir bundle
     - mv dist bundle/
     - mv apps bundle/

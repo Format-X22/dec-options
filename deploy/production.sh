@@ -25,10 +25,10 @@ echo "clear old directory"
 rm -rf /var/www/opex/production/current/*
 
 echo "Copy source to directory"
-cd /var/www/opex/stage/source/ && yarn
+cd /var/www/opex/stage/source/ && npm
 mkdir /var/www/opex/production/current
 cp -r /var/www/opex/production/source/* /var/www/opex/production/current
 cp /var/www/opex/production/source/.env /var/www/opex/production/current
 
 echo "Start new process"
-cd /var/www/opex/production/current && yarn pm2:start:all:production
+cd /var/www/opex/production/current && npm run pm2:start:all:production

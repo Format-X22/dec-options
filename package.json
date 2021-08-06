@@ -25,10 +25,10 @@
     "start:agg": "nest start options-aggregator",
     "start:prod:api": "node dist/apps/aggregation-api/apps/aggregation-api/src/main.js",
     "start:prod:agg": "node dist/apps/options-aggregator/apps/options-aggregator/src/main.js",
-    "pm2:start:all:production": "yarn pm2:start:agg:production; yarn pm2:start:api:production;",
+    "pm2:start:all:production": "npm run pm2:start:agg:production; npm run pm2:start:api:production;",
     "pm2:start:api:production": "NODE_ENV=production pm2 stop opex_api; pm2 delete opex_api; pm2 start ecosystem.config.js --only opex_api",
     "pm2:start:agg:production": "NODE_ENV=production pm2 stop opex_agg; pm2 delete opex_agg; pm2 start ecosystem.config.js --only opex_agg",
-    "pm2:start:all:staging": "yarn pm2:start:agg:staging; yarn pm2:start:api:staging;",
+    "pm2:start:all:staging": "npm run pm2:start:agg:staging; npm run pm2:start:api:staging;",
     "pm2:start:api:staging": "NODE_ENV=production pm2 stop opex_api_staging; pm2 delete opex_api_staging; pm2 start ecosystem.config.js --only opex_api_staging",
     "pm2:start:agg:staging": "NODE_ENV=production pm2 stop opex_agg_staging; pm2 delete opex_agg_staging; pm2 start ecosystem.config.js --only opex_agg_staging"
   },
