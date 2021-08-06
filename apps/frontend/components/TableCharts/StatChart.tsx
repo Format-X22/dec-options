@@ -69,6 +69,7 @@ const options: Highcharts.Options = {
             'line-height': '18px',
             fontWeight: '400',
             textOverflow: 'ellipsis',
+            'text-transform': 'capitalize',
         },
         itemHoverStyle: {
             color: '#ffffff',
@@ -142,12 +143,16 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
     const series =
         data && selectedBase
             ? Object.keys(data[selectedBase]).map((marketKey) => ({
-                  name: marketKey,
+                  name: marketKey.toLocaleLowerCase(),
                   data: data[selectedBase][marketKey].map((marketData) => +marketData[chartKey].toFixed(2)),
                   dates: data[selectedBase][marketKey].map(({ date }) => {
                       const dateObject = new Date(date);
                       return new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(dateObject);
                   }),
+                  marker: {
+                      radius: 1,
+                      symbol: 'circle',
+                  },
               }))
             : [];
     console.log(series);
