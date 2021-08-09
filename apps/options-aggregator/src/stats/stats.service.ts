@@ -110,7 +110,7 @@ export class StatsService {
         private priceService: PriceService,
     ) {}
 
-    @Cron(CronExpression.EVERY_MINUTE)
+    @Cron(CronExpression.EVERY_HOUR)
     private async iteration(): Promise<void> {
         if (this.inProcess) {
             return;
