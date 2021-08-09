@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: 'opex_api',
-            script: 'yarn',
+            script: 'npm',
             interpreter: 'none',
             args: 'run start:prod:api',
             env: {
@@ -14,7 +14,7 @@ module.exports = {
         },
         {
             name: 'opex_agg',
-            script: 'yarn',
+            script: 'npm',
             interpreter: 'none',
             args: 'run start:prod:agg',
             env: {
@@ -26,7 +26,7 @@ module.exports = {
         },
         {
             name: 'opex_api_staging',
-            script: 'yarn',
+            script: 'npm',
             interpreter: 'none',
             args: 'run start:prod:api',
             env: {
@@ -38,7 +38,7 @@ module.exports = {
         },
         {
             name: 'opex_agg_staging',
-            script: 'yarn',
+            script: 'npm',
             interpreter: 'none',
             args: 'run start:prod:agg',
             env: {
