@@ -94,7 +94,7 @@ export class Option {
 
     @Prop({ enum: EOptionType, type: String })
     @Field((): typeof EOptionType => EOptionType)
-    type?: EOptionType;
+    type: EOptionType;
 
     @Prop({ enum: EOptionDeliveryType, type: String })
     @Field((): typeof EOptionDeliveryType => EOptionDeliveryType)

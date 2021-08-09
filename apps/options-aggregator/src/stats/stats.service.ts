@@ -1,20 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as ccxt from 'ccxt';
+import * as iv from 'implied-volatility';
 import * as moment from 'moment';
 import { Exchange } from 'ccxt';
 import { InjectModel } from '@nestjs/mongoose';
-import { Option, OptionDocument } from '@app/shared/option.schema';
+import { EOptionType, ESymbol, Option, OptionDocument } from '@app/shared/option.schema';
 import { Model } from 'mongoose';
 import { EMarketKey } from '@app/shared/market.schema';
 import * as sleep from 'sleep-promise';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Stats, StatsDocument, StatsOpenInterestDetails } from '@app/shared/stats.schema';
+import { Stats, StatsDocument, StatsDetails } from '@app/shared/stats.schema';
+import { PriceService } from '../price/price.service';
 
 type TOptionNamesWithMeta = Array<{
     name: string;
-    base: string;
+    base: ESymbol;
     expirationDate: Date;
     strike: number;
+    type: EOptionType;
 }>;
 
 type TBinanceCandleResponse = {
@@ -27,6 +30,17 @@ type TBinanceCandleResponse = {
                   volume: string;
               },
           ];
+};
+
+type TBinanceInstrumentResponse = {
+    code: string;
+    msg: string;
+    data: [
+        {
+            askPrice: string;
+            bidPrice: string;
+        },
+    ];
 };
 
 type TOkexCandleResponse =
@@ -45,6 +59,8 @@ type TOkexCandleResponse =
 
 type TOkexInstrumentResponse = {
     open_interest: string;
+    best_ask: string;
+    best_bid: string;
 };
 
 type TDeribitCandleResponse = {
@@ -57,6 +73,8 @@ type TDeribitCandleResponse = {
 type TDeribitInstrumentResponse = {
     result: {
         open_interest: string;
+        bid_price: string;
+        ask_price: string;
     };
 };
 
@@ -68,6 +86,7 @@ type TCacheItem = {
     strike: number;
     volume: number;
     openInterest: number;
+    impliedVolatility: number;
 };
 
 const BINANCE_API = 'https://vapi.binance.com/vapi/v1';
@@ -86,6 +105,7 @@ export class StatsService {
     constructor(
         @InjectModel(Option.name) private optionModel: Model<OptionDocument>,
         @InjectModel(Stats.name) private statsModel: Model<StatsDocument>,
+        private priceService: PriceService,
     ) {}
 
     @Cron(CronExpression.EVERY_HOUR)
@@ -98,7 +118,7 @@ export class StatsService {
         this.cache = [];
 
         try {
-            this.logger.log('Trade history sync started');
+            this.logger.verbose('Trade history sync started');
 
             const results = await Promise.allSettled([
                 this.syncCexStock(EMarketKey.BINANCE, this.syncBinanceOption, this.binanceExchange.rateLimit),
@@ -106,7 +126,7 @@ export class StatsService {
                 this.syncCexStock(EMarketKey.DERIBIT, this.syncDeribitOption, this.deribitExchange.rateLimit),
             ]);
 
-            this.logger.log('Trade history sync complete');
+            this.logger.verbose('Trade history sync complete');
 
             for (const result of results) {
                 if (result.status === 'rejected') {
@@ -114,11 +134,11 @@ export class StatsService {
                 }
             }
 
-            this.logger.log('Stats build started');
+            this.logger.verbose('Stats build started');
 
             await this.buildStats();
 
-            this.logger.log('Stats build complete');
+            this.logger.verbose('Stats build complete');
         } catch (error) {
             this.logger.error(error);
         }
@@ -149,7 +169,7 @@ export class StatsService {
     }
 
     private async syncBinanceOption(
-        { name, base, expirationDate, strike }: TOptionNamesWithMeta[0],
+        { name, base, expirationDate, strike, type }: TOptionNamesWithMeta[0],
         marketKey,
     ): Promise<TCacheItem> {
         const candleStartTime: number = moment().startOf('hour').subtract(1, 'hour').valueOf();
@@ -169,6 +189,20 @@ export class StatsService {
 
         const volume = Number(candleResponse.data[0].volume);
 
+        const instrumentResponse: TBinanceInstrumentResponse = await this.binanceExchange.fetch(
+            `${BINANCE_API}/ticker?symbol=${name}`,
+            'GET',
+        );
+        const data = instrumentResponse.data[0];
+        const impliedVolatility = await this.calcImpliedVolatility({
+            minAsk: Number(data.askPrice),
+            maxBid: Number(data.bidPrice),
+            base,
+            expirationDate,
+            strike,
+            type,
+        });
+
         return {
             name,
             base,
@@ -177,11 +211,12 @@ export class StatsService {
             volume,
             marketKey,
             openInterest: 0,
+            impliedVolatility,
         };
     }
 
     private async syncOkexOption(
-        { name, base, expirationDate, strike }: TOptionNamesWithMeta[0],
+        { name, base, expirationDate, strike, type }: TOptionNamesWithMeta[0],
         marketKey,
     ): Promise<TCacheItem> {
         const candleStartTime: string = moment.utc().startOf('hour').subtract(1, 'hour').toISOString();
@@ -207,6 +242,14 @@ export class StatsService {
         }
 
         const openInterest = Number(instrumentResponse.open_interest) || 0;
+        const impliedVolatility = await this.calcImpliedVolatility({
+            strike,
+            base,
+            expirationDate,
+            type,
+            minAsk: Number(instrumentResponse.best_ask),
+            maxBid: Number(instrumentResponse.best_bid),
+        });
 
         return {
             name,
@@ -216,11 +259,12 @@ export class StatsService {
             volume,
             marketKey,
             openInterest,
+            impliedVolatility,
         };
     }
 
     private async syncDeribitOption(
-        { name, base, expirationDate, strike }: TOptionNamesWithMeta[0],
+        { name, base, expirationDate, strike, type }: TOptionNamesWithMeta[0],
         marketKey,
     ): Promise<TCacheItem> {
         const candleStartTime: number = moment().startOf('hour').subtract(1, 'hour').valueOf();
@@ -244,6 +288,15 @@ export class StatsService {
         );
 
         const openInterest: number = Number(instrumentResponse.result.open_interest) || 0;
+        const data = instrumentResponse.result;
+        const impliedVolatility = await this.calcImpliedVolatility({
+            minAsk: Number(data.ask_price) || 0,
+            maxBid: Number(data.bid_price) || 0,
+            strike,
+            base,
+            expirationDate,
+            type,
+        });
 
         return {
             name,
@@ -253,13 +306,14 @@ export class StatsService {
             volume,
             marketKey,
             openInterest,
+            impliedVolatility,
         };
     }
 
     private async extractOptionNamesWithMeta(marketKey: EMarketKey): Promise<TOptionNamesWithMeta> {
         const optionNamesModels: Array<OptionDocument> = await this.optionModel.find(
             { marketKey, expirationDate: { $gt: new Date() } },
-            { _id: false, name: true, base: true, expirationDate: true, strike: true },
+            { _id: false, name: true, base: true, expirationDate: true, strike: true, type: true },
         );
 
         if (!optionNamesModels) {
@@ -283,13 +337,13 @@ export class StatsService {
     private async buildStatsFor(base: string, marketKey: EMarketKey, items: Array<TCacheItem>): Promise<void> {
         let volume = 0;
         let openInterest = 0;
-        const openInterestDetails: Array<StatsOpenInterestDetails> = [];
+        const details: Array<StatsDetails> = [];
 
         for (const item of items) {
             volume += item.volume;
             openInterest += item.openInterest;
 
-            let currentDetails = openInterestDetails.find(
+            let currentDetails = details.find(
                 (resultItem) => resultItem.expirationDate === item.expirationDate && resultItem.strike === item.strike,
             );
 
@@ -299,19 +353,26 @@ export class StatsService {
                     strike: item.strike,
                     openInterest: 0,
                     volume: 0,
+                    impliedVolatility: 0,
+                    impliedVolatilityCount: 0,
                 };
 
-                openInterestDetails.push(currentDetails);
+                details.push(currentDetails);
             }
 
             currentDetails.volume += volume;
             currentDetails.openInterest += openInterest;
+
+            const IVSumPart = currentDetails.impliedVolatility / currentDetails.impliedVolatilityCount || 0;
+            const nextCount = ++currentDetails.impliedVolatilityCount;
+
+            currentDetails.impliedVolatility = (IVSumPart + item.impliedVolatility) / nextCount;
         }
 
         await this.statsModel.create({
             volume,
             openInterest,
-            openInterestDetails,
+            details,
             base,
             marketKey,
             date: moment.utc().startOf('hour').toDate(),
@@ -320,5 +381,31 @@ export class StatsService {
 
     private async getBases(): Promise<Array<string>> {
         return this.optionModel.distinct('base');
+    }
+
+    private async calcImpliedVolatility({
+        minAsk,
+        maxBid,
+        strike,
+        expirationDate,
+        type,
+        base,
+    }: {
+        minAsk: number;
+        maxBid: number;
+        strike: number;
+        expirationDate: Date;
+        type: EOptionType;
+        base: ESymbol;
+    }): Promise<number> {
+        const currentPrice = await this.priceService.getPrice(base);
+
+        minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
+        maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
+
+        const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
+        const datesDifference = Math.abs(moment(expirationDate).diff(new Date(), 'days') + 1) / 365;
+
+        return iv.getImpliedVolatility(optionPrice, currentPrice, strike, datesDifference, 0, type.toLowerCase());
     }
 }
