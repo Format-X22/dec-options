@@ -5,7 +5,7 @@ import { EMarketKey } from '@app/shared/market.schema';
 
 @ObjectType()
 @Schema({ versionKey: false })
-export class StatsOpenInterestDetails {
+export class StatsDetails {
     @Field()
     @Prop()
     expirationDate: Date;
@@ -21,11 +21,19 @@ export class StatsOpenInterestDetails {
     @Field()
     @Prop()
     volume: number;
+
+    @Field()
+    @Prop()
+    impliedVolatility: number;
+
+    impliedVolatilityCount?: number;
 }
 
-export type StatsOpenInterestDetailsDocument = StatsOpenInterestDetails & mongoose.Document;
-export const StatsOpenInterestDetailsSchema: mongoose.Schema<StatsOpenInterestDetailsDocument> =
-    SchemaFactory.createForClass<StatsOpenInterestDetails, StatsOpenInterestDetailsDocument>(StatsOpenInterestDetails);
+export type StatsDetailsDocument = StatsDetails & mongoose.Document;
+export const StatsDetailsSchema: mongoose.Schema<StatsDetailsDocument> = SchemaFactory.createForClass<
+    StatsDetails,
+    StatsDetailsDocument
+>(StatsDetails);
 
 @ObjectType()
 @Schema({ versionKey: false })
@@ -50,14 +58,9 @@ export class Stats {
     @Prop()
     openInterest: number;
 
-    @Field((): Array<typeof StatsOpenInterestDetails> => [StatsOpenInterestDetails])
-    @Prop({ type: [StatsOpenInterestDetailsSchema] })
-    openInterestDetails: Array<StatsOpenInterestDetails>;
-
-    // TODO ?
-    @Field()
-    @Prop()
-    impliedVolatility: number;
+    @Field((): Array<typeof StatsDetails> => [StatsDetails])
+    @Prop({ type: [StatsDetailsSchema] })
+    details: Array<StatsDetails>;
 }
 
 export type StatsDocument = Stats & mongoose.Document;

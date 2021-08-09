@@ -9,7 +9,7 @@ import { Model } from 'mongoose';
 import { EMarketKey } from '@app/shared/market.schema';
 import * as sleep from 'sleep-promise';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Stats, StatsDocument, StatsOpenInterestDetails } from '@app/shared/stats.schema';
+import { Stats, StatsDocument, StatsDetails } from '@app/shared/stats.schema';
 import { PriceService } from '../price/price.service';
 
 type TOptionNamesWithMeta = Array<{
@@ -193,9 +193,10 @@ export class StatsService {
             `${BINANCE_API}/ticker?symbol=${name}`,
             'GET',
         );
+        const data = instrumentResponse.data[0];
         const impliedVolatility = await this.calcImpliedVolatility({
-            minAsk: Number(instrumentResponse.data[0].askPrice),
-            maxBid: Number(instrumentResponse.data[0].bidPrice),
+            minAsk: Number(data.askPrice),
+            maxBid: Number(data.bidPrice),
             base,
             expirationDate,
             strike,
@@ -287,9 +288,10 @@ export class StatsService {
         );
 
         const openInterest: number = Number(instrumentResponse.result.open_interest) || 0;
+        const data = instrumentResponse.result;
         const impliedVolatility = await this.calcImpliedVolatility({
-            minAsk: Number(instrumentResponse.result.ask_price) || 0,
-            maxBid: Number(instrumentResponse.result.bid_price) || 0,
+            minAsk: Number(data.ask_price) || 0,
+            maxBid: Number(data.bid_price) || 0,
             strike,
             base,
             expirationDate,
@@ -335,13 +337,13 @@ export class StatsService {
     private async buildStatsFor(base: string, marketKey: EMarketKey, items: Array<TCacheItem>): Promise<void> {
         let volume = 0;
         let openInterest = 0;
-        const openInterestDetails: Array<StatsOpenInterestDetails> = [];
+        const details: Array<StatsDetails> = [];
 
         for (const item of items) {
             volume += item.volume;
             openInterest += item.openInterest;
 
-            let currentDetails = openInterestDetails.find(
+            let currentDetails = details.find(
                 (resultItem) => resultItem.expirationDate === item.expirationDate && resultItem.strike === item.strike,
             );
 
@@ -351,23 +353,28 @@ export class StatsService {
                     strike: item.strike,
                     openInterest: 0,
                     volume: 0,
+                    impliedVolatility: 0,
+                    impliedVolatilityCount: 0,
                 };
 
-                openInterestDetails.push(currentDetails);
+                details.push(currentDetails);
             }
 
             currentDetails.volume += volume;
             currentDetails.openInterest += openInterest;
+
+            const IVSumPart = currentDetails.impliedVolatility / currentDetails.impliedVolatilityCount || 0;
+            const nextCount = ++currentDetails.impliedVolatilityCount;
+
+            currentDetails.impliedVolatility = (IVSumPart + item.impliedVolatility) / nextCount;
         }
 
         await this.statsModel.create({
             volume,
             openInterest,
-            openInterestDetails,
+            details,
             base,
             marketKey,
-            // TODO -
-            impliedVolatility: 0,
             date: moment.utc().startOf('hour').toDate(),
         });
     }
