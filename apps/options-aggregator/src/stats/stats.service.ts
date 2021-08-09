@@ -118,7 +118,7 @@ export class StatsService {
         this.cache = [];
 
         try {
-            this.logger.log('Trade history sync started');
+            this.logger.verbose('Trade history sync started');
 
             const results = await Promise.allSettled([
                 this.syncCexStock(EMarketKey.BINANCE, this.syncBinanceOption, this.binanceExchange.rateLimit),
@@ -126,7 +126,7 @@ export class StatsService {
                 this.syncCexStock(EMarketKey.DERIBIT, this.syncDeribitOption, this.deribitExchange.rateLimit),
             ]);
 
-            this.logger.log('Trade history sync complete');
+            this.logger.verbose('Trade history sync complete');
 
             for (const result of results) {
                 if (result.status === 'rejected') {
@@ -134,11 +134,11 @@ export class StatsService {
                 }
             }
 
-            this.logger.log('Stats build started');
+            this.logger.verbose('Stats build started');
 
             await this.buildStats();
 
-            this.logger.log('Stats build complete');
+            this.logger.verbose('Stats build complete');
         } catch (error) {
             this.logger.error(error);
         }
