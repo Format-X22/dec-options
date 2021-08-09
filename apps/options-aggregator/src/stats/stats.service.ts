@@ -71,11 +71,13 @@ type TDeribitCandleResponse = {
 };
 
 type TDeribitInstrumentResponse = {
-    result: {
-        open_interest: string;
-        bid_price: string;
-        ask_price: string;
-    };
+    result: [
+        {
+            open_interest: string;
+            bid_price: string;
+            ask_price: string;
+        },
+    ];
 };
 
 type TCacheItem = {
@@ -108,7 +110,7 @@ export class StatsService {
         private priceService: PriceService,
     ) {}
 
-    @Cron(CronExpression.EVERY_HOUR)
+    @Cron(CronExpression.EVERY_MINUTE)
     private async iteration(): Promise<void> {
         if (this.inProcess) {
             return;
@@ -287,8 +289,8 @@ export class StatsService {
             'GET',
         );
 
-        const openInterest: number = Number(instrumentResponse.result.open_interest) || 0;
-        const data = instrumentResponse.result;
+        const openInterest: number = Number(instrumentResponse.result[0].open_interest) || 0;
+        const data = instrumentResponse.result[0];
         const impliedVolatility = await this.calcImpliedVolatility({
             minAsk: Number(data.ask_price) || 0,
             maxBid: Number(data.bid_price) || 0,
