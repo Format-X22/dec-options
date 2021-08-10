@@ -82,6 +82,7 @@ type TDeribitInstrumentResponse = {
 
 type TCacheItem = {
     base: string;
+    type: EOptionType,
     marketKey: EMarketKey;
     name: string;
     expirationDate: Date;
@@ -208,6 +209,7 @@ export class StatsService {
         return {
             name,
             base,
+            type,
             expirationDate,
             strike,
             volume,
@@ -256,6 +258,7 @@ export class StatsService {
         return {
             name,
             base,
+            type,
             expirationDate,
             strike,
             volume,
@@ -303,6 +306,7 @@ export class StatsService {
         return {
             name,
             base,
+            type,
             expirationDate,
             strike,
             volume,
@@ -353,6 +357,7 @@ export class StatsService {
                 currentDetails = {
                     expirationDate: item.expirationDate,
                     strike: item.strike,
+                    type: item.type,
                     openInterest: 0,
                     volume: 0,
                     impliedVolatility: 0,

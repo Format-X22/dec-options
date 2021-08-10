@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { EMarketKey } from '@app/shared/market.schema';
+import { EOptionType } from '@app/shared/option.schema';
 
 @ObjectType()
 @Schema({ versionKey: false })
@@ -13,6 +14,10 @@ export class StatsDetails {
     @Field({ nullable: true })
     @Prop()
     strike: number;
+
+    @Field()
+    @Prop()
+    type: EOptionType
 
     @Field()
     @Prop()
