@@ -8,13 +8,25 @@ import { ITradeQuery } from '../../dtos/ITradeQuery';
 
 const StyledInfo = styled.div`
     width: 100%;
-    display: flex;
-    justify-content: left;
     background: ${$backgroundLight};
-    padding: 10px 24px;
-    flex-direction: row;
-    align-items: center;
-    flex: 1;
+
+    > div {
+        display: flex;
+        align-items: flex-end;
+        padding: 8px 24px 24px;
+
+        &:first-child {
+            padding: 24px;
+        }
+    }
+`;
+
+const BaseText = styled.span`
+    font-size: 32px;
+    line-height: 32px;
+    color: white;
+    margin-right: 8px;
+    margin-left: 25px;
 `;
 
 const Text = styled.span`
@@ -35,18 +47,19 @@ export function GroupInfo(): JSX.Element {
 
     return (
         <StyledInfo>
-            <Button
-                onClick={() => {
-                    router.back();
-                }}
-            >
-                &lt;&lt;&lt; back
-            </Button>
-            <Space />
-            <Text>{base}</Text>
-            <Text>{dateString}</Text>
-            <Text>{strike}</Text>
-            {type === 'call' ? <Text>{'CALL'}</Text> : <Text>{'PUT'}</Text>}
+            <div>
+                <Button
+                    onClick={() => {
+                        router.back();
+                    }}
+                >
+                    &lt; Go back
+                </Button>
+                <BaseText>{base}</BaseText>
+                <Text>{dateString}</Text>
+                <Text>{strike}</Text>
+                {type === 'call' ? <Text>{'CALL'}</Text> : <Text>{'PUT'}</Text>}
+            </div>
         </StyledInfo>
     );
 }

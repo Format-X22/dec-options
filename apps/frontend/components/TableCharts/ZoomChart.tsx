@@ -96,92 +96,34 @@ const ChartsCol = styled.div`
     }
 `;
 
-const ChartsHeader = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    h3 {
-        margin: 0;
-        padding: 24px;
-        font-size: 14px;
-        line-height: 18px;
-        color: #f3f3f3;
-    }
-
-    div {
-        display: flex;
-        align-items: center;
-    }
-
-    button {
-        border-radius: 4px;
-        padding: 7px 16px;
-        font-size: 14px;
-        line-height: 18px;
-        color: #e6e6e6;
-        margin-right: 4px;
-        background-color: #282828;
-        border: none;
-        cursor: pointer;
-
-        &.active,
-        &:hover {
-            background: #393939;
-        }
-    }
-`;
-
 interface IProps {
-    type: 'area' | 'column';
-    title: string;
     chartKey: 'volume' | 'openInterest' | 'impliedVolatility';
     data: {
-        [base: string]: {
-            [marketKey: string]: {
-                volume: number;
-                openInterest: number;
-                date: Date;
-            }[];
-        };
+        [marketKey: string]: {
+            volume: number;
+            openInterest: number;
+            date: Date;
+        }[];
     };
 }
 
-const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
-    const baseList = Object.keys(data);
-    const [selectedBase, setSelectedBase] = useState(baseList[0]);
-    const series =
-        data && selectedBase
-            ? Object.keys(data[selectedBase]).map((marketKey) => ({
-                  name: marketKey.toLocaleLowerCase(),
-                  data: data[selectedBase][marketKey].map((marketData) => +marketData[chartKey].toFixed(2)),
-                  dates: data[selectedBase][marketKey].map(({ date }) => {
-                      const dateObject = new Date(date);
-                      return new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(dateObject);
-                  }),
-                  marker: {
-                      radius: 1,
-                      symbol: 'circle',
-                  },
-              }))
-            : [];
+const ZoomChart: FC<IProps> = ({ chartKey, data }) => {
+    const series = data
+        ? Object.keys(data).map((marketKey) => ({
+              name: marketKey.toLocaleLowerCase(),
+              data: data[marketKey].map((marketData) => +marketData[chartKey].toFixed(2)),
+              dates: data[marketKey].map(({ date }) => {
+                  const dateObject = new Date(date);
+                  return new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(dateObject);
+              }),
+              marker: {
+                  radius: 2,
+                  symbol: 'circle',
+              },
+          }))
+        : [];
     return (
         <ChartsCol>
-            <ChartsHeader>
-                <h3>{title}</h3>
-                <div>
-                    {baseList.map((base) => (
-                        <button
-                            key={base}
-                            type='button'
-                            className={selectedBase === base ? 'active' : ''}
-                            onClick={() => setSelectedBase(base)}
-                        >
-                            {base}
-                        </button>
-                    ))}
-                </div>
-            </ChartsHeader>
             <HighchartsReact
                 highcharts={Highcharts}
                 options={{
@@ -193,16 +135,16 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
                     yAxis: {
                         ...options.yAxis,
                         title: {
-                            text: selectedBase,
+                            text: 'BASE',
                         },
                     },
                     tooltip: {
-                        valueSuffix: ` ${selectedBase}`,
+                        valueSuffix: ` BASE`,
                     },
                     series,
                     chart: {
-                        type,
-                        height: 250,
+                        zoomType: 'x',
+                        height: 450,
                     },
                 }}
             />
@@ -210,4 +152,4 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
     );
 };
 
-export default StatChart;
+export default ZoomChart;

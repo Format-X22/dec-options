@@ -50,7 +50,7 @@ const AsksText: FC = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: red;
+    color: #d27171;
 `;
 
 const BidsText: FC = styled.div`
@@ -60,7 +60,7 @@ const BidsText: FC = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: green;
+    color: #71d298;
 `;
 
 const SubTable: FC<{ reverse?: boolean }> = styled.div`

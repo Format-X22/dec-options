@@ -5,25 +5,44 @@ import styled from 'styled-components';
 import Trade from './Trade';
 
 const PanelBodyWrap = styled.div`
-    margin: 4px 0;
+    padding: 24px;
     display: flex;
     flex-direction: row;
     align-content: space-between;
     justify-content: flex-start;
     overflow: hidden;
     flex: 100;
+    background: #303030;
 
     & > div + div {
         margin-left: 5px;
+        width: 100%;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+        &::-webkit-scrollbar {
+            padding: 2px;
+            width: 12px;
+            height: 12px;
+            background: #000000;
+        }
+        &:hover::-webkit-scrollbar-thumb {
+            background: #303030;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
     }
 `;
 const OrderBookWrap = styled.div`
-    width: 50%;
+    width: 450px;
     display: flex;
     flex-direction: column;
 
     @media screen and (max-width: 576px) {
-      width: 100%;
+        width: 100%;
     }
 `;
 
@@ -35,9 +54,7 @@ export function OptionsPanel(): JSX.Element {
                 <OrderBookWrap>
                     <OrderBook />
                 </OrderBookWrap>
-                <OrderBookWrap>
-                  <Trade />
-                </OrderBookWrap>
+                <Trade />
             </PanelBodyWrap>
         </>
     );

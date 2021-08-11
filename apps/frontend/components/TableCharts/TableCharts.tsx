@@ -6,20 +6,6 @@ import StatChart from './StatChart';
 const ChartsRow = styled.div`
     display: flex;
     margin-bottom: 2px;
-
-    svg {
-        border: 1px solid #343434;
-        box-sizing: border-box;
-    }
-    .highcharts-container {
-        width: 100% !important;
-    }
-    .highcharts-background {
-        fill: #303030;
-    }
-    .highcharts-grid-line {
-        stroke: #343434;
-    }
 `;
 
 const GET_STATS = gql`
@@ -30,6 +16,13 @@ const GET_STATS = gql`
             volume
             openInterest
             marketKey
+            details {
+                expirationDate
+                strike
+                openInterest
+                volume
+                impliedVolatility
+            }
         }
     }
 `;
