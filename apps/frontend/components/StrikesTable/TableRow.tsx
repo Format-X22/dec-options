@@ -4,13 +4,14 @@ import { $backgroundLight, $lineColor, $tableRowHover } from '../../theme';
 
 type TableRowProps = {
     reverse?: boolean;
+    maxHeight?: number;
     onClick?: () => void;
     className?: string;
 };
 export const TableRow: FC<TableRowProps> = styled.div`
     display: flex;
     width: 100%;
-    max-height: 48px;
+    max-height: ${({ maxHeight }: TableRowProps) => (maxHeight ? `${maxHeight}px` : '48px')};
     background: ${$backgroundLight};
     align-items: center;
     justify-content: center;

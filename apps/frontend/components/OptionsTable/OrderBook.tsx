@@ -176,10 +176,10 @@ export function OrderBook(): JSX.Element {
 
     return (
         <>
-            <TableRow>
+            <TableRow maxHeight={52}>
                 <TableCell>ORDER BOOK</TableCell>
             </TableRow>
-            <TableRow className={'TODO-order-book-column-size-scroll-fix'}>
+            <TableRow maxHeight={52} className={'TODO-order-book-column-size-scroll-fix'}>
                 <TableCell className={'TODO-order-book-column-size'}>
                     <TitleText>Price</TitleText>
                 </TableCell>
@@ -193,14 +193,14 @@ export function OrderBook(): JSX.Element {
                     <TitleText>Fees</TitleText>
                 </TableCell>
             </TableRow>
-            {optionGroupError && <TableRow>{optionGroupError.toString()}</TableRow>}
-            {!optionGroupError && error && <TableRow>{error.toString()}</TableRow>}
+            {optionGroupError && <TableRow maxHeight={52}>{optionGroupError.toString()}</TableRow>}
+            {!optionGroupError && error && <TableRow maxHeight={52}>{error.toString()}</TableRow>}
             {!optionGroupError && !error && (
                 <SubTablesWrapper>
                     <SubTable reverse>
                         {asks.slice().map(
                             ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
-                                <TableRow key={`asks-${index}-${price}-${amount}-${marketName}`}>
+                                <TableRow maxHeight={52} key={`asks-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <AsksText>{price}</AsksText>
                                     </TableCell>
@@ -217,7 +217,7 @@ export function OrderBook(): JSX.Element {
                             ),
                         )}
                         {asks.length === 0 && (
-                            <TableRow>
+                            <TableRow maxHeight={52}>
                                 <TableCell>No asks...</TableCell>
                             </TableRow>
                         )}
@@ -226,7 +226,7 @@ export function OrderBook(): JSX.Element {
                     <SubTable>
                         {bids.map(
                             ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
-                                <TableRow key={`bids-${index}-${price}-${amount}-${marketName}`}>
+                                <TableRow maxHeight={52} key={`bids-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <BidsText>{price}</BidsText>
                                     </TableCell>
@@ -243,7 +243,7 @@ export function OrderBook(): JSX.Element {
                             ),
                         )}
                         {bids.length === 0 && (
-                            <TableRow>
+                            <TableRow maxHeight={52}>
                                 <TableCell>No bids...</TableCell>
                             </TableRow>
                         )}

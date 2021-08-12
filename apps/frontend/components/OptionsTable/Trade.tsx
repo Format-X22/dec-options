@@ -1,76 +1,36 @@
-import { gql, useQuery } from '@apollo/client';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import ZoomChart from '../TableCharts/ZoomChart';
+import { useStatsData } from '../../hooks/useStatsData';
 
 const TradeComingSoon = styled.div`
     background: #303030;
-    padding: 31px;
+    padding-left: 31px;
     font-size: 22px;
 `;
-
-const GET_STATS = gql`
-    query getStats {
-        stats {
-            base
-            date
-            volume
-            openInterest
-            marketKey
-            type
-            details {
-                expirationDate
-                strike
-                openInterest
-                volume
-                impliedVolatility
-            }
-        }
-    }
-`;
-
-export type StatsData = {
-    base: string;
-    date: Date;
-    volume: number;
-    openInterest: number;
-    marketKey: string;
-    details: {
-        strike: number;
-        volume: number;
-        openInterest: number;
-        impliedVolatility: number;
-    }[];
-};
 
 const Trade = () => {
     const router = useRouter();
     const { date, strike, base, type } = router.query as unknown as ITradeQuery;
-    const { loading: loadingStats, data: dataStats } = useQuery<{ stats: StatsData[] }>(GET_STATS);
-    // console.log(dataStats.stats);
+    const { loading: loadingStats, data: dataStats } = useStatsData();
     const dataByBase = useMemo(() => {
-        const returnValue = {};
+        const returnValue: { volume: number; openInterest: number; impliedVolatility: number; date: string }[] = [];
         if (dataStats) {
             dataStats.stats
-                .filter((stat) => {
-                    // console.log(stat.date, date, new Date(stat.date), new Date(date), new Date(stat.date).setHours(0,0,0,0) === new Date(date).setHours(0,0,0,0));
-                    return (
-                        new Date(stat.date).setHours(0, 0, 0, 0) === new Date(date).setHours(0, 0, 0, 0) &&
-                        stat.base === base
-                    );
-                })
+                .filter((stat) => stat.base === base)
                 .forEach(({ details }) => {
-                    console.log('DETAILS', details);
-                    if (!returnValue['data']) {
-                        returnValue['data'] = [];
-                    }
-
                     details
-                        .filter((detail) => detail.strike === +strike)
+                        .filter(
+                            (detail) =>
+                                new Date(detail.expirationDate).setHours(0, 0, 0, 0) ===
+                                    new Date(date).setHours(0, 0, 0, 0) &&
+                                detail.strike === +strike &&
+                                detail.type.toLowerCase() === type,
+                        )
                         .forEach(({ volume, openInterest, impliedVolatility }) => {
-                            returnValue['data'].push({
+                            returnValue.push({
                                 volume,
                                 openInterest,
                                 impliedVolatility,
@@ -81,13 +41,15 @@ const Trade = () => {
         }
         return returnValue;
     }, [dataStats]);
-
-    console.log(dataByBase);
     return (
         <TradeComingSoon>
-            {!loadingStats && <ZoomChart data={dataByBase} chartKey='openInterest' />}
-            {!loadingStats && <ZoomChart data={dataByBase} chartKey='volume' />}
-            {!loadingStats && <ZoomChart data={dataByBase} chartKey='impliedVolatility' />}
+            {!loadingStats && (
+                <ZoomChart data={dataByBase} chartKey='openInterest' dataTitle='Open Interest' base={base} />
+            )}
+            {!loadingStats && <ZoomChart data={dataByBase} chartKey='volume' dataTitle='Volume' base={base} />}
+            {!loadingStats && (
+                <ZoomChart data={dataByBase} chartKey='impliedVolatility' dataTitle='Implied Volatility' base='' />
+            )}
         </TradeComingSoon>
     );
 };

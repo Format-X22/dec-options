@@ -53,7 +53,7 @@ export function GroupInfo(): JSX.Element {
                         router.back();
                     }}
                 >
-                    &lt; Go back
+                    &lt;&lt;&lt; Go back
                 </Button>
                 <BaseText>{base}</BaseText>
                 <Text>{dateString}</Text>
