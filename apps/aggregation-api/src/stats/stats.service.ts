@@ -12,6 +12,7 @@ export class StatsService {
             .aggregate([
                 {
                     $project: {
+                        month: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
                         base: 1,
                         marketKey: 1,
                         volume: 1,
