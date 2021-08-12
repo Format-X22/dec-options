@@ -1,49 +1,15 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import { gql, useQuery } from '@apollo/client';
 import StatChart from './StatChart';
+import { useStatsData } from '../../hooks/useStatsData';
 
 const ChartsRow = styled.div`
     display: flex;
     margin-bottom: 2px;
-
-    svg {
-        border: 1px solid #343434;
-        box-sizing: border-box;
-    }
-    .highcharts-container {
-        width: 100% !important;
-    }
-    .highcharts-background {
-        fill: #303030;
-    }
-    .highcharts-grid-line {
-        stroke: #343434;
-    }
 `;
-
-const GET_STATS = gql`
-    query getStats {
-        stats {
-            base
-            date
-            volume
-            openInterest
-            marketKey
-        }
-    }
-`;
-
-export type StatsData = {
-    base: string;
-    date: Date;
-    volume: number;
-    openInterest: number;
-    marketKey: string;
-};
 
 const TableCharts = () => {
-    const { loading: loadingStats, data: dataStats } = useQuery<{ stats: StatsData[] }>(GET_STATS);
+    const { loading: loadingStats, data: dataStats } = useStatsData();
     const dataByBase = useMemo(() => {
         const returnValue = {};
         if (dataStats) {

@@ -30,7 +30,10 @@ function Header({}: { children?: ReactElement | string }): JSX.Element {
     };
     return (
         <StyledHeader>
-            <Logo>OPEX</Logo>
+            <Logo>
+                {/* <img src='/public/logo.png' alt='Opex' /> */}
+                Opex
+            </Logo>
             <Button onClick={openModal}>Connect wallet</Button>
             <Modal visible={connectModalIsVisible} onClose={closeModal} title='Keep calm and just wait'>
                 The connection with Ethereum network will be available soon.

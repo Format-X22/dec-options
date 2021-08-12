@@ -17,7 +17,7 @@ export class StatsDetails {
 
     @Field()
     @Prop()
-    type: EOptionType
+    type: EOptionType;
 
     @Field()
     @Prop()

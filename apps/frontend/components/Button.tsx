@@ -3,16 +3,16 @@ import styled from 'styled-components';
 import { $backgroundLight, $blue } from '../theme';
 
 const StyledButton = styled.button`
-    padding: 8px 24px;
+    padding: 8px 16px;
     border: 1px solid ${$blue};
     color: ${$blue};
-    background: ${$backgroundLight};
+    background: #3a3a3a;
     font-weight: 600;
     font-size: 14px;
     line-height: 18px;
     letter-spacing: 0.16px;
     box-sizing: border-box;
-    border-radius: 2px;
+    border-radius: 6px;
     cursor: pointer;
 
     &:hover:not(:disabled) {

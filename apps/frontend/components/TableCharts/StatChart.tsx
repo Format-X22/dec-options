@@ -80,6 +80,20 @@ const ChartsCol = styled.div`
     &:last-child {
         margin-right: 0;
     }
+
+    svg {
+        border: 1px solid #343434;
+        box-sizing: border-box;
+    }
+    .highcharts-container {
+        width: 100% !important;
+    }
+    .highcharts-background {
+        fill: #303030;
+    }
+    .highcharts-grid-line {
+        stroke: #343434;
+    }
 `;
 
 const ChartsHeader = styled.div`
@@ -121,7 +135,7 @@ const ChartsHeader = styled.div`
 interface IProps {
     type: 'area' | 'column';
     title: string;
-    chartKey: 'volume' | 'openInterest';
+    chartKey: 'volume' | 'openInterest' | 'impliedVolatility';
     data: {
         [base: string]: {
             [marketKey: string]: {
@@ -151,8 +165,6 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
                   },
               }))
             : [];
-    console.log(series);
-    const a = 2;
     return (
         <ChartsCol>
             <ChartsHeader>
@@ -160,7 +172,6 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
                 <div>
                     {baseList.map((base) => (
                         <button
-                            a={2}
                             key={base}
                             type='button'
                             className={selectedBase === base ? 'active' : ''}
