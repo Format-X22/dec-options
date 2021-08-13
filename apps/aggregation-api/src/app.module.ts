@@ -12,7 +12,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 @Module({
     imports: [
         ServeStaticModule.forRoot({
-            rootPath: './apps/frontend/public',
+            rootPath: 'apps/frontend/public',
             serveRoot: '/public',
         }),
         OptionModule,
