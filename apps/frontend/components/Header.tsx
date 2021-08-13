@@ -48,7 +48,7 @@ function Header({}: { children?: ReactElement | string }): JSX.Element {
     return (
         <StyledHeader>
             <Logo>
-                <img src='/public/opex.svg' alt='Opex' />
+                <img src='/opex/public/opex.svg' alt='Opex' />
                 <h1>
                     <sup>DeCommas</sup>Opex
                 </h1>
