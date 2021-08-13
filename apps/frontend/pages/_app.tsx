@@ -43,7 +43,8 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
         <>
             <Head>
                 <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
-                <title>Options aggregator</title>
+                <title>DeCommas Opex</title>
+                <link rel='icon' href='/public/opex.svg' />
                 <link
                     href='https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap'
                     rel='stylesheet'

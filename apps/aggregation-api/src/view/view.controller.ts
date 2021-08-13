@@ -3,7 +3,7 @@ import { ViewService } from './view.service';
 import { NextFunction, Request, Response } from 'express';
 import { NextServer } from 'next/dist/server/next';
 
-const EXCLUDE_PATH: Array<string> = ['/option', '/graphql'];
+const EXCLUDE_PATH: Array<string> = ['/option', '/graphql', '/public'];
 
 @Controller()
 export class ViewController {
@@ -11,7 +11,7 @@ export class ViewController {
 
     @Get('*')
     async getFrontend(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction): Promise<void> {
-        if (EXCLUDE_PATH.includes(req.path)) {
+        if (new RegExp(EXCLUDE_PATH.join('|')).test(req.path)) {
             next();
             return;
         }

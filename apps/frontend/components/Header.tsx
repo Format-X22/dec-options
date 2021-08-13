@@ -15,9 +15,26 @@ const StyledHeader = styled.div`
 `;
 
 const Logo = styled.div`
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 22px;
+    display: flex;
+    align-items: center;
+    h1 {
+        font-size: 34px;
+        line-height: 34px;
+        margin: 0 0 0 15px;
+        position: relative;
+        color: #fff;
+        sup {
+            color: #c3c3c3;
+            font-size: 11px;
+            position: absolute;
+            right: 0;
+            top: -2px;
+        }
+    }
+
+    img {
+        width: 50px;
+    }
 `;
 
 function Header({}: { children?: ReactElement | string }): JSX.Element {
@@ -31,8 +48,10 @@ function Header({}: { children?: ReactElement | string }): JSX.Element {
     return (
         <StyledHeader>
             <Logo>
-                {/* <img src='/public/logo.png' alt='Opex' /> */}
-                Opex
+                <img src='/public/opex.svg' alt='Opex' />
+                <h1>
+                    <sup>DeCommas</sup>Opex
+                </h1>
             </Logo>
             <Button onClick={openModal}>Connect wallet</Button>
             <Modal visible={connectModalIsVisible} onClose={closeModal} title='Keep calm and just wait'>
