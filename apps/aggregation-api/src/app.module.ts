@@ -8,11 +8,12 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { PriceModule } from './price/price.module';
 import { StatsModule } from './stats/stats.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
     imports: [
         ServeStaticModule.forRoot({
-            rootPath: 'apps/frontend/public',
+            rootPath: join(__dirname, '../../../../../../public'),
             serveRoot: '/public',
         }),
         OptionModule,
