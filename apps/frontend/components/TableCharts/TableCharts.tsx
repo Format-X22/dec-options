@@ -30,6 +30,7 @@ const TableCharts = () => {
         }
         return returnValue;
     }, [dataStats]);
+    console.log(dataByBase);
 
     return (
         <ChartsRow>
