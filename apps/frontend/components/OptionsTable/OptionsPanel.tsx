@@ -10,7 +10,6 @@ const PanelBodyWrap = styled.div`
     flex-direction: row;
     align-content: space-between;
     justify-content: flex-start;
-    overflow: hidden;
     flex: 100;
     background: #303030;
 
