@@ -13,7 +13,7 @@ import { join } from 'path';
 @Module({
     imports: [
         ServeStaticModule.forRoot({
-            rootPath: 'apps/frontend/public',
+            rootPath: join(__dirname, '../../../../../../apps/frontend/public'),
             serveRoot: '/public',
         }),
         OptionModule,
