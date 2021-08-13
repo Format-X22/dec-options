@@ -200,7 +200,7 @@ export function OrderBook(): JSX.Element {
                     <SubTable reverse>
                         {asks.slice().map(
                             ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
-                                <TableRow maxHeight={52} key={`asks-${index}-${price}-${amount}-${marketName}`}>
+                                <TableRow maxHeight={53} key={`asks-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <AsksText>{price}</AsksText>
                                     </TableCell>
@@ -217,7 +217,7 @@ export function OrderBook(): JSX.Element {
                             ),
                         )}
                         {asks.length === 0 && (
-                            <TableRow maxHeight={52}>
+                            <TableRow maxHeight={53}>
                                 <TableCell>No asks...</TableCell>
                             </TableRow>
                         )}
@@ -226,7 +226,7 @@ export function OrderBook(): JSX.Element {
                     <SubTable>
                         {bids.map(
                             ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
-                                <TableRow maxHeight={52} key={`bids-${index}-${price}-${amount}-${marketName}`}>
+                                <TableRow maxHeight={53} key={`bids-${index}-${price}-${amount}-${marketName}`}>
                                     <TableCell className={'TODO-order-book-column-size'}>
                                         <BidsText>{price}</BidsText>
                                     </TableCell>
@@ -243,7 +243,7 @@ export function OrderBook(): JSX.Element {
                             ),
                         )}
                         {bids.length === 0 && (
-                            <TableRow maxHeight={52}>
+                            <TableRow maxHeight={53}>
                                 <TableCell>No bids...</TableCell>
                             </TableRow>
                         )}

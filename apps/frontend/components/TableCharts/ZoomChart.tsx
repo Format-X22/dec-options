@@ -89,24 +89,34 @@ const options: Highcharts.Options = {
 };
 
 const ChartsCol = styled.div`
-    background-color: #282828;
+    background-color: #3d3d3d;
     min-width: 50%;
     margin-bottom: 24px;
+    border-radius: 6px;
+    max-width: 1000px;
     &:last-child {
         margin-bottom: 0;
     }
 
     svg {
         box-sizing: border-box;
+        border-radius: 6px;
+        max-width: 1000px;
     }
     .highcharts-container {
         width: 100% !important;
     }
     .highcharts-background {
-        fill: #3a3a3a;
+        fill: #3d3d3d;
+    }
+    .highcharts-plot-background {
+      fill: #3a3a3a;
     }
     .highcharts-grid-line {
         stroke: #343434;
+    }
+    .highcharts-axis-line {
+      stroke: #343434
     }
 `;
 
@@ -160,7 +170,7 @@ const ZoomChart: FC<IProps> = ({ chartKey, data, dataTitle, base }) => {
                     series,
                     chart: {
                         zoomType: 'x',
-                        height: 450,
+                        height: 375,
                     },
                 }}
             />
