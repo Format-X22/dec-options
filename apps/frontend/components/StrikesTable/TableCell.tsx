@@ -1,8 +1,14 @@
+import { FC } from 'react';
 import styled from 'styled-components';
 
-export const TableCell = styled.div`
-    width: calc(100% / 8);
+type TableCellProps = {
+    width?: string;
+};
+
+export const TableCell: FC<TableCellProps> = styled.div`
+    width: ${({ width }: TableCellProps) => (width ? `${width}` : 'calc(100% / 8)')};
     padding: 16px 0;
+    text-align: center;
 
     @media (max-width: 1024px) {
         width: calc(100% / 5);

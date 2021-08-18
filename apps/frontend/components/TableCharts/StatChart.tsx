@@ -94,6 +94,11 @@ const ChartsCol = styled.div`
     .highcharts-grid-line {
         stroke: #343434;
     }
+
+    @media all and (max-width: 768px) {
+      min-width: 100%;
+      margin-right: 0;
+    }
 `;
 
 const ChartsHeader = styled.div`
@@ -152,19 +157,32 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
     const [selectedBase, setSelectedBase] = useState(baseList[0]);
     const series =
         data && selectedBase
-            ? Object.keys(data[selectedBase]).map((marketKey) => ({
-                  name: marketKey.toLocaleLowerCase(),
-                  data: data[selectedBase][marketKey].map((marketData) => +marketData[chartKey].toFixed(2)),
-                  dates: data[selectedBase][marketKey].map(({ date }) => {
-                      const dateObject = new Date(date);
-                      return new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(dateObject);
-                  }),
-                  marker: {
-                      radius: 1,
-                      symbol: 'circle',
-                  },
-              }))
+            ? Object.keys(data[selectedBase])
+                  .map((marketKey) => {
+                      const sortedData = data[selectedBase][marketKey].sort(
+                          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+                      );
+                      return {
+                          name: marketKey.toLocaleLowerCase(),
+                          data: sortedData.map((marketData) => +marketData[chartKey].toFixed(2)),
+                          dates: sortedData.map(({ date }) => {
+                              const dateObject = new Date(date);
+                              return new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(
+                                  dateObject,
+                              );
+                          }),
+                          marker: {
+                              radius: 1,
+                              symbol: 'circle',
+                          },
+                      };
+                  })
+                  .sort((a, b) => a.name.localeCompare(b.name))
             : [];
+    const biggestDatesArr = series.reduce((a, b) => {
+        return a.length > b.dates.length ? a : b.dates;
+    }, []);
+
     return (
         <ChartsCol>
             <ChartsHeader>
@@ -188,7 +206,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
                     ...options,
                     xAxis: {
                         ...options.xAxis,
-                        categories: series.length > 0 ? series[0].dates : [],
+                        categories: biggestDatesArr,
                     },
                     yAxis: {
                         ...options.yAxis,

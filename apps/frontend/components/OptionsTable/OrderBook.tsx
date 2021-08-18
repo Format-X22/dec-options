@@ -218,7 +218,7 @@ export function OrderBook(): JSX.Element {
                         )}
                         {asks.length === 0 && (
                             <TableRow maxHeight={53}>
-                                <TableCell>No asks...</TableCell>
+                                <TableCell width='100%'>No asks...</TableCell>
                             </TableRow>
                         )}
                     </SubTable>
@@ -244,7 +244,7 @@ export function OrderBook(): JSX.Element {
                         )}
                         {bids.length === 0 && (
                             <TableRow maxHeight={53}>
-                                <TableCell>No bids...</TableCell>
+                                <TableCell width='100%'>No bids...</TableCell>
                             </TableRow>
                         )}
                     </SubTable>
