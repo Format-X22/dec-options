@@ -177,6 +177,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
                           },
                       };
                   })
+                  .filter(({data}) => Math.max(...data) > 0)
                   .sort((a, b) => a.name.localeCompare(b.name))
             : [];
     const biggestDatesArr = series.reduce((a, b) => {
