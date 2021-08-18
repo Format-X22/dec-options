@@ -6,6 +6,10 @@ import { useStatsData } from '../../hooks/useStatsData';
 const ChartsRow = styled.div`
     display: flex;
     margin-bottom: 2px;
+
+    @media all and (max-width: 768px) {
+      flex-direction: column;
+    }
 `;
 
 const TableCharts = () => {
