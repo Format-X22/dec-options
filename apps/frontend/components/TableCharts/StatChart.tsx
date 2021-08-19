@@ -1,7 +1,8 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import { useRouter } from 'next/router';
 
 const options: Highcharts.Options = {
     title: {
@@ -96,8 +97,8 @@ const ChartsCol = styled.div`
     }
 
     @media all and (max-width: 768px) {
-      min-width: 100%;
-      margin-right: 0;
+        min-width: 100%;
+        margin-right: 0;
     }
 `;
 
@@ -137,6 +138,21 @@ const ChartsHeader = styled.div`
     }
 `;
 
+const getColorByMarket = (marketKey: string) => {
+    const colorsByMarket = {
+        auctus: '#8085B5',
+        binance: '#79C971',
+        deribit: '#BF618F',
+        finnexus: '#975FC7',
+        hegic: '#5C6DC6',
+        okex: '#C6A064',
+        opyn: '#C6CC6A',
+        siren: '#77a1e5',
+    };
+
+    return colorsByMarket[marketKey.toLocaleLowerCase()];
+};
+
 interface IProps {
     type: 'area' | 'column';
     title: string;
@@ -153,10 +169,17 @@ interface IProps {
 }
 
 const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
+    const router = useRouter();
+    const { base } = router.query as { base: string };
     const baseList = Object.keys(data);
     const [selectedBase, setSelectedBase] = useState(baseList[0]);
-    const series =
-        data && selectedBase
+    useEffect(() => {
+        if (base) {
+            setSelectedBase(base);
+        }
+    }, [base]);
+    const series = useMemo(() => {
+        return data && selectedBase
             ? Object.keys(data[selectedBase])
                   .map((marketKey) => {
                       const sortedData = data[selectedBase][marketKey].sort(
@@ -167,23 +190,27 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
                           data: sortedData.map((marketData) => +marketData[chartKey].toFixed(2)),
                           dates: sortedData.map(({ date }) => {
                               const dateObject = new Date(date);
-                              return new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(
-                                  dateObject,
-                              );
+                              return new Intl.DateTimeFormat('en', {
+                                  month: 'short',
+                                  day: '2-digit',
+                                  timeZone: 'UTC',
+                              }).format(dateObject);
                           }),
                           marker: {
                               radius: 1,
                               symbol: 'circle',
                           },
+                          color: getColorByMarket(marketKey),
                       };
                   })
-                  .filter(({data}) => Math.max(...data) > 0)
+                  .filter(({ data }) => Math.max(...data) > 0)
                   .sort((a, b) => a.name.localeCompare(b.name))
             : [];
+    }, [data, selectedBase, chartKey]);
+
     const biggestDatesArr = series.reduce((a, b) => {
         return a.length > b.dates.length ? a : b.dates;
     }, []);
-
     return (
         <ChartsCol>
             <ChartsHeader>
