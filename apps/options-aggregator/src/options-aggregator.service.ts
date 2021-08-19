@@ -5,6 +5,7 @@ import { HegicService } from './options/hegic/hegic.service';
 import { OkexService } from './options/okex/okex.service';
 import { AggregatorAbstract } from './options/aggregator.abstract';
 import { AuctusService } from './options/auctus/auctus.service';
+import { SirenService } from './options/siren/siren.service';
 
 @Injectable()
 export class OptionsAggregatorService {
@@ -16,10 +17,11 @@ export class OptionsAggregatorService {
         private readonly hegicService: HegicService,
         private readonly okexService: OkexService,
         private readonly auctusService: AuctusService,
+        private readonly sirenService: SirenService,
     ) {}
 
     async start(): Promise<void> {
-        [this.binanceService, this.deribitService, this.okexService, this.auctusService].forEach(
+        [this.binanceService, this.deribitService, this.okexService, this.auctusService, this.sirenService].forEach(
             this.startOptionsSync.bind(this),
         );
 
