@@ -57,8 +57,8 @@ const ErrorText = styled.div`
     margin-top: 16px;
 `;
 const GET_EXPIRATIONS = gql`
-    query getExpirations($timezone: Int, $base: String) {
-        expirations(packByDateSize: DAY, timezone: $timezone, base: $base) {
+    query getExpirations($timezone: Int, $base: String, $marketType: MarketType) {
+        expirations(packByDateSize: DAY, timezone: $timezone, base: $base, marketType: $marketType) {
             expirationDate
             markets {
                 name
@@ -96,8 +96,7 @@ type WEIGHT = {
 export function TimeTable(): JSX.Element {
     const router = useRouter();
     const { state } = useContext(ContextApp);
-    const value = state.filter.date;
-    const base = state.filter.currency;
+    const { currency: base, date: value, marketType } = state.filter;
 
     function onChange(newValue: string): void {
         router.query.date = newValue;
@@ -118,6 +117,7 @@ export function TimeTable(): JSX.Element {
         variables: {
             timezone: new Date().getTimezoneOffset() / 60,
             base,
+            marketType,
         },
     });
 

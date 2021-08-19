@@ -100,6 +100,11 @@ export class ExpirationGroupArgs {
     @IsOptional()
     @IsString()
     base?: Option['base'];
+
+    @Field((): typeof EMarketType => EMarketType, { nullable: true })
+    @IsOptional()
+    @IsEnum(EMarketType)
+    marketType?: Option['marketType'];
 }
 
 @ArgsType()

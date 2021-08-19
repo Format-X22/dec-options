@@ -13,7 +13,11 @@ export function MarketSelector(): JSX.Element {
     const value = state.filter.marketType || 'ALL';
 
     function onChange(newValue: string): void {
-        router.query.marketType = newValue;
+        if (newValue === 'ALL') {
+            delete router.query.marketType;
+        } else {
+            router.query.marketType = newValue;
+        }
         router.push(router);
     }
 
