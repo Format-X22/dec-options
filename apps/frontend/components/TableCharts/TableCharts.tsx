@@ -8,7 +8,7 @@ const ChartsRow = styled.div`
     margin-bottom: 2px;
 
     @media all and (max-width: 768px) {
-      flex-direction: column;
+        flex-direction: column;
     }
 `;
 
@@ -34,7 +34,6 @@ const TableCharts = () => {
         }
         return returnValue;
     }, [dataStats]);
-    console.log(dataByBase);
 
     return (
         <ChartsRow>
