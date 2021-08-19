@@ -179,7 +179,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, data }) => {
         }
     }, [base]);
     const series = useMemo(() => {
-        return data && selectedBase
+        return data && selectedBase && data[selectedBase]
             ? Object.keys(data[selectedBase])
                   .map((marketKey) => {
                       const sortedData = data[selectedBase][marketKey].sort(
