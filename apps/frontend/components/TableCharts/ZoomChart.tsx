@@ -36,7 +36,7 @@ const options: Highcharts.Options = {
                 },
                 stops: [
                     [0, '#8085B5'],
-                    [1, color ? color('#8085B5').setOpacity(0).get('rgba') : '#8085B5'],
+                    [1, color ? (color('#8085B5').setOpacity(0).get('rgba') as string) : '#8085B5'],
                 ],
             },
             marker: {
@@ -110,13 +110,13 @@ const ChartsCol = styled.div`
         fill: #3d3d3d;
     }
     .highcharts-plot-background {
-      fill: #3a3a3a;
+        fill: #3a3a3a;
     }
     .highcharts-grid-line {
         stroke: #343434;
     }
     .highcharts-axis-line {
-      stroke: #343434
+        stroke: #343434;
     }
 `;
 

@@ -1,5 +1,5 @@
 import { EMarketType } from '@app/shared/market.schema';
-import { Action, ActionType, State } from '../pages/stateType';
+import { Action, ActionType, State } from '../types/stateType';
 
 export const rootReducer = (state: State, action: Action): State => {
     switch (action.type) {

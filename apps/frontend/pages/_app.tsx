@@ -8,7 +8,7 @@ import 'antd/dist/antd.css';
 import './index.scss';
 
 import 'swiper/swiper.scss';
-import { Action, ContextState, State } from './stateType';
+import { Action, ContextState, State } from '../types/stateType';
 import { rootReducer } from '../reducers/rootReducer';
 
 export const client = new ApolloClient({ uri: '/graphql', cache: new InMemoryCache() });

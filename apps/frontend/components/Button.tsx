@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 import styled from 'styled-components';
-import { $backgroundLight, $blue } from '../theme';
+import { $blue } from '../theme';
 
 const StyledButton = styled.button`
     padding: 8px 16px;

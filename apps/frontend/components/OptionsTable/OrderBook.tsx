@@ -180,16 +180,16 @@ export function OrderBook(): JSX.Element {
                 <TableCell>ORDER BOOK</TableCell>
             </TableRow>
             <TableRow maxHeight={52} className={'TODO-order-book-column-size-scroll-fix'}>
-                <TableCell className={'TODO-order-book-column-size'}>
+                <TableCell>
                     <TitleText>Price</TitleText>
                 </TableCell>
-                <TableCell className={'TODO-order-book-column-size'}>
+                <TableCell>
                     <TitleText>Amount</TitleText>
                 </TableCell>
-                <TableCell className={'TODO-order-book-column-size'}>
+                <TableCell>
                     <TitleText>Source</TitleText>
                 </TableCell>
-                <TableCell className={'TODO-order-book-column-size'}>
+                <TableCell>
                     <TitleText>Fees</TitleText>
                 </TableCell>
             </TableRow>
@@ -201,16 +201,16 @@ export function OrderBook(): JSX.Element {
                         {asks.slice().map(
                             ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
                                 <TableRow maxHeight={53} key={`asks-${index}-${price}-${amount}-${marketName}`}>
-                                    <TableCell className={'TODO-order-book-column-size'}>
+                                    <TableCell>
                                         <AsksText>{price}</AsksText>
                                     </TableCell>
-                                    <TableCell className={'TODO-order-book-column-size'}>
+                                    <TableCell>
                                         <TitleText>{amount}</TitleText>
                                     </TableCell>
-                                    <TableCell className={'TODO-order-book-column-size'}>
+                                    <TableCell>
                                         <TitleText>{marketName}</TitleText>
                                     </TableCell>
-                                    <TableCell className={'TODO-order-book-column-size'}>
+                                    <TableCell>
                                         <TitleText>{formatFees(fees)}</TitleText>
                                     </TableCell>
                                 </TableRow>
@@ -227,16 +227,16 @@ export function OrderBook(): JSX.Element {
                         {bids.map(
                             ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
                                 <TableRow maxHeight={53} key={`bids-${index}-${price}-${amount}-${marketName}`}>
-                                    <TableCell className={'TODO-order-book-column-size'}>
+                                    <TableCell>
                                         <BidsText>{price}</BidsText>
                                     </TableCell>
-                                    <TableCell className={'TODO-order-book-column-size'}>
+                                    <TableCell>
                                         <TitleText>{amount}</TitleText>
                                     </TableCell>
-                                    <TableCell className={'TODO-order-book-column-size'}>
+                                    <TableCell>
                                         <TitleText>{marketName}</TitleText>
                                     </TableCell>
-                                    <TableCell className={'TODO-order-book-column-size'}>
+                                    <TableCell>
                                         <TitleText>{formatFees(fees)}</TitleText>
                                     </TableCell>
                                 </TableRow>
