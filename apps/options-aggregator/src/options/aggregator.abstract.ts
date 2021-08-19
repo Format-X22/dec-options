@@ -7,9 +7,11 @@ import { OrderBook, OrderBookDocument } from '@app/shared/orderbook.schema';
 import { PriceService } from '../price/price.service';
 
 export abstract class AggregatorAbstract<TRawOption> {
-    protected logger: Logger;
-    protected abstract get rateLimit(): number;
+    protected readonly logger: Logger;
+    protected readonly isGetWithPagination: boolean = false;
     protected readonly pageSize: number = null;
+
+    protected abstract get rateLimit(): number;
 
     constructor(
         @InjectModel(Option.name) private optionsDataModel: Model<OptionDocument>,
@@ -33,15 +35,24 @@ export abstract class AggregatorAbstract<TRawOption> {
     }
 
     protected async iteration(): Promise<void> {
-        const rawOptions: Array<TRawOption> = await this.getRawOptions();
+        let rawOptions: Array<TRawOption>;
+
+        if (this.isGetWithPagination) {
+            rawOptions = await this.getRawOptionsWithPagination();
+        } else {
+            rawOptions = await this.getRawOptions();
+        }
 
         sleep(this.rateLimit);
 
         for (const raw of rawOptions) {
-            const orderBook: OrderBook = await this.getOrderBook(raw);
+            const orderBook: OrderBook | null = await this.getOrderBook(raw);
             const option: Option = await this.constructOptionData(raw, orderBook);
 
-            await this.saveOrderBook(orderBook);
+            if (orderBook) {
+                await this.saveOrderBook(orderBook);
+            }
+
             await this.saveResult(option);
 
             sleep(this.rateLimit);
@@ -81,6 +92,9 @@ export abstract class AggregatorAbstract<TRawOption> {
     }
 
     protected abstract getRawOptions(skip?: number): Promise<Array<TRawOption>>;
-    protected abstract getOrderBook(rawOption: TRawOption): Promise<OrderBook>;
-    protected abstract constructOptionData(rawOption: TRawOption, depth: OrderBook): Option | Promise<Option>;
+    protected abstract getOrderBook(rawOption: TRawOption): Promise<OrderBook | null>;
+    protected abstract constructOptionData(
+        rawOption: TRawOption,
+        orderBook: OrderBook | null,
+    ): Option | Promise<Option>;
 }
