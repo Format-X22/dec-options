@@ -13,7 +13,7 @@ const TradeComingSoon = styled.div`
 
 const Trade = () => {
     const router = useRouter();
-    const { date, strike, base, type } = router.query as unknown as ITradeQuery;
+    const { strike, base, type } = router.query as unknown as ITradeQuery;
     const { loading: loadingStats, data: dataStats } = useStatsData();
     const dataByBase = useMemo(() => {
         const returnValue: {

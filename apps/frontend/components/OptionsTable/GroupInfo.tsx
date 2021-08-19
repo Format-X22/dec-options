@@ -36,10 +36,6 @@ const Text = styled.span`
     margin-right: 12px;
 `;
 
-const Space = styled.span`
-    margin-left: 25px;
-`;
-
 export function GroupInfo(): JSX.Element {
     const router = useRouter();
     const { date, strike, base, type } = router.query as unknown as ITradeQuery;

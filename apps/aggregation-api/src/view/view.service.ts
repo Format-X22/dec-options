@@ -9,7 +9,7 @@ export class ViewService implements OnModuleInit, OnModuleDestroy {
 
     async onModuleInit(): Promise<void> {
         try {
-            this.server = next({ dev: true, dir: './apps/frontend' });
+            this.server = next({ dev: process.env.NODE_ENV !== 'production', dir: './apps/frontend' });
 
             await this.server.prepare();
         } catch (error) {

@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Filters from '../components/Filters';
 import { ContextApp } from './_app';
-import { ActionType, ContextState } from './stateType';
+import { ActionType, ContextState } from '../types/stateType';
 import StrikesTable from '../components/StrikesTable/StrikesTable';
 import { gql, useQuery } from '@apollo/client';
 import Layout from '../components/Layout/Layout';
