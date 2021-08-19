@@ -44,13 +44,16 @@ export function GroupInfo(): JSX.Element {
     const router = useRouter();
     const { date, strike, base, type } = router.query as unknown as ITradeQuery;
     const dateString = format(new Date(date) || new Date(), 'dd MMMM');
-
     return (
         <StyledInfo>
             <div>
                 <Button
                     onClick={() => {
-                        router.back();
+                        if (window.history.length < 3) {
+                            router.push(`/?date=${date}&base=${base}`);
+                        } else {
+                            router.back();
+                        }
                     }}
                 >
                     &lt;&lt;&lt; Go back

@@ -16,7 +16,15 @@ const Trade = () => {
     const { date, strike, base, type } = router.query as unknown as ITradeQuery;
     const { loading: loadingStats, data: dataStats } = useStatsData();
     const dataByBase = useMemo(() => {
-        const returnValue: { volume: number; openInterest: number; impliedVolatility: number; date: string }[] = [];
+        const returnValue: {
+            marketKey: string;
+            volume: number;
+            openInterest: number;
+            impliedVolatility: number;
+            date: string;
+            expirationDate: string;
+        }[] = [];
+        const retObj = {};
         if (dataStats) {
             dataStats.stats
                 .filter((stat) => stat.base === base)
@@ -24,22 +32,39 @@ const Trade = () => {
                     details
                         .filter(
                             (detail) =>
-                                new Date(detail.expirationDate).setHours(0, 0, 0, 0) ===
-                                    new Date(date).setHours(0, 0, 0, 0) &&
+                                new Date(detail.expirationDate).getTime() > new Date().getTime() &&
                                 detail.strike === +strike &&
                                 detail.type.toLowerCase() === type,
                         )
-                        .forEach(({ volume, openInterest, impliedVolatility }) => {
-                            returnValue.push({
-                                volume,
-                                openInterest,
-                                impliedVolatility,
-                                date,
-                            });
+                        .forEach(({ volume, openInterest, impliedVolatility, expirationDate }) => {
+                            if (!retObj[expirationDate]) {
+                                retObj[expirationDate] = {
+                                    volume: 0,
+                                    openInterest: 0,
+                                    impliedVolatility: 0,
+                                    impliedVolatilityCount: 0,
+                                };
+                            }
+                            retObj[expirationDate] = {
+                                volume: retObj[expirationDate].volume + volume,
+                                openInterest: retObj[expirationDate].openInterest + openInterest,
+                                impliedVolatility: retObj[expirationDate].impliedVolatility + impliedVolatility,
+                                impliedVolatilityCount: retObj[expirationDate].impliedVolatilityCount + 1,
+                            };
                         });
                 });
         }
-        return returnValue;
+        Object.keys(retObj).map((date) => {
+            const dateObj = retObj[date];
+            const { impliedVolatility, impliedVolatilityCount } = dateObj;
+            const ivAvg = impliedVolatility / impliedVolatilityCount;
+            returnValue.push({
+                date,
+                ...dateObj,
+                impliedVolatility: ivAvg,
+            });
+        });
+        return returnValue.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     }, [dataStats]);
     return (
         <TradeComingSoon>
