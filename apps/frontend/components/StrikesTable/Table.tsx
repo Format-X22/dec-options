@@ -50,7 +50,7 @@ export function Table({
 }: {
     date: string;
     base: string;
-    marketType?: EMarketType | 'ALL';
+    marketType?: EMarketType | '';
 }): JSX.Element {
     const router = useRouter();
 
@@ -67,7 +67,7 @@ export function Table({
         variables: {
             type: 'PUT',
             base,
-            marketType: marketType !== 'ALL' ? marketType : undefined,
+            marketType: marketType,
             fromDate: fromDate.toString(),
             toDate: toDate.toString(),
         },
@@ -77,7 +77,7 @@ export function Table({
         variables: {
             type: 'CALL',
             base,
-            marketType: marketType !== 'ALL' ? marketType : undefined,
+            marketType: marketType,
             fromDate: fromDate.toString(),
             toDate: toDate.toString(),
         },

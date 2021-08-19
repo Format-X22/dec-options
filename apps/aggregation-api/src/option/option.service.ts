@@ -119,6 +119,9 @@ export class OptionService {
         if (args.base) {
             filter.base = args.base;
         }
+        if (args.marketType) {
+            filter.marketType = args.marketType;
+        }
 
         const data: Array<TRawExpirationGroup> = await this.optionsModel.aggregate([
             {

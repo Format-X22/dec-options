@@ -5,7 +5,7 @@ export type State = {
     filter: {
         date: string;
         currency: string;
-        marketType?: EMarketType | 'ALL';
+        marketType?: EMarketType | '';
     };
     prices: {
         [key: string]: number;
