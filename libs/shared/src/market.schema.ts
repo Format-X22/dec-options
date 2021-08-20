@@ -78,3 +78,11 @@ export const marketsMapByKey: Map<EMarketKey, Market> = new Map();
 for (const market of markets) {
     marketsMapByKey.set(market.key, market);
 }
+
+export const ActiveMarkets: Array<EMarketKey> = [
+    EMarketKey.OKEX,
+    EMarketKey.DERIBIT,
+    EMarketKey.BINANCE,
+    EMarketKey.AUCTUS,
+    EMarketKey.SIREN,
+];
