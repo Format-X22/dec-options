@@ -79,6 +79,10 @@ for (const market of markets) {
     marketsMapByKey.set(market.key, market);
 }
 
+export function marketKeysByMarketType(type: EMarketType): Array<EMarketKey> {
+    return markets.filter((item) => item.type === type).map((item) => item.key);
+}
+
 export const ActiveMarkets: Array<EMarketKey> = [
     EMarketKey.OKEX,
     EMarketKey.DERIBIT,
