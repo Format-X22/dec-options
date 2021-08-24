@@ -47,13 +47,15 @@ export abstract class AggregatorAbstract<TRawOption> {
 
         for (const raw of rawOptions) {
             const orderBook: OrderBook | null = await this.getOrderBook(raw);
-            const option: Option = await this.constructOptionData(raw, orderBook);
+            const option: Option | null = await this.constructOptionData(raw, orderBook);
 
             if (orderBook) {
                 await this.saveOrderBook(orderBook);
             }
 
-            await this.saveResult(option);
+            if (option) {
+                await this.saveResult(option);
+            }
 
             sleep(this.rateLimit);
         }
@@ -96,5 +98,5 @@ export abstract class AggregatorAbstract<TRawOption> {
     protected abstract constructOptionData(
         rawOption: TRawOption,
         orderBook: OrderBook | null,
-    ): Option | Promise<Option>;
+    ): Option | null | Promise<Option | null>;
 }

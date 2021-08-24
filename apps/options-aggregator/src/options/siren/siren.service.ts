@@ -30,7 +30,7 @@ export class SirenService extends AggregatorAbstract<TRawOption> {
     protected readonly pageSize: number = 1000;
 
     protected get rateLimit(): number {
-        return 1000;
+        return 3000;
     }
 
     protected async getRawOptions(skip: number): Promise<Array<TRawOption>> {
