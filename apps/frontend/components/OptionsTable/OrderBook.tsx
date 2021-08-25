@@ -90,11 +90,6 @@ const SubTablesWrapper: FC = styled.div`
     flex: 100;
 `;
 
-const Divider: FC = styled.div`
-    width: 100%;
-    height
-`;
-
 const OrderBookTable = styled.div`
     background: #3a3a3a;
     border: 1px solid #3a3a3a;
