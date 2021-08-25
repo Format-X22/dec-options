@@ -44,22 +44,24 @@ const GET_OPTIONS = gql`
 `;
 
 const AsksText: FC = styled.div`
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 20px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-left: 24px;
     color: #d27171;
 `;
 
 const BidsText: FC = styled.div`
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 20px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-left: 24px;
     color: #71d298;
 `;
 
@@ -90,8 +92,42 @@ const SubTablesWrapper: FC = styled.div`
 
 const Divider: FC = styled.div`
     width: 100%;
-    border: 1px solid white;
+    height
 `;
+
+const OrderBookTable = styled.div`
+    background: #3a3a3a;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+
+    .table-row {
+        min-height: 52px;
+        background: #3a3a3a;
+        border: 0;
+        border-bottom: 1px solid #303030;
+    }
+    .title-text {
+        text-align: left;
+        justify-content: flex-start;
+        padding-left: 24px;
+    }
+    .asks-weight {
+        top: 0;
+        left: 0;
+        position: absolute;
+        height: 100%;
+        background-color: rgba(210, 113, 113, 0.06);
+    }
+    .bids-weight {
+        top: 0;
+        left: 0;
+        position: absolute;
+        height: 100%;
+        background-color: rgba(113, 210, 152, 0.06);
+    }
+`;
+
+type OrderWithWeight = OrderBookOrder & { weight?: number };
 
 export function OrderBook(): JSX.Element {
     const router = useRouter();
@@ -126,8 +162,8 @@ export function OrderBook(): JSX.Element {
         marketFeesMap.set(option.market.name, option?.fees);
     }
 
-    const asks: Array<OrderBookOrder> = [];
-    const bids: Array<OrderBookOrder> = [];
+    const asks: Array<OrderWithWeight> = [];
+    const bids: Array<OrderWithWeight> = [];
 
     const { data, error }: QueryResult<{ orderBook: OrderBookModel }> = useQuery(
         makeOrderBookQuery(optionGroupData?.options.data),
@@ -136,20 +172,22 @@ export function OrderBook(): JSX.Element {
     if (data) {
         for (const [key, orderBook] of Object.entries(data)) {
             const marketName: string = key.split('_')[1];
-            let asksData: Array<OrderBookOrder> = orderBook?.asks || [];
-            let bidsData: Array<OrderBookOrder> = orderBook?.bids || [];
+            let asksData = orderBook?.asks || [];
+            let bidsData = orderBook?.bids || [];
 
             asksData = asksData.map(
-                (order: OrderBookOrder): OrderBookOrder => ({
+                (order: OrderBookOrder): OrderWithWeight => ({
                     ...order,
                     marketName,
+                    weight: order.price * order.amount,
                     fees: marketFeesMap.get(marketName),
                 }),
             );
             bidsData = bidsData.map(
-                (order: OrderBookOrder): OrderBookOrder => ({
+                (order: OrderBookOrder): OrderWithWeight => ({
                     ...order,
                     marketName,
+                    weight: order.price * order.amount,
                     fees: marketFeesMap.get(marketName),
                 }),
             );
@@ -173,84 +211,116 @@ export function OrderBook(): JSX.Element {
             return -1;
         }
     });
+    const maxAsksWeight = Math.max(...asks.map(({ weight }) => weight || 0));
+    const maxBidsWeight = Math.max(...bids.map(({ weight }) => weight || 0));
 
     return (
-        <>
-            <TableRow maxHeight={52}>
+        <OrderBookTable>
+            {/* <TableRow maxHeight={52} className='table-row'>
                 <TableCell>ORDER BOOK</TableCell>
+            </TableRow> */}
+            <TableRow maxHeight={52} className='table-row'>
+                <TableCell>
+                    <TitleText className='title-text'>Price</TitleText>
+                </TableCell>
+                <TableCell>
+                    <TitleText className='title-text'>Amount</TitleText>
+                </TableCell>
+                <TableCell>
+                    <TitleText className='title-text'>Source</TitleText>
+                </TableCell>
+                <TableCell>
+                    <TitleText className='title-text'>Fees</TitleText>
+                </TableCell>
             </TableRow>
-            <TableRow maxHeight={52} className={'TODO-order-book-column-size-scroll-fix'}>
-                <TableCell>
-                    <TitleText>Price</TitleText>
-                </TableCell>
-                <TableCell>
-                    <TitleText>Amount</TitleText>
-                </TableCell>
-                <TableCell>
-                    <TitleText>Source</TitleText>
-                </TableCell>
-                <TableCell>
-                    <TitleText>Fees</TitleText>
-                </TableCell>
-            </TableRow>
-            {optionGroupError && <TableRow maxHeight={52}>{optionGroupError.toString()}</TableRow>}
-            {!optionGroupError && error && <TableRow maxHeight={52}>{error.toString()}</TableRow>}
+            {optionGroupError && (
+                <TableRow maxHeight={52} className='table-row'>
+                    {optionGroupError.toString()}
+                </TableRow>
+            )}
+            {!optionGroupError && error && (
+                <TableRow maxHeight={52} className='table-row'>
+                    {error.toString()}
+                </TableRow>
+            )}
             {!optionGroupError && !error && (
                 <SubTablesWrapper>
                     <SubTable reverse>
                         {asks.slice().map(
-                            ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
-                                <TableRow maxHeight={53} key={`asks-${index}-${price}-${amount}-${marketName}`}>
+                            ({ price, amount, marketName, fees, weight }, index): JSX.Element => (
+                                <TableRow
+                                    maxHeight={53}
+                                    key={`asks-${index}-${price}-${amount}-${marketName}`}
+                                    className='table-row'
+                                >
+                                    {weight && (
+                                        <div
+                                            className='asks-weight'
+                                            style={{ width: `${(weight / maxAsksWeight) * 100}%` }}
+                                        />
+                                    )}
                                     <TableCell>
                                         <AsksText>{price}</AsksText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText>{amount}</TitleText>
+                                        <TitleText className='title-text'>{amount}</TitleText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText>{marketName}</TitleText>
+                                        <TitleText className='title-text'>{marketName}</TitleText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText>{formatFees(fees)}</TitleText>
+                                        <TitleText className='title-text'>{formatFees(fees)}</TitleText>
                                     </TableCell>
                                 </TableRow>
                             ),
                         )}
                         {asks.length === 0 && (
-                            <TableRow maxHeight={53}>
+                            <TableRow maxHeight={53} className='table-row'>
                                 <TableCell width='100%'>No asks...</TableCell>
                             </TableRow>
                         )}
                     </SubTable>
-                    <Divider />
+                    <TableRow maxHeight={52} className='table-row'>
+                        &nbsp;
+                    </TableRow>
                     <SubTable>
                         {bids.map(
-                            ({ price, amount, marketName, fees }: OrderBookOrder, index): JSX.Element => (
-                                <TableRow maxHeight={53} key={`bids-${index}-${price}-${amount}-${marketName}`}>
+                            ({ price, amount, marketName, fees, weight }, index): JSX.Element => (
+                                <TableRow
+                                    maxHeight={53}
+                                    key={`bids-${index}-${price}-${amount}-${marketName}`}
+                                    className='table-row'
+                                >
+                                    {weight && (
+                                        <div
+                                            className='bids-weight'
+                                            style={{ width: `${(weight / maxBidsWeight) * 100}%` }}
+                                        />
+                                    )}
                                     <TableCell>
                                         <BidsText>{price}</BidsText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText>{amount}</TitleText>
+                                        <TitleText className='title-text'>{amount}</TitleText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText>{marketName}</TitleText>
+                                        <TitleText className='title-text'>{marketName}</TitleText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText>{formatFees(fees)}</TitleText>
+                                        <TitleText className='title-text'>{formatFees(fees)}</TitleText>
                                     </TableCell>
                                 </TableRow>
                             ),
                         )}
                         {bids.length === 0 && (
-                            <TableRow maxHeight={53}>
+                            <TableRow maxHeight={53} className='table-row'>
                                 <TableCell width='100%'>No bids...</TableCell>
                             </TableRow>
                         )}
                     </SubTable>
                 </SubTablesWrapper>
             )}
-        </>
+        </OrderBookTable>
     );
 }
 

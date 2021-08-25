@@ -4,6 +4,7 @@ import { $tableTitleBackground } from '../../theme';
 
 type TitleTextProps = {
     active?: boolean;
+    className?: string;
 };
 export const TitleText: FC<TitleTextProps> = styled.div`
     font-weight: 500;

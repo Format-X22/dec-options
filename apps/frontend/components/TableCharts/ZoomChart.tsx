@@ -93,7 +93,6 @@ const ChartsCol = styled.div`
     min-width: 50%;
     margin-bottom: 24px;
     border-radius: 6px;
-    max-width: 1000px;
     &:last-child {
         margin-bottom: 0;
     }
@@ -101,7 +100,6 @@ const ChartsCol = styled.div`
     svg {
         box-sizing: border-box;
         border-radius: 6px;
-        max-width: 1000px;
     }
     .highcharts-container {
         width: 100% !important;

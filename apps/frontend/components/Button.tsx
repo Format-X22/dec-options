@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import styled from 'styled-components';
 import { $blue } from '../theme';
 
@@ -14,9 +14,15 @@ const StyledButton = styled.button`
     box-sizing: border-box;
     border-radius: 6px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
 
     &:hover:not(:disabled) {
         background: linear-gradient(0deg, rgba(99, 206, 250, 0.1), rgba(99, 206, 250, 0.1));
+    }
+
+    img {
+        margin-right: 10px;
     }
 
     &:disabled {
@@ -33,7 +39,7 @@ function Button({
     onClick,
     disabled = false,
 }: {
-    children: ReactElement | string;
+    children: ReactNode;
     onClick?: () => void;
     disabled?: boolean;
 }): JSX.Element {

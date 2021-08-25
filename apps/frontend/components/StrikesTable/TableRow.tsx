@@ -19,6 +19,7 @@ export const TableRow: FC<TableRowProps> = styled.div`
     position: relative;
     border-top: 1px solid ${$lineColor};
     flex: 1;
+    position: relative;
 
     &.data-row {
         cursor: pointer;

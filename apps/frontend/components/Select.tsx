@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from 'react';
+import { FC, ReactNode, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { $labelColor, $optionColor, $selectBackground, $selectBackgroundHover } from '../theme';
 import { IconUp } from './IconUp';
@@ -6,7 +6,7 @@ import { IconDown } from './IconDown';
 import { useClickOutside } from '../hooks/useClickOutside';
 
 export type Option = {
-    name: string;
+    name: ReactNode;
     value: string;
 };
 
@@ -22,9 +22,9 @@ const SelectAndLabelContainer = styled.div`
 `;
 
 const Label = styled.label`
-    font-weight: 500;
+    font-weight: 400;
     font-size: 14px;
-    line-height: 18px;
+    line-height: 16px;
     letter-spacing: 0.16px;
     color: ${$labelColor};
     margin-right: 16px;
@@ -39,21 +39,28 @@ const SelectContainer: FC<SelectContainerProps> = styled.div`
     position: relative;
     width: auto;
     min-width: 128px;
+    padding: 7px 16px;
+    border-radius: 6px;
     transition: 0.3s ease all;
-    border-radius: 2px;
     display: flex;
     align-items: center;
-    padding: 7px 16px;
     justify-content: space-between;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 14px;
-    line-height: 18px;
+    line-height: 16px;
     letter-spacing: 0.16px;
     cursor: pointer;
     background: ${({ open }: SelectContainerProps) => (open ? $selectBackgroundHover : $selectBackground)};
 
     &:hover {
         background: ${$selectBackgroundHover};
+    }
+
+    svg:first-child {
+        margin: 10px 10px 10px 0;
+    }
+    svg:last-child {
+        margin-left: 11px;
     }
 `;
 
@@ -73,6 +80,7 @@ const OptionsContainer: FC<OptionsContainerProps> = styled.div`
     z-index: 99;
     filter: drop-shadow(0px 5px 14px rgba(0, 0, 0, 0.45));
     overflow: hidden;
+    border-radius: 6px;
 `;
 
 type OptionProps = {
@@ -83,12 +91,12 @@ type OptionProps = {
 const Option: FC<OptionProps> = styled.div`
     width: 100%;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 14px;
-    line-height: 18px;
+    line-height: 16px;
     letter-spacing: 0.16px;
     color: ${$optionColor};
-    padding: 7px 16px;
+    padding: 10px 16px;
     background: ${$selectBackground};
 
     &:hover {
@@ -108,7 +116,7 @@ function Select({
     onChange,
     label,
 }: {
-    value: string;
+    value: ReactNode;
     options: Option[];
     onChange: (value: string) => void;
     label?: string;
@@ -134,7 +142,7 @@ function Select({
             {label && <Label>{label}</Label>}
             <SelectContainer onClick={toggle} open={open}>
                 {valueString}
-                {open ? <IconUp /> : <IconDown />}
+                <div className='arrow'>{open ? <IconUp /> : <IconDown />}</div>
                 <OptionsContainer open={open}>
                     {options.map(
                         (option): JSX.Element => (

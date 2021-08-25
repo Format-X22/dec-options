@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
-import { useContext, FC, useState, useEffect, useCallback } from 'react';
+import { useContext, FC, useEffect, useCallback } from 'react';
 import { ContextApp } from '../pages/_app';
-import { gql, useQuery } from '@apollo/client';
 import format from 'date-fns/format';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { Skeleton } from 'antd';
 import Bars from './Bars';
 import { $dateBackground, $dateBackgroundActive } from '../theme';
+import { useExpirations } from '../hooks/useExpirations';
 
 const SwiperSlideElement = styled.div`
     width: 160px;
@@ -56,76 +56,20 @@ const DateElement: FC<DateElementProps> = styled.div`
 const ErrorText = styled.div`
     margin-top: 16px;
 `;
-const GET_EXPIRATIONS = gql`
-    query getExpirations($timezone: Int, $base: String, $marketType: MarketType) {
-        expirations(packByDateSize: DAY, timezone: $timezone, base: $base, marketType: $marketType) {
-            expirationDate
-            markets {
-                name
-            }
-            strikes
-        }
-    }
-`;
+
 const printDate = (dateString: string): string => format(new Date(dateString), 'MMMM, d');
 const getDateString = (dateString: string): string => format(new Date(dateString), 'yyyy/MM/dd');
-
-function normalizeWeight(obj: WEIGHT): WEIGHT {
-    const newObject: WEIGHT = {};
-    let previousValue = -1;
-    let previousIndex = -1;
-    Object.entries(obj)
-        .map(([key, value]): [string, number] => [key, value])
-        .sort(([, a], [, b]) => (a > b ? 1 : -1))
-        .forEach(([key, value]) => {
-            if (value === previousValue) {
-                newObject[key] = previousIndex;
-            } else {
-                previousIndex++;
-                newObject[key] = previousIndex;
-                previousValue = value;
-            }
-        });
-    return newObject;
-}
-
-type WEIGHT = {
-    [key: string]: number;
-};
 
 export function TimeTable(): JSX.Element {
     const router = useRouter();
     const { state } = useContext(ContextApp);
-    const { currency: base, date: value, marketType } = state.filter;
+    const { date: value } = state.filter;
+    const { loading, error, parsedData, data } = useExpirations();
 
     function onChange(newValue: string): void {
         router.query.date = newValue;
         router.push(router);
     }
-
-    const [loadingTimeout, setLoadingTimeout] = useState(true);
-    const { loading, data, error } = useQuery<{
-        expirations: {
-            expirationDate: string;
-            markets: {
-                name: string;
-            }[];
-            strikes: number;
-            barsValue: number;
-        }[];
-    }>(GET_EXPIRATIONS, {
-        variables: {
-            timezone: new Date().getTimezoneOffset() / 60,
-            base,
-            marketType,
-        },
-    });
-
-    useEffect((): void => {
-        setTimeout((): void => {
-            setLoadingTimeout(false);
-        }, 1000);
-    }, []);
 
     useEffect((): void => {
         if (data?.expirations?.length) {
@@ -144,27 +88,6 @@ export function TimeTable(): JSX.Element {
         }
     }, [data]);
 
-    const strikesWeightsBeforeParsing: WEIGHT = {};
-    const marketsWeightsBeforeParsing: WEIGHT = {};
-
-    data?.expirations?.forEach((el): void => {
-        strikesWeightsBeforeParsing[el.expirationDate] = el.strikes;
-        marketsWeightsBeforeParsing[el.expirationDate] = el.markets.length;
-    });
-
-    const strikesWeights: WEIGHT = normalizeWeight(strikesWeightsBeforeParsing);
-    const marketsWeights: WEIGHT = normalizeWeight(marketsWeightsBeforeParsing);
-
-    const parsedData =
-        data && data.expirations
-            ? data.expirations.map((ex) => {
-                  if (ex.expirationDate === '2021-08-27T03:00:00.000Z') {
-                  }
-                  const _ = { ...ex };
-                  _.barsValue = strikesWeights[ex.expirationDate] + marketsWeights[ex.expirationDate] * 1.3; // magic coefficient
-                  return _;
-              })
-            : null;
     const barsValues = [...new Set(parsedData?.map(({ barsValue }) => barsValue))];
     const maxBarsValue = Math.max.apply(null, barsValues);
     const minBarsValue = Math.min.apply(null, barsValues);
@@ -191,7 +114,7 @@ export function TimeTable(): JSX.Element {
     return (
         <>
             <Swiper slidesPerView='auto' loop={false} spaceBetween={12} cssMode>
-                {parsedData && (loading || loadingTimeout || error) ? (
+                {parsedData && (loading || error) ? (
                     <>
                         {[...Array(10)].map(
                             (_: unknown, index: number): JSX.Element => (
