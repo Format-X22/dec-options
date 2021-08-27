@@ -30,12 +30,28 @@ export class DeribitService extends AggregatorAbstract<TRawOption> {
 
     protected async getOrderBook(rawOption: TRawOption): Promise<OrderBook> {
         const ccxtOrderBook: CcxtOrderBook = await this.exchange.fetchOrderBook(rawOption.symbol);
+        const asks: Array<OrderBookOrder> = [];
+        const bids: Array<OrderBookOrder> = [];
+
+        for (const [rawPrice, amount] of ccxtOrderBook.asks) {
+            const basePrice: number = await this.priceService.getPrice(rawOption.base as ESymbol);
+            const price: number = basePrice * rawPrice;
+
+            asks.push({ price, amount });
+        }
+
+        for (const [rawPrice, amount] of ccxtOrderBook.bids) {
+            const basePrice: number = await this.priceService.getPrice(rawOption.base as ESymbol);
+            const price: number = basePrice * rawPrice;
+
+            bids.push({ price, amount });
+        }
 
         return {
             optionId: rawOption.id,
             optionMarketKey: EMarketKey.DERIBIT,
-            asks: ccxtOrderBook.asks.map(([price, amount]: [number, number]): OrderBookOrder => ({ price, amount })),
-            bids: ccxtOrderBook.bids.map(([price, amount]: [number, number]): OrderBookOrder => ({ price, amount })),
+            asks,
+            bids,
         };
     }
 

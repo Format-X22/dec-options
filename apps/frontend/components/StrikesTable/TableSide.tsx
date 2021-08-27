@@ -75,9 +75,6 @@ export function TableSide({
             let maxBid: number = item.maxBid || item.bidQuote || 0;
 
             if (Number.isFinite(minAsk)) {
-                minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
-                maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
-
                 const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
                 const strike = item.strike;
                 const datesDifference = Math.abs(differenceInDays(new Date(date), new Date()) + 1) / 365;
