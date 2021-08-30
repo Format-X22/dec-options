@@ -5,6 +5,7 @@ module.exports = {
             script: 'npm',
             interpreter: 'none',
             args: 'run start:prod:api',
+            max_memory_restart: '512M',
             env: {
                 NODE_ENV: 'production',
             },
@@ -17,6 +18,7 @@ module.exports = {
             script: 'npm',
             interpreter: 'none',
             args: 'run start:prod:agg',
+            max_memory_restart: '512M',
             env: {
                 NODE_ENV: 'production',
             },
@@ -29,6 +31,7 @@ module.exports = {
             script: 'npm',
             interpreter: 'none',
             args: 'run start:prod:api',
+            max_memory_restart: '512M',
             env: {
                 NODE_ENV: 'production',
             },
@@ -41,6 +44,7 @@ module.exports = {
             script: 'npm',
             interpreter: 'none',
             args: 'run start:prod:agg',
+            max_memory_restart: '512M',
             env: {
                 NODE_ENV: 'production',
             },
