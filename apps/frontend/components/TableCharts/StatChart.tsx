@@ -1,8 +1,9 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useRouter } from 'next/router';
+import { ContextApp } from 'apps/frontend/pages/_app';
 
 const options: Highcharts.Options = {
     title: {
@@ -194,8 +195,9 @@ interface IProps {
 const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
     const router = useRouter();
     const { base } = router.query as { base: string };
+    const { state } = useContext(ContextApp);
     const baseList = Object.keys(data);
-    const [selectedBase, setSelectedBase] = useState(baseList[0]);
+    const [selectedBase, setSelectedBase] = useState(state.filter.currency);
     useEffect(() => {
         if (base) {
             setSelectedBase(base);

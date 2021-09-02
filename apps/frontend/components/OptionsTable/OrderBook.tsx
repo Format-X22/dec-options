@@ -255,10 +255,10 @@ export function OrderBook(): JSX.Element {
                                         />
                                     )}
                                     <TableCell>
-                                        <AsksText>{price}</AsksText>
+                                        <AsksText>{price.toFixed(4)}</AsksText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText className='title-text'>{amount}</TitleText>
+                                        <TitleText className='title-text'>{amount.toFixed(2)}</TitleText>
                                     </TableCell>
                                     <TableCell>
                                         <TitleText className='title-text'>{marketName}</TitleText>
