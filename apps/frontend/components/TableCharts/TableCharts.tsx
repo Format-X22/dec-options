@@ -37,17 +37,20 @@ const TableCharts = () => {
 
     return (
         <ChartsRow>
-            {!loadingStats && (
-                <StatChart
-                    type='area'
-                    title='Total options open interest history'
-                    data={dataByBase}
-                    chartKey='openInterest'
-                />
-            )}
-            {!loadingStats && (
-                <StatChart type='column' title='Total options volume history' data={dataByBase} chartKey='volume' />
-            )}
+            <StatChart
+                type='area'
+                title='Total options open interest history'
+                data={dataByBase}
+                chartKey='openInterest'
+                loading={loadingStats}
+            />
+            <StatChart
+                type='column'
+                title='Total options volume history'
+                data={dataByBase}
+                chartKey='volume'
+                loading={loadingStats}
+            />
         </ChartsRow>
     );
 };
