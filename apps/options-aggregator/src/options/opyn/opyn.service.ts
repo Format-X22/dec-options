@@ -4,6 +4,8 @@ import { AggregatorAbstract } from '../aggregator.abstract';
 import { OrderBook } from '@app/shared/orderbook.schema';
 import { gql, request } from 'graphql-request';
 import { EMarketKey, EMarketType } from '@app/shared/market.schema';
+import BigNumber from 'bignumber.js';
+import { GweiPrice } from '@app/shared/price.schema';
 
 type TOptionsResponse = {
     otokens: Array<{
@@ -18,6 +20,7 @@ type TOptionsResponse = {
         };
         strikeAsset: {
             symbol: ESymbol;
+            decimals: number;
         };
         collateralAsset: {
             symbol: ESymbol;
@@ -27,8 +30,24 @@ type TOptionsResponse = {
 
 type TRawOption = TOptionsResponse['otokens'][0];
 
+type TRawOrders = {
+    records: Array<{
+        order: {
+            makerAmount: string;
+            takerAmount: string;
+        };
+    }>;
+};
+type TRawOrderBook = {
+    asks: TRawOrders;
+    bids: TRawOrders;
+};
+
 const theGraphApi: string = 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet';
 const second: number = 1000;
+const orderBookApi = 'https://opyn.api.0x.org/sra/v4/orderbook';
+const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+const transactionGasAmount = 91_175;
 
 @Injectable()
 export class OpynService extends AggregatorAbstract<TRawOption> {
@@ -55,12 +74,15 @@ export class OpynService extends AggregatorAbstract<TRawOption> {
                     id
                     underlyingAsset {
                         symbol
+                        decimals
                     }
                     strikeAsset {
                         symbol
+                        decimals
                     }
                     collateralAsset {
                         symbol
+                        decimals
                     }
                     name
                     isPut
@@ -73,10 +95,41 @@ export class OpynService extends AggregatorAbstract<TRawOption> {
     }
 
     protected async getOrderBook(rawOption: TRawOption): Promise<OrderBook> {
-        return null;
+        const orderBook: OrderBook = {
+            optionMarketKey: EMarketKey.OPYN,
+            optionId: rawOption.id,
+            asks: [],
+            bids: [],
+        };
+        const orderBookResponse = await this.httpService
+            .get(`${orderBookApi}?baseToken=${rawOption.id}&quoteToken=${usdcAddress}&perPage=100`)
+            .toPromise();
+        const rawOrderBook: TRawOrderBook = orderBookResponse.data;
+        const optionDecimalsMul: BigNumber = new BigNumber(10).pow(rawOption.decimals);
+        const strikeDecimalsMul: BigNumber = new BigNumber(10).pow(rawOption.strikeAsset.decimals);
+
+        for (const { order } of rawOrderBook.asks.records) {
+            const amount = new BigNumber(order.makerAmount).div(optionDecimalsMul).toNumber();
+            const price = new BigNumber(order.takerAmount).div(strikeDecimalsMul).div(amount).toNumber();
+
+            orderBook.asks.push({ price, amount });
+        }
+
+        for (const { order } of rawOrderBook.bids.records) {
+            const amount = new BigNumber(order.takerAmount).div(optionDecimalsMul).toNumber();
+            const price = new BigNumber(order.makerAmount).div(strikeDecimalsMul).div(amount).toNumber();
+
+            orderBook.bids.push({ price, amount });
+        }
+
+        return orderBook;
     }
 
-    protected constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Option {
+    protected async constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Promise<Option> {
+        const ethPrice: number = await this.priceService.getPrice(ESymbol.ETH);
+        const { standard: gwei }: GweiPrice = await this.priceService.getGwei();
+        const takerTransactionUsd: number = transactionGasAmount * gwei * ethPrice;
+
         return {
             id: rawOption.id,
             name: rawOption.name,
@@ -91,11 +144,14 @@ export class OpynService extends AggregatorAbstract<TRawOption> {
             strikeAsset: rawOption.strikeAsset.symbol,
             marketUrl: 'https://www.opyn.co/#/trade',
             askBase: null,
-            askQuote: null, // TODO -
+            askQuote: orderBook.asks[0]?.price || 0,
             bidBase: null,
-            bidQuote: null, // TODO -
+            bidQuote: orderBook.bids[0]?.price || 0,
             deliveryType: EOptionDeliveryType.SETTLEMENT,
             styleType: EOptionStyleType.EUROPEAN,
+            fees: {
+                takerTransactionUsd,
+            },
         };
     }
 }
