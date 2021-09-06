@@ -43,11 +43,11 @@ type TRawOrderBook = {
     bids: TRawOrders;
 };
 
-const theGraphApi: string = 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet';
-const second: number = 1000;
-const orderBookApi = 'https://opyn.api.0x.org/sra/v4/orderbook';
-const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
-const transactionGasAmount = 91_175;
+const THE_GRAPH_API = 'https://api.thegraph.com/subgraphs/name/opynfinance/gamma-mainnet';
+const SECOND = 1000;
+const ORDER_BOOK_API = 'https://opyn.api.0x.org/sra/v4/orderbook';
+const USDC_ADDRESS = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+const TRANSACTION_GAS_AMOUNT = 91_175;
 
 @Injectable()
 export class OpynService extends AggregatorAbstract<TRawOption> {
@@ -60,13 +60,13 @@ export class OpynService extends AggregatorAbstract<TRawOption> {
     }
 
     protected async getRawOptions(skip: number): Promise<Array<TRawOption>> {
-        const rawOptionsResponse: TOptionsResponse = await request(theGraphApi, this.getQuery(skip));
+        const rawOptionsResponse: TOptionsResponse = await request(THE_GRAPH_API, this.getQuery(skip));
 
         return rawOptionsResponse.otokens;
     }
 
     private getQuery(skip: number): string {
-        const now: number = Math.floor(Date.now() / second);
+        const now: number = Math.floor(Date.now() / SECOND);
 
         return gql`
             {
@@ -102,7 +102,7 @@ export class OpynService extends AggregatorAbstract<TRawOption> {
             bids: [],
         };
         const orderBookResponse = await this.httpService
-            .get(`${orderBookApi}?baseToken=${rawOption.id}&quoteToken=${usdcAddress}&perPage=100`)
+            .get(`${ORDER_BOOK_API}?baseToken=${rawOption.id}&quoteToken=${USDC_ADDRESS}&perPage=100`)
             .toPromise();
         const rawOrderBook: TRawOrderBook = orderBookResponse.data;
         const optionDecimalsMul: BigNumber = new BigNumber(10).pow(rawOption.decimals);
@@ -128,7 +128,7 @@ export class OpynService extends AggregatorAbstract<TRawOption> {
     protected async constructOptionData(rawOption: TRawOption, orderBook: OrderBook): Promise<Option> {
         const ethPrice: number = await this.priceService.getPrice(ESymbol.ETH);
         const { standard: gwei }: GweiPrice = await this.priceService.getGwei();
-        const takerTransactionUsd: number = transactionGasAmount * gwei * ethPrice;
+        const takerTransactionUsd: number = TRANSACTION_GAS_AMOUNT * gwei * ethPrice;
 
         return {
             id: rawOption.id,
@@ -138,7 +138,7 @@ export class OpynService extends AggregatorAbstract<TRawOption> {
             type: rawOption.isPut ? EOptionType.PUT : EOptionType.CALL,
             size: 1,
             strike: Number(rawOption.strikePrice) / Math.pow(10, rawOption.decimals),
-            expirationDate: new Date(Number(rawOption.expiryTimestamp) * second),
+            expirationDate: new Date(Number(rawOption.expiryTimestamp) * SECOND),
             base: rawOption.underlyingAsset.symbol,
             quote: rawOption.strikeAsset.symbol,
             strikeAsset: rawOption.strikeAsset.symbol,
