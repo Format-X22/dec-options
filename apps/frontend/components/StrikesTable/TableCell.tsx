@@ -7,7 +7,6 @@ type TableCellProps = {
 
 export const TableCell: FC<TableCellProps> = styled.div`
     width: ${({ width }: TableCellProps) => (width ? `${width}` : 'calc(100% / 8)')};
-    padding: 16px 0;
     text-align: center;
     flex: 1;
 

@@ -264,7 +264,7 @@ export function OrderBook(): JSX.Element {
                                         <TitleText className='title-text'>{marketName}</TitleText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText className='title-text'>{formatFees(fees)}</TitleText>
+                                        <TitleText className='title-text'>$21.652 for gas</TitleText>
                                     </TableCell>
                                 </TableRow>
                             ),
@@ -359,7 +359,7 @@ function formatFees(fees?: OptionFees): string {
     }
 
     if (fees.takerTransactionUsd) {
-        result.push(`$${fees.takerTransactionUsd} for gas`);
+        result.push(`$${fees.takerTransactionUsd.toFixed(3)} for gas`);
     }
 
     return result.join(' + ');
