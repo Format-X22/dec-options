@@ -23,6 +23,14 @@ const FiltersRow = styled.div`
     & + & {
         margin-top: 40px;
     }
+
+    @media all and (max-width: 576px) {
+        flex-direction: column;
+
+        & + & {
+            overflow-x: auto;
+        }
+    }
 `;
 
 function Filters({}: { children?: ReactElement | string }): JSX.Element {

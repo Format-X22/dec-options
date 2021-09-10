@@ -34,6 +34,14 @@ const PanelBodyWrap = styled.div`
             background-clip: content-box;
         }
     }
+
+    @media all and (max-width: 576px) {
+        flex-direction: column;
+
+        & > div + div {
+            margin-left: 0;
+        }
+    }
 `;
 const OrderBookWrap = styled.div`
     width: 450px;

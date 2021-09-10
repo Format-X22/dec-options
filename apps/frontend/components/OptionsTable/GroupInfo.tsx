@@ -36,6 +36,17 @@ const StyledInfo = styled.div`
             }
         }
     }
+
+    @media all and (max-width: 576px) {
+      > div {
+          flex-direction: column;
+          align-items: flex-start;
+
+          .group-info {
+            margin-bottom: 20px
+          }
+      }
+    }
 `;
 
 const BaseText = styled.span`

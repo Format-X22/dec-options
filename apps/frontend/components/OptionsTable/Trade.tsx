@@ -9,6 +9,11 @@ const TradeComingSoon = styled.div`
     background: #303030;
     padding-left: 31px;
     font-size: 22px;
+
+    @media all and (max-width: 576px) {
+        padding-left: 0;
+        padding-top: 30px;
+    }
 `;
 
 const Trade = () => {

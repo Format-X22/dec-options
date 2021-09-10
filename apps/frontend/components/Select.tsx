@@ -13,11 +13,19 @@ export type Option = {
 const SelectAndLabelContainer = styled.div`
     display: flex;
     align-items: center;
-    justify-content: center;
     margin-right: 40px;
 
     &:last-child {
         margin-right: 0;
+    }
+
+    @media all and (max-width: 576px) {
+        margin-right: 0;
+        margin-bottom: 20px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 `;
 

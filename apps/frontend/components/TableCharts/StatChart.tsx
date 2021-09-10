@@ -159,6 +159,16 @@ const ChartsHeader = styled.div`
             background: #393939;
         }
     }
+
+    @media all and (max-width: 576px) {
+        flex-direction: column;
+        align-items: flex-start;
+
+        div {
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+    }
 `;
 
 const getColorByMarket = (marketKey: string) => {
