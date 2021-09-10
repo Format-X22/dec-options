@@ -105,6 +105,7 @@ const OrderBookTable = styled.div`
         text-align: left;
         justify-content: flex-start;
         padding-left: 24px;
+        padding-right: 24px;
     }
     .asks-weight {
         top: 0;
