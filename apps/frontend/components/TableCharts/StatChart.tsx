@@ -165,8 +165,10 @@ const ChartsHeader = styled.div`
         align-items: flex-start;
 
         div {
-            padding-left: 24px;
+            padding: 0 24px;
             margin-bottom: 20px;
+            overflow-x: auto;
+            width: 100%;
         }
     }
 `;
