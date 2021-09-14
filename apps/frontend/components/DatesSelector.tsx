@@ -1,15 +1,28 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { useExpirations } from '../hooks/useExpirations';
 import format from 'date-fns/format';
 import Select from './Select';
 import { CalendarIcon } from './Icons/CalendarIcon';
+import { gql, useQuery } from '@apollo/client';
+import { OptionGQL } from '@app/shared/option.schema';
+import { QueryResult } from '@apollo/client/react/types/types';
+
+const GET_OPTIONS = gql`
+    query getOptions($type: OptionType, $base: String!, $strike: Float!) {
+        options(filterByType: $type, filterByBase: $base, filterByStrike: $strike) {
+            data {
+                id
+                expirationDate
+            }
+        }
+    }
+`;
 
 const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(date));
 };
 
-export function DatesSelector(): JSX.Element {
+export function DatesSelector() {
     const router = useRouter();
     const value = (
         <>
@@ -18,18 +31,25 @@ export function DatesSelector(): JSX.Element {
         </>
     );
 
-    const { parsedData } = useExpirations();
-    const options = parsedData
-        ? parsedData.map(({ expirationDate }) => ({
-              name: formatDate(new Date(expirationDate)),
-              value: format(new Date(expirationDate), 'yyyy/MM/dd'),
-          }))
-        : [];
-
+    const { data: optionGroupData, error: optionGroupError }: QueryResult<{ options: { data: Array<OptionGQL> } }> =
+        useQuery(GET_OPTIONS, {
+            variables: {
+                type: ((router.query.type as string) || 'CALL').toUpperCase(),
+                base: router.query.base || '',
+                strike: +(router.query.strike || 0),
+            },
+        });
+    const sortedData = optionGroupData ? [...optionGroupData.options.data] : [];
+    const options = sortedData
+        .sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime())
+        .map(({ expirationDate }) => ({
+            name: formatDate(new Date(expirationDate)),
+            value: format(new Date(expirationDate), 'yyyy/MM/dd'),
+        }));
     function onChange(newValue: string): void {
         router.query.date = newValue;
         router.push(router);
     }
 
-    return <Select options={options} value={value} onChange={onChange} />;
+    return !optionGroupError ? <Select options={options} value={value} onChange={onChange} /> : null;
 }
