@@ -258,7 +258,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
                     {baseList
                         .filter((base) =>
                             Object.keys(data[base]).some((marketKey) =>
-                                data[selectedBase][marketKey].some((marketData) => marketData[chartKey] > 0),
+                                data[base][marketKey].some((marketData) => marketData[chartKey] > 0),
                             ),
                         )
                         .map((base) => (
