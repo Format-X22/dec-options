@@ -70,6 +70,12 @@ const SelectContainer: FC<SelectContainerProps> = styled.div`
     svg:last-child {
         margin-left: 11px;
     }
+
+    .arrow {
+        svg {
+            max-height: 6px;
+        }
+    }
 `;
 
 type OptionsContainerProps = {
