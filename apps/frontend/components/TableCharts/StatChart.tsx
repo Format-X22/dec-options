@@ -85,7 +85,7 @@ const ChartsCol = styled.div`
     }
 
     svg {
-        border: 1px solid #343434;
+        width: 100%;
         box-sizing: border-box;
     }
     .highcharts-container {
