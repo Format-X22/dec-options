@@ -205,6 +205,7 @@ interface IProps {
 }
 
 const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
+    console.log({data});
     const router = useRouter();
     const { base } = router.query as { base: string };
     const { state } = useContext(ContextApp);
