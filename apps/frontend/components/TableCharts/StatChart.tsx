@@ -205,7 +205,6 @@ interface IProps {
 }
 
 const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
-    console.log({data});
     const router = useRouter();
     const { base } = router.query as { base: string };
     const { state } = useContext(ContextApp);
@@ -258,7 +257,9 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
                 <div>
                     {baseList
                         .filter((base) =>
-                            Object.keys(data[base]).some((marketKey) => data[selectedBase][marketKey].length > 0),
+                            Object.keys(data[base]).some((marketKey) =>
+                                data[selectedBase][marketKey].some((marketData) => marketData[chartKey] > 0),
+                            ),
                         )
                         .map((base) => (
                             <button
