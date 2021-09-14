@@ -85,7 +85,7 @@ const ChartsCol = styled.div`
     }
 
     svg {
-        border: 1px solid #343434;
+        width: 100%;
         box-sizing: border-box;
     }
     .highcharts-container {
@@ -255,16 +255,20 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
             <ChartsHeader>
                 <h3>{title}</h3>
                 <div>
-                    {baseList.map((base) => (
-                        <button
-                            key={base}
-                            type='button'
-                            className={selectedBase === base ? 'active' : ''}
-                            onClick={() => setSelectedBase(base)}
-                        >
-                            {base}
-                        </button>
-                    ))}
+                    {baseList
+                        .filter((base) =>
+                            Object.keys(data[base]).some((marketKey) => data[selectedBase][marketKey].length > 0),
+                        )
+                        .map((base) => (
+                            <button
+                                key={base}
+                                type='button'
+                                className={selectedBase === base ? 'active' : ''}
+                                onClick={() => setSelectedBase(base)}
+                            >
+                                {base}
+                            </button>
+                        ))}
                 </div>
             </ChartsHeader>
             <HighchartsReact
