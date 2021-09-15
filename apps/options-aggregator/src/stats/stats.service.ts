@@ -407,9 +407,6 @@ export class StatsService {
     }): Promise<number> {
         const currentPrice = await this.priceService.getPrice(base);
 
-        minAsk = minAsk > currentPrice * 0.9 ? minAsk : minAsk * currentPrice;
-        maxBid = maxBid > currentPrice * 0.9 ? maxBid : maxBid * currentPrice;
-
         const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
         const datesDifference = Math.abs(moment(expirationDate).diff(new Date(), 'days') + 1) / 365;
 
