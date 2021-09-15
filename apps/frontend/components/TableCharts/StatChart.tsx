@@ -245,7 +245,12 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
                           },
                           stops: [
                               [0, 'rgba(113, 171, 210, 0.11)'],
-                              [1, colorFunc ? (colorFunc('rgba(113, 171, 210, 0.11)').brighten().setOpacity(0).get('rgba') as string) : '#71ABD2'],
+                              [
+                                  1,
+                                  colorFunc
+                                      ? (colorFunc('rgba(113, 171, 210, 0.11)').setOpacity(0).get('rgba') as string)
+                                      : '#71ABD2',
+                              ],
                           ],
                       },
                       marker: {
