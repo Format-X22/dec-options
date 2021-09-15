@@ -37,9 +37,9 @@ export type StatsData = {
     }[];
 };
 
-export const useStatsData = () => {
+export const useStatsData = (base?: string) => {
     const router = useRouter();
-    const { marketType, base } = router.query;
+    const { marketType } = router.query;
     return useQuery<{ stats: StatsData[] }>(GET_STATS, {
         variables: {
             marketType,

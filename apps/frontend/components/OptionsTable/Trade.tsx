@@ -19,7 +19,7 @@ const TradeComingSoon = styled.div`
 const Trade = () => {
     const router = useRouter();
     const { strike, base, type } = router.query as unknown as ITradeQuery;
-    const { loading: loadingStats, data: dataStats } = useStatsData();
+    const { loading: loadingStats, data: dataStats } = useStatsData(base);
     const dataByBase = useMemo(() => {
         const returnValue: {
             marketKey: string;
@@ -69,7 +69,6 @@ const Trade = () => {
                 impliedVolatility: ivAvg,
             });
         });
-        console.log({retObj, returnValue});
         return returnValue.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     }, [dataStats]);
     return (

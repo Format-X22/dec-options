@@ -45,7 +45,8 @@ export function DatesSelector() {
         .map(({ expirationDate }) => ({
             name: formatDate(new Date(expirationDate)),
             value: format(new Date(expirationDate), 'yyyy/MM/dd'),
-        }));
+        }))
+        .filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i);
     function onChange(newValue: string): void {
         router.query.date = newValue;
         router.push(router);
