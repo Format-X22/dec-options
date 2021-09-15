@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectModel } from '@nestjs/mongoose';
-import { Option, OptionDocument } from '@app/shared/option.schema';
+import { ESymbol, Option, OptionDocument } from '@app/shared/option.schema';
 import { Model } from 'mongoose';
 import * as moment from 'moment';
 import { ActiveMarkets } from '@app/shared/market.schema';
@@ -14,11 +14,17 @@ export class CleanerService implements OnModuleInit {
 
     async onModuleInit(): Promise<void> {
         await this.cleanInactiveMarketOptions();
+        await this.joinDexWithCanonicalBases();
     }
 
     async cleanInactiveMarketOptions(): Promise<void> {
         await this.optionsModel.deleteMany({ marketKey: { $nin: ActiveMarkets } });
         this.logger.verbose('Options from inactive markets cleaned');
+    }
+
+    async joinDexWithCanonicalBases(): Promise<void> {
+        await this.optionsModel.updateMany({ base: ESymbol.WETH }, { $set: { base: ESymbol.ETH } });
+        await this.optionsModel.updateMany({ base: ESymbol.WBTC }, { $set: { base: ESymbol.BTC } });
     }
 
     @Cron(CronExpression.EVERY_4_HOURS)
