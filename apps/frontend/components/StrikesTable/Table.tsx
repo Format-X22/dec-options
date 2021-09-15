@@ -106,14 +106,18 @@ export function Table({
 
     const onRowClick = useCallback(
         ({ strike, type }: { strike: number; type: string }): void => {
+            const query: { date: string; base: string; strike: number; type: string; marketType?: string } = {
+                date,
+                base,
+                strike,
+                type,
+            };
+            if (router.query.marketType) {
+                query.marketType = router.query.marketType as string;
+            }
             router.push({
                 pathname: `/trade`,
-                query: {
-                    date,
-                    base,
-                    strike,
-                    type,
-                },
+                query: query,
             });
         },
         [date, base],

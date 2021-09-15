@@ -53,7 +53,7 @@ const Trade = () => {
                             retObj[expirationDate] = {
                                 volume: retObj[expirationDate].volume + volume,
                                 openInterest: retObj[expirationDate].openInterest + openInterest,
-                                impliedVolatility: retObj[expirationDate].impliedVolatility + impliedVolatility,
+                                impliedVolatility: (retObj[expirationDate].impliedVolatility || 0) + impliedVolatility,
                                 impliedVolatilityCount: retObj[expirationDate].impliedVolatilityCount + 1,
                             };
                         });
@@ -69,6 +69,7 @@ const Trade = () => {
                 impliedVolatility: ivAvg,
             });
         });
+        console.log({retObj, returnValue});
         return returnValue.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     }, [dataStats]);
     return (

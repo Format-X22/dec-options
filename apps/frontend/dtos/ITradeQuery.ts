@@ -3,4 +3,5 @@ export interface ITradeQuery {
     strike: string;
     base: string;
     type: string;
+    marketType?: string;
 }

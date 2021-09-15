@@ -71,8 +71,8 @@ export function TableSide({
             let gamma: GreekValue = null;
             let theta: GreekValue = null;
             let vega: GreekValue = null;
-            let minAsk: number = item.minAsk || item.askQuote || 0;
-            let maxBid: number = item.maxBid || item.bidQuote || 0;
+            const minAsk: number = item.minAsk || item.askQuote || 0;
+            const maxBid: number = item.maxBid || item.bidQuote || 0;
 
             if (Number.isFinite(minAsk)) {
                 const optionPrice = maxBid ? Math.abs(maxBid + minAsk) / 2 : minAsk;
@@ -155,7 +155,11 @@ export function TableSide({
                         <TableRow
                             reverse={reverse}
                             key={item.strike + j + Math.random()}
-                            onClick={(): void => onRowClick({ strike: item.strike, type })}
+                            onClick={(): void => {
+                                if (item.minAsk || item.maxBid) {
+                                    onRowClick({ strike: item.strike, type });
+                                }
+                            }}
                             className='data-row'
                         >
                             {showMarketColumn && (

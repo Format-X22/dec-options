@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import Highcharts from 'highcharts';
+import Highcharts, { color as colorFunc } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useRouter } from 'next/router';
 import { ContextApp } from 'apps/frontend/pages/_app';
@@ -26,23 +26,6 @@ const options: Highcharts.Options = {
     },
     tooltip: {
         split: true,
-    },
-    plotOptions: {
-        area: {
-            stacking: 'normal',
-            lineColor: '#666666',
-            lineWidth: 1,
-            marker: {
-                lineWidth: 1,
-                lineColor: '#666666',
-            },
-        },
-        column: {
-            stacking: 'normal',
-            dataLabels: {
-                enabled: false,
-            },
-        },
     },
     colors: [
         '#8085B5',
@@ -173,11 +156,11 @@ const ChartsHeader = styled.div`
     }
 `;
 
-const getColorByMarket = (marketKey: string) => {
+const getColorByMarket = (marketKey: string, areaType: string) => {
     const colorsByMarket = {
         auctus: '#8085B5',
         binance: '#79C971',
-        deribit: '#BF618F',
+        deribit: areaType === 'area' ? '#71ABD2' : '#D28E71',
         finnexus: '#975FC7',
         hegic: '#5C6DC6',
         okex: '#C6A064',
@@ -237,7 +220,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
                               radius: 1,
                               symbol: 'circle',
                           },
-                          color: getColorByMarket(marketKey),
+                          color: getColorByMarket(marketKey, type),
                       };
                   })
                   .filter(({ data }) => Math.max(...data) > 0)
@@ -248,6 +231,58 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
     const biggestDatesArr = series.reduce((a, b) => {
         return a.length > b.dates.length ? a : b.dates;
     }, []);
+
+    const plotOptions =
+        type === 'area'
+            ? {
+                  area: {
+                      fillColor: {
+                          linearGradient: {
+                              x1: 0,
+                              y1: 0,
+                              x2: 0,
+                              y2: 1,
+                          },
+                          stops: [
+                              [0, 'rgba(113, 171, 210, 0.11)'],
+                              [1, colorFunc ? (colorFunc('rgba(113, 171, 210, 0.11)').brighten().setOpacity(0).get('rgba') as string) : '#71ABD2'],
+                          ],
+                      },
+                      marker: {
+                          radius: 2,
+                      },
+                      lineWidth: 2,
+                      states: {
+                          hover: {
+                              lineWidth: 1,
+                          },
+                      },
+                      threshold: null,
+                  },
+                  column: {
+                      stacking: 'normal',
+                      dataLabels: {
+                          enabled: false,
+                      },
+                  },
+              }
+            : {
+                  area: {
+                      stacking: 'normal',
+                      lineColor: '#666666',
+                      lineWidth: 1,
+                      marker: {
+                          lineWidth: 1,
+                          lineColor: '#666666',
+                      },
+                  },
+                  column: {
+                      stacking: 'normal',
+                      dataLabels: {
+                          enabled: false,
+                      },
+                  },
+              };
 
     return (
         <ChartsCol>
@@ -277,6 +312,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
                 highcharts={Highcharts}
                 options={{
                     ...options,
+                    plotOptions,
                     loading: true,
                     xAxis: {
                         ...options.xAxis,
@@ -294,7 +330,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
                     series,
                     chart: {
                         type,
-                        height: 250,
+                        height: 350,
                     },
                 }}
             />

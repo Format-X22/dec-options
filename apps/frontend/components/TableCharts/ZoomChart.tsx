@@ -35,8 +35,8 @@ const options: Highcharts.Options = {
                     y2: 1,
                 },
                 stops: [
-                    [0, '#8085B5'],
-                    [1, color ? (color('#8085B5').setOpacity(0).get('rgba') as string) : '#8085B5'],
+                    [0, '#71ABD2'],
+                    [1, color ? (color('#71ABD2').setOpacity(0).get('rgba') as string) : '#71ABD2'],
                 ],
             },
             marker: {
@@ -58,7 +58,7 @@ const options: Highcharts.Options = {
         },
     },
     colors: [
-        '#8085B5',
+        '#71ABD2',
         '#79C971',
         '#BF618F',
         '#975FC7',

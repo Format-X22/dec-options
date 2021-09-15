@@ -38,14 +38,14 @@ const StyledInfo = styled.div`
     }
 
     @media all and (max-width: 576px) {
-      > div {
-          flex-direction: column;
-          align-items: flex-start;
+        > div {
+            flex-direction: column;
+            align-items: flex-start;
 
-          .group-info {
-            margin-bottom: 20px
-          }
-      }
+            .group-info {
+                margin-bottom: 20px;
+            }
+        }
     }
 `;
 
@@ -65,11 +65,25 @@ const Text = styled.span`
 
 export function GroupInfo(): JSX.Element {
     const router = useRouter();
-    const { date, strike, base, type } = router.query as unknown as ITradeQuery;
+    const { date, strike, base, type, marketType } = router.query as unknown as ITradeQuery;
     return (
         <StyledInfo>
             <div>
-                <Button onClick={() => router.push(`/?date=${date}&base=${base}`)}>
+                <Button
+                    onClick={() => {
+                        const query: { date: string; base: string; marketType?: string } = {
+                            date,
+                            base,
+                        };
+                        if (marketType) {
+                            query.marketType = marketType;
+                        }
+                        router.push({
+                            pathname: `/`,
+                            query: query,
+                        });
+                    }}
+                >
                     <img src='/opex/public/back.svg' alt='back' /> Go back
                 </Button>
             </div>
