@@ -256,7 +256,7 @@ export function OrderBook(): JSX.Element {
                                         />
                                     )}
                                     <TableCell>
-                                        <AsksText>{price.toFixed(4)}</AsksText>
+                                        <AsksText>{price.toFixed(2)}</AsksText>
                                     </TableCell>
                                     <TableCell>
                                         <TitleText className='title-text'>{amount.toFixed(2)}</TitleText>
@@ -294,7 +294,7 @@ export function OrderBook(): JSX.Element {
                                         />
                                     )}
                                     <TableCell>
-                                        <BidsText>{price.toFixed(4)}</BidsText>
+                                        <BidsText>{price.toFixed(2)}</BidsText>
                                     </TableCell>
                                     <TableCell>
                                         <TitleText className='title-text'>{amount.toFixed(2)}</TitleText>
