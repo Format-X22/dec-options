@@ -1,5 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Option, OptionDocument } from '@app/shared/option.schema';
+import { ESymbol, Option, OptionDocument } from '@app/shared/option.schema';
 import { Model } from 'mongoose';
 import { HttpService, Logger } from '@nestjs/common';
 import * as sleep from 'sleep-promise';
@@ -54,6 +54,7 @@ export abstract class AggregatorAbstract<TRawOption> {
             }
 
             if (option) {
+                this.normalizeOptionBase(option);
                 await this.saveResult(option);
             }
 
@@ -91,6 +92,16 @@ export abstract class AggregatorAbstract<TRawOption> {
         }
 
         return result;
+    }
+
+    private normalizeOptionBase(option: Option): void {
+        if (option.base === ESymbol.WETH) {
+            option.base = ESymbol.ETH;
+        }
+
+        if (option.base === ESymbol.WBTC) {
+            option.base = ESymbol.BTC;
+        }
     }
 
     protected abstract getRawOptions(skip?: number): Promise<Array<TRawOption>>;
