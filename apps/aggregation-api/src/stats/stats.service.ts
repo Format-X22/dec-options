@@ -51,6 +51,14 @@ export class StatsService {
             });
         }
 
+        if (args.base) {
+            pipeline.unshift({
+                $match: {
+                    base: args.base,
+                },
+            });
+        }
+
         return this.statsModel.aggregate(pipeline).exec();
     }
 }

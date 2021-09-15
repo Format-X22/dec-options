@@ -1,6 +1,6 @@
 import { ArgsType, Field } from '@nestjs/graphql';
 import { EMarketType } from '@app/shared/market.schema';
-import { IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { Option } from '@app/shared/option.schema';
 
 @ArgsType()
@@ -9,4 +9,9 @@ export class StatsArgs {
     @IsOptional()
     @IsEnum(EMarketType)
     marketType?: Option['marketType'];
+
+    @Field((): typeof String => String, { nullable: true })
+    @IsOptional()
+    @IsString()
+    base?: Option['base'];
 }
