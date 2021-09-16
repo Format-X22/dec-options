@@ -259,7 +259,9 @@ export function OrderBook(): JSX.Element {
                                         <AsksText>{price.toFixed(2)}</AsksText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText className='title-text'>{amount.toFixed(2)}</TitleText>
+                                        <TitleText className='title-text'>
+                                            {amount < 0.01 ? amount.toFixed(4) : amount.toFixed(2)}
+                                        </TitleText>
                                     </TableCell>
                                     <TableCell>
                                         <TitleText className='title-text'>{marketName}</TitleText>
@@ -297,7 +299,9 @@ export function OrderBook(): JSX.Element {
                                         <BidsText>{price.toFixed(2)}</BidsText>
                                     </TableCell>
                                     <TableCell>
-                                        <TitleText className='title-text'>{amount.toFixed(2)}</TitleText>
+                                        <TitleText className='title-text'>
+                                            {amount < 0.001 ? amount.toFixed(4) : amount.toFixed(2)}
+                                        </TitleText>
                                     </TableCell>
                                     <TableCell>
                                         <TitleText className='title-text'>{marketName}</TitleText>
@@ -353,7 +357,7 @@ function formatFees(fees?: OptionFees): string {
         return 'N/A';
     }
 
-    let result: Array<string> = [];
+    const result: Array<string> = [];
 
     if (fees.takerPercent) {
         result.push(`${fees.takerPercent}%`);
