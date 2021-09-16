@@ -23,7 +23,7 @@ const GET_STATS = gql`
 
 export type StatsData = {
     base: string;
-    date: Date;
+    date: string;
     volume: number;
     openInterest: number;
     marketKey: string;
