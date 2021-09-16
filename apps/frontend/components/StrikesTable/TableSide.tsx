@@ -161,6 +161,7 @@ export function TableSide({
                                 }
                             }}
                             className='data-row'
+                            highlighted={item.minAsk && item.maxBid ? item.minAsk < item.maxBid : false}
                         >
                             {showMarketColumn && (
                                 <TableCell>

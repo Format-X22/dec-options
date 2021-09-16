@@ -7,12 +7,13 @@ type TableRowProps = {
     maxHeight?: number;
     onClick?: () => void;
     className?: string;
+    highlighted?: boolean;
 };
 export const TableRow: FC<TableRowProps> = styled.div`
     display: flex;
     width: 100%;
     max-height: ${({ maxHeight }: TableRowProps) => (maxHeight ? `${maxHeight}px` : '48px')};
-    background: ${$backgroundLight};
+    background: ${({ highlighted }: TableRowProps) => (highlighted ? `rgba(113,210,152,0.06)` : $backgroundLight)};
     align-items: center;
     justify-content: center;
     flex-direction: ${({ reverse }: TableRowProps) => (reverse ? 'row-reverse' : 'row')};
