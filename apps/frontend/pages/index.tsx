@@ -87,7 +87,7 @@ function Index(): JSX.Element {
     return (
         <Layout>
             <Filters />
-            <TableCharts />
+            {marketType !== 'DEX' && <TableCharts />}
             <StrikesTable />
         </Layout>
     );

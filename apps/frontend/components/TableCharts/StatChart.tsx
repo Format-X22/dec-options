@@ -198,6 +198,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
             setSelectedBase(base);
         }
     }, [base]);
+
     const series = useMemo(() => {
         return data && selectedBase && data[selectedBase]
             ? Object.keys(data[selectedBase])
