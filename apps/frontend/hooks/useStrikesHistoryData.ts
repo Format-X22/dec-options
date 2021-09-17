@@ -33,7 +33,6 @@ export const useStrikeHistoryData = (
                             );
                         })
                         .forEach(({ volume, openInterest, impliedVolatility }) => {
-                            const statDateTime = new Date(statDate).getTime();
                             if (!retObj[statDate]) {
                                 retObj[statDate] = {
                                     volume: 0,
