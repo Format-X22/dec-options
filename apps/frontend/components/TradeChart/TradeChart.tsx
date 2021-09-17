@@ -2,7 +2,8 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import { useHistoryChartOptions } from 'apps/frontend/hooks/useHistoryChartOptions';
+import { getHistoryChartOptions } from './getHistoryChartOptions';
+import { getTotalValueChartOptions } from './getTotalValueChartOptions';
 
 const ChartsCol = styled.div`
     background-color: #3d3d3d;
@@ -47,8 +48,13 @@ interface IProps {
     }[];
 }
 
-const ZoomChart: FC<IProps> = ({ type = 'area', chartKey, data, dataTitle, base }) => {
-    const historyChartOptions = useHistoryChartOptions({ base, type, chartKey, dataTitle, data });
+const TradeChart: FC<IProps> = ({ type = 'area', chartKey, data, dataTitle, base }) => {
+    const historyChartOptions =
+        type === 'area'
+            ? getHistoryChartOptions({ base, type, chartKey, dataTitle, data })
+            : getTotalValueChartOptions({ base, type, chartKey, dataTitle, data });
+    
+            console.log({data, historyChartOptions});
     return (
         <ChartsCol>
             <HighchartsReact highcharts={Highcharts} options={historyChartOptions} />
@@ -56,4 +62,4 @@ const ZoomChart: FC<IProps> = ({ type = 'area', chartKey, data, dataTitle, base 
     );
 };
 
-export default ZoomChart;
+export default TradeChart;

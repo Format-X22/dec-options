@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 
 import { ITradeQuery } from '../../dtos/ITradeQuery';
-import ZoomChart from '../TableCharts/ZoomChart';
+import TradeChart from '../TradeChart/TradeChart';
 import { useStatsData } from '../../hooks/useStatsData';
 import { useStrikeHistoryData } from '../../hooks/useStrikesHistoryData';
 import { useTotalValuesByExpirations } from '../../hooks/useTotalValuesByExpirations';
@@ -29,7 +29,7 @@ const Trade = () => {
     return (
         <TradeComingSoon>
             {!loadingStats && (
-                <ZoomChart
+                <TradeChart
                     type='area'
                     data={strikesHistoryData}
                     chartKey='openInterest'
@@ -38,7 +38,7 @@ const Trade = () => {
                 />
             )}
             {!loadingStats && (
-                <ZoomChart
+                <TradeChart
                     type='area'
                     data={strikesHistoryData}
                     chartKey='volume'
@@ -47,7 +47,7 @@ const Trade = () => {
                 />
             )}
             {!loadingStats && (
-                <ZoomChart
+                <TradeChart
                     type='area'
                     data={strikesHistoryData}
                     chartKey='impliedVolatility'
@@ -56,7 +56,7 @@ const Trade = () => {
                 />
             )}
             {!loadingStats && (
-                <ZoomChart
+                <TradeChart
                     type='column'
                     data={totalValuesByExpirations}
                     chartKey='openInterest'
@@ -65,7 +65,7 @@ const Trade = () => {
                 />
             )}
             {!loadingStats && (
-                <ZoomChart
+                <TradeChart
                     type='column'
                     data={totalValuesByExpirations}
                     chartKey='volume'
@@ -74,7 +74,7 @@ const Trade = () => {
                 />
             )}
             {!loadingStats && (
-                <ZoomChart
+                <TradeChart
                     type='column'
                     data={totalValuesByExpirations}
                     chartKey='impliedVolatility'

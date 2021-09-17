@@ -13,11 +13,7 @@ interface IProps {
     }[];
 }
 
-export const useHistoryChartOptions = ({ base, type, dataTitle, chartKey, data }: IProps) => {
-    const dates = data.map(({ date }) => {
-        const dateObject = new Date(date);
-        return new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(dateObject);
-    });
+export const getHistoryChartOptions = ({ base, type, dataTitle, chartKey, data }: IProps) => {
     return {
         title: {
             text: '',
@@ -32,19 +28,15 @@ export const useHistoryChartOptions = ({ base, type, dataTitle, chartKey, data }
             tickLength: 5,
             labels: {
                 formatter: function () {
-                    if (type === 'area') {
-                        const dateObject = new Date(this.value);
-                        const isMidnight = true; //dateObject.getHours() === 0;
-                        return new Intl.DateTimeFormat(
-                            'en',
-                            isMidnight ? { month: 'short', day: '2-digit' } : { hour: 'numeric', minute: '2-digit' },
-                        ).format(dateObject);
-                    }
-                    return this.value;
+                    const dateObject = new Date(this.value);
+                    const isMidnight = true; //dateObject.getHours() === 0;
+                    return new Intl.DateTimeFormat(
+                        'en',
+                        isMidnight ? { month: 'short', day: '2-digit' } : { hour: 'numeric', minute: '2-digit' },
+                    ).format(dateObject);
                 },
             },
             tickPixelInterval: 150,
-            categories: type === 'area' ? undefined : dates,
         },
         yAxis: {
             opposite: true,
@@ -65,14 +57,7 @@ export const useHistoryChartOptions = ({ base, type, dataTitle, chartKey, data }
             {
                 type: type,
                 name: dataTitle,
-                data:
-                    type === 'area'
-                        ? data.map((marketData) => [
-                              new Date(marketData.date).getTime(),
-                              +marketData[chartKey].toFixed(2),
-                          ])
-                        : data.map((marketData) => +marketData[chartKey].toFixed(2)),
-                dates,
+                data: data.map((marketData) => [new Date(marketData.date).getTime(), +marketData[chartKey].toFixed(2)]),
                 marker: {
                     radius: 2,
                     symbol: 'circle',
