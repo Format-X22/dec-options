@@ -12,6 +12,8 @@ const GET_OPTIONS = gql`
         options(filterByType: $type, filterByBase: $base, filterByStrike: $strike) {
             data {
                 id
+                askQuote
+                bidQuote
                 expirationDate
             }
         }
@@ -41,6 +43,7 @@ export function DatesSelector() {
         });
     const sortedData = optionGroupData ? [...optionGroupData.options.data] : [];
     const options = sortedData
+        .filter(({ askQuote, bidQuote }) => askQuote !== 0 || bidQuote !== 0)
         .sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime())
         .map(({ expirationDate }) => ({
             name: formatDate(new Date(expirationDate)),
