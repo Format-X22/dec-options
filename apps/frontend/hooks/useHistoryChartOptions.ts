@@ -32,12 +32,15 @@ export const useHistoryChartOptions = ({ base, type, dataTitle, chartKey, data }
             tickLength: 5,
             labels: {
                 formatter: function () {
-                    const dateObject = new Date(this.value);
-                    const isMidnight = true; //dateObject.getHours() === 0;
-                    return new Intl.DateTimeFormat(
-                        'en',
-                        isMidnight ? { month: 'short', day: '2-digit' } : { hour: 'numeric', minute: '2-digit' },
-                    ).format(dateObject);
+                    if (type === 'area') {
+                        const dateObject = new Date(this.value);
+                        const isMidnight = true; //dateObject.getHours() === 0;
+                        return new Intl.DateTimeFormat(
+                            'en',
+                            isMidnight ? { month: 'short', day: '2-digit' } : { hour: 'numeric', minute: '2-digit' },
+                        ).format(dateObject);
+                    }
+                    return this.value;
                 },
             },
             tickPixelInterval: 150,
@@ -74,6 +77,7 @@ export const useHistoryChartOptions = ({ base, type, dataTitle, chartKey, data }
                     radius: 2,
                     symbol: 'circle',
                 },
+                maxPointWidth: 30,
             },
         ],
         chart: {
