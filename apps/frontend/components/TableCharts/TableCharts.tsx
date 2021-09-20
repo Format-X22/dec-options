@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import StatChart from './StatChart';
 import { useStatsData } from '../../hooks/useStatsData';
@@ -13,7 +14,8 @@ const ChartsRow = styled.div`
 `;
 
 const TableCharts = () => {
-    const { loading: loadingStats, data: dataStats } = useStatsData();
+    const router = useRouter();
+    const { loading: loadingStats, data: dataStats } = useStatsData({ marketType: router.query.marketType as string });
     const dataByBase = useMemo(() => {
         const returnValue = {};
         if (dataStats) {

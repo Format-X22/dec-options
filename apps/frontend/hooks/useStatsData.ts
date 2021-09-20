@@ -1,5 +1,4 @@
 import { gql, useQuery } from '@apollo/client';
-import { useRouter } from 'next/router';
 
 const GET_STATS = gql`
     query getStats($marketType: MarketType, $base: String) {
@@ -37,9 +36,12 @@ export type StatsData = {
     }[];
 };
 
-export const useStatsData = (base?: string) => {
-    const router = useRouter();
-    const { marketType } = router.query;
+interface IProps {
+    base?: string;
+    marketType?: string;
+}
+
+export const useStatsData = ({ base, marketType }: IProps) => {
     return useQuery<{ stats: StatsData[] }>(GET_STATS, {
         variables: {
             marketType,

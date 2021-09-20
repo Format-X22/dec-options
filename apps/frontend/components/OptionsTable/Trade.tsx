@@ -22,7 +22,7 @@ const TradeComingSoon = styled.div`
 const Trade = () => {
     const router = useRouter();
     const { strike, base, type, date } = router.query as unknown as ITradeQuery;
-    const { loading: loadingStats, data: dataStats } = useStatsData(base);
+    const { loading: loadingStats, data: dataStats } = useStatsData({ base });
     const strikesHistoryData = useStrikeHistoryData(base, date, strike, type, dataStats);
     const totalValuesByExpirations = useTotalValuesByExpirations(base, strike, type, dataStats);
 
