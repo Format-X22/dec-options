@@ -53,8 +53,6 @@ const TradeChart: FC<IProps> = ({ type = 'area', chartKey, data, dataTitle, base
         type === 'area'
             ? getHistoryChartOptions({ base, type, chartKey, dataTitle, data })
             : getTotalValueChartOptions({ base, type, chartKey, dataTitle, data });
-    
-            console.log({data, historyChartOptions});
     return (
         <ChartsCol>
             <HighchartsReact highcharts={Highcharts} options={historyChartOptions} />

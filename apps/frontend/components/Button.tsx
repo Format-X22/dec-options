@@ -1,59 +1,44 @@
-import { ReactNode } from 'react';
-import styled from 'styled-components';
-import { $blue } from '../theme';
+import styled, { StyledComponent, css } from 'styled-components';
+import { Button as Btn } from 'antd';
+import { $buttonBackground, $buttonBackgroundHover } from '@dexcommas/core';
+import { $buttonBackgroundGhost, $buttonBackgroundHoverGhost } from '../theme';
 
-const StyledButton = styled.button`
-    padding: 8px 16px;
-    border: 1px solid ${$blue};
-    color: ${$blue};
-    background: #3a3a3a;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 18px;
-    letter-spacing: 0.16px;
-    box-sizing: border-box;
-    border-radius: 6px;
-    cursor: pointer;
+export const Button: StyledComponent<typeof Btn, any> = styled(Btn)`
     display: flex;
     align-items: center;
-
-    &:hover:not(:disabled) {
-        background: linear-gradient(0deg, rgba(99, 206, 250, 0.1), rgba(99, 206, 250, 0.1));
-    }
+    justify-content: center;
+    height: 38px;
+    border-radius: 4px;
+    text-shadow: none;
+    box-shadow: none;
 
     img {
         margin-right: 10px;
     }
 
-    &:disabled {
-        cursor: not-allowed;
+    ${({ type }) =>
+        type === 'primary' &&
+        css`
+            border: 1px solid ${$buttonBackgroundHover};
+            background-color: ${$buttonBackgroundHover};
 
-        &:hover {
-            cursor: not-allowed;
-        }
-    }
+            :hover {
+                background-color: ${$buttonBackground};
+                border-color: ${$buttonBackground};
+            }
+        `}
+
+    ${({ type }) =>
+        type === 'ghost' &&
+        css`
+            border: 1px solid ${$buttonBackgroundGhost};
+            color: ${$buttonBackgroundGhost};
+
+            :hover,
+            :focus {
+                color: #fff;
+                background-color: ${$buttonBackgroundHoverGhost};
+                border-color: ${$buttonBackgroundHoverGhost};
+            }
+        `}
 `;
-
-function Button({
-    children,
-    onClick,
-    disabled = false,
-}: {
-    children: ReactNode;
-    onClick?: () => void;
-    disabled?: boolean;
-}): JSX.Element {
-    function onClickHandler(): void {
-        if (onClick) {
-            onClick();
-        }
-    }
-
-    return (
-        <StyledButton onClick={onClickHandler} disabled={disabled}>
-            {children}
-        </StyledButton>
-    );
-}
-
-export default Button;

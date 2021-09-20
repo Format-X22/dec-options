@@ -4,6 +4,8 @@ import { $backgroundLight } from '../theme';
 import Button from './Button';
 import { Modal } from './Modal';
 
+import { GetInTouch } from './GetInTouch/GetInTouch';
+
 const StyledHeader = styled.div`
     width: 100%;
     display: flex;
@@ -53,10 +55,11 @@ function Header({}: { children?: ReactElement | string }): JSX.Element {
                     <sup>DeCommas</sup>Opex
                 </h1>
             </Logo>
-            <Button onClick={openModal}>Connect wallet</Button>
+            {/* <Button onClick={openModal}>Connect wallet</Button>
             <Modal visible={connectModalIsVisible} onClose={closeModal} title='Keep calm and just wait'>
                 The connection with Ethereum network will be available soon.
-            </Modal>
+            </Modal> */}
+            <GetInTouch />
         </StyledHeader>
     );
 }

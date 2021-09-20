@@ -14,4 +14,6 @@ export const $colorGreen = '#71D298';
 export const $colorRed = '#D27171';
 export const $buttonBackground = '#5D97BE';
 export const $buttonBackgroundHover = '#3F79A0';
+export const $buttonBackgroundGhost = '#71D298';
+export const $buttonBackgroundHoverGhost = '#4AE49A';
 export const $tableRowHover = '#383838';

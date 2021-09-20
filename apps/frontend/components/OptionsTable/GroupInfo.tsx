@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { $backgroundLight } from '../../theme';
-import Button from '../Button';
+import { Button } from '../Button';
 import { useRouter } from 'next/router';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
 import { CallsSvgIcon } from '../Icons/CallsSvgIcon';
@@ -70,6 +70,7 @@ export function GroupInfo(): JSX.Element {
         <StyledInfo>
             <div>
                 <Button
+                    type='primary'
                     onClick={() => {
                         const query: { date: string; base: string; marketType?: string } = {
                             date,
