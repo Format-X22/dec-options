@@ -25,6 +25,7 @@ build_stage:
     - mv tsconfig.json bundle/
     - mv ecosystem.config.js bundle/
     - mv .env bundle/
+    - mv .npmrc bundle/
   artifacts:
     expire_in: 1 week
     paths:
@@ -49,6 +50,7 @@ build_production:
     - mv tsconfig.json bundle/
     - mv ecosystem.config.js bundle/
     - mv .env bundle/
+    - mv .npmrc bundle/
   artifacts:
     expire_in: 1 week
     paths:
