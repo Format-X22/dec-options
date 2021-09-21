@@ -14,6 +14,7 @@ interface IProps {
 }
 
 export const getHistoryChartOptions = ({ base, type, dataTitle, chartKey, data }: IProps) => {
+    const measureValue = chartKey !== 'openInterest' ? base : '$';
     return {
         title: {
             text: '',
@@ -47,11 +48,11 @@ export const getHistoryChartOptions = ({ base, type, dataTitle, chartKey, data }
                 },
             },
             title: {
-                text: base,
+                text: '',
             },
         },
         tooltip: {
-            valueSuffix: ` ${base}`,
+            valueSuffix: ` ${measureValue}`,
         },
         series: [
             {

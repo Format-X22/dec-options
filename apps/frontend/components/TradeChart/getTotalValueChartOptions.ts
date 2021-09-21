@@ -18,6 +18,7 @@ export const getTotalValueChartOptions = ({ base, type, dataTitle, chartKey, dat
         const dateObject = new Date(date);
         return new Intl.DateTimeFormat('en', { month: 'short', day: '2-digit' }).format(dateObject);
     });
+    const measureValue = chartKey !== 'openInterest' ? base : '$';
     return {
         title: {
             text: '',
@@ -37,11 +38,11 @@ export const getTotalValueChartOptions = ({ base, type, dataTitle, chartKey, dat
                 },
             },
             title: {
-                text: base,
+                text: '',
             },
         },
         tooltip: {
-            valueSuffix: ` ${base}`,
+            valueSuffix: ` ${measureValue}`,
         },
         series: [
             {

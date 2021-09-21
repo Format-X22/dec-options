@@ -290,6 +290,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
                   },
               };
 
+    const measureValue = chartKey !== 'openInterest' ? selectedBase : '$';
     return (
         <ChartsCol>
             {loading && <div className='spinner' />}
@@ -327,11 +328,11 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
                     yAxis: {
                         ...options.yAxis,
                         title: {
-                            text: selectedBase,
+                            text: '',
                         },
                     },
                     tooltip: {
-                        valueSuffix: ` ${selectedBase}`,
+                        valueSuffix: ` ${measureValue}`,
                     },
                     series,
                     chart: {
