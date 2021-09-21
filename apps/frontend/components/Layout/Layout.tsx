@@ -1,7 +1,8 @@
 import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
-import Header from '../Header';
+import Header from './Header';
+import Footer from './Footer';
 
 const Container: FC<{ fixedScreenHeight: boolean }> = styled.div`
     display: flex;
@@ -20,6 +21,7 @@ const Layout: FC<IProps> = ({ fixedScreenHeight = false, children }) => {
         <Container fixedScreenHeight={fixedScreenHeight}>
             <Header />
             {children}
+            <Footer />
         </Container>
     );
 };

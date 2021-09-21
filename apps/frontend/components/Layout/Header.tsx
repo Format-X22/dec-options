@@ -1,10 +1,8 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement } from 'react';
 import styled from 'styled-components';
-import { $backgroundLight } from '../theme';
-import Button from './Button';
-import { Modal } from './Modal';
+import { $backgroundLight } from '../../theme';
 
-import { GetInTouch } from './GetInTouch/GetInTouch';
+import { GetInTouch } from '../GetInTouch/GetInTouch';
 
 const StyledHeader = styled.div`
     width: 100%;
@@ -40,13 +38,6 @@ const Logo = styled.div`
 `;
 
 function Header({}: { children?: ReactElement | string }): JSX.Element {
-    const [connectModalIsVisible, setConnectModalIsVisible] = useState(false);
-    const closeModal = () => {
-        setConnectModalIsVisible(false);
-    };
-    const openModal = () => {
-        setConnectModalIsVisible(true);
-    };
     return (
         <StyledHeader>
             <Logo>
@@ -55,10 +46,6 @@ function Header({}: { children?: ReactElement | string }): JSX.Element {
                     <sup>DeCommas</sup>Opex
                 </h1>
             </Logo>
-            {/* <Button onClick={openModal}>Connect wallet</Button>
-            <Modal visible={connectModalIsVisible} onClose={closeModal} title='Keep calm and just wait'>
-                The connection with Ethereum network will be available soon.
-            </Modal> */}
             <GetInTouch />
         </StyledHeader>
     );

@@ -5,5 +5,4 @@ export const StyledContainer = styled.div`
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    max-height: 100vh;
 `;
