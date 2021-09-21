@@ -1,6 +1,6 @@
 default:
   tags: ["docker"]
-  image: node:lts
+  image: node:16
 
 stages:
   - build
