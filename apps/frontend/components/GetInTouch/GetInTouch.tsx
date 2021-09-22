@@ -86,7 +86,7 @@ export const GetInTouch = () => {
                     </StyleButton>
                 </Container>
             </Modal>
-            <Button onClick={() => setModalIsVisible(true)} type='primary'>
+            <Button onClick={() => setModalIsVisible(true)} type='ghost'>
                 Get in touch
             </Button>
         </>

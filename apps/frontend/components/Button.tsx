@@ -19,12 +19,14 @@ export const Button: StyledComponent<typeof Btn, any> = styled(Btn)`
     ${({ type }) =>
         type === 'primary' &&
         css`
-            border: 1px solid ${$buttonBackgroundHover};
-            background-color: ${$buttonBackgroundHover};
+            border: 1px solid ${$buttonBackground};
+            color: ${$buttonBackground};
+            background: transparent;
 
             :hover {
-                background-color: ${$buttonBackground};
-                border-color: ${$buttonBackground};
+                color: #fff;
+                border-color: ${$buttonBackgroundHover};
+                background: ${$buttonBackgroundHover};
             }
         `}
 
