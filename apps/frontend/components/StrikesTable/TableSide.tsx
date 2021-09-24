@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useMemo } from 'react';
 import { ContextApp } from '../../pages/_app';
 import { GreekValue } from '../../types';
 import { differenceInDays } from 'date-fns';
@@ -53,14 +53,19 @@ export function TableSide({
 }): JSX.Element {
     const { state } = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
-    const [dataWithGreeks, setDataWithGreeks] = useState<(TTableData | undefined)[]>([]);
 
-    function calcGreeks(): void {
+    console.log({ data, maxStrike });
+    const maxStrike =
+        data && data.length > 0
+            ? // @ts-ignore
+              data.filter((item) => item).reduce((max, { strike }) => (strike > max ? strike : max), 0)
+            : 0;
+    const dataWithGreeks = useMemo(() => {
         if (!data) {
-            return;
+            return [];
         }
 
-        const newData = data.map((item) => {
+        return data.map((item) => {
             if (!item) {
                 return;
             }
@@ -96,21 +101,11 @@ export function TableSide({
             elementData.vega = checkGreek(vega) || undefined;
             elementData.maxBid = maxBid;
             elementData.minAsk = minAsk;
+            elementData.strike = item.strike;
 
             return elementData;
         });
-
-        setDataWithGreeks(newData);
-    }
-
-    useEffect((): void => {
-        setDataWithGreeks([]);
-        calcGreeks();
-    }, [data]);
-
-    useEffect((): void => {
-        calcGreeks();
-    }, [currentPrice]);
+    }, [data, currentPrice]);
 
     return (
         <>
@@ -143,7 +138,7 @@ export function TableSide({
                 </TableCell>
                 {!hideSourcesColumn && (
                     <TableCell>
-                        <TitleText>Sources</TitleText>
+                        <TitleText></TitleText>
                     </TableCell>
                 )}
             </TableRow>
@@ -186,7 +181,7 @@ export function TableSide({
                             {item.markets && !hideSourcesColumn && (
                                 <TableCell>
                                     <TitleText active>
-                                        <Bars max={7} value={item.markets.length} align={reverse ? 'left' : 'right'} />
+                                        <Bars max={maxStrike} value={item.strike} align={reverse ? 'left' : 'right'} />
                                     </TitleText>
                                 </TableCell>
                             )}

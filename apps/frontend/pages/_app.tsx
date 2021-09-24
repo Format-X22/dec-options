@@ -49,6 +49,17 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
                     href='https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap'
                     rel='stylesheet'
                 />
+                <script async src='https://www.googletagmanager.com/gtag/js?id=G-0PTR8ERRMJ' />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'G-0PTR8ERRMJ', { page_path: window.location.pathname });
+                      `,
+                    }}
+                />
             </Head>
             <ContextApp.Provider value={contextState}>
                 <ApolloProvider client={client}>
