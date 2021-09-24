@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { ContextApp } from '../../pages/_app';
 import { GreekValue } from '../../types';
 import { differenceInDays } from 'date-fns';
