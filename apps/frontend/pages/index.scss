@@ -8,6 +8,7 @@ body {
     font-size: 12px;
     background: #000000;
     color: #fff;
+    overflow-x: hidden;
 
     &::-webkit-scrollbar-thumb {
       background: transparent;
