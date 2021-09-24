@@ -45,7 +45,7 @@ const StyledFooter = styled.footer`
             line-height: 34px;
         }
     }
-    .social-links {
+    .decommas-links {
         display: flex;
         flex-direction: column;
 
@@ -94,7 +94,7 @@ const StyledFooter = styled.footer`
 const Footer = () => {
     const decommasTools = [
         { link: '/#tools', text: 'Tools' },
-        { link: '/#contact', text: 'Contact Us' },
+        { link: '/#contacts', text: 'Contact Us' },
         { link: 'mailto:info@decommas.io', text: 'info@decommas.io' },
     ];
     const socialLinks = [
@@ -113,10 +113,10 @@ const Footer = () => {
                 <GetInTouch />
             </div>
             <div className='link-row'>
-                <div className='social-links'>
+                <div className='decommas-links'>
                     {decommasTools.map(({ link, text }, index) => {
                         return (
-                            <a key={`decommas-links-${index}`} href={link}>
+                            <a target='_blank' rel='noreferrer' key={`decommas-links-${index}`} href={link}>
                                 {text}
                             </a>
                         );
