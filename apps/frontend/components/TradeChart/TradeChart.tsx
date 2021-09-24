@@ -17,6 +17,7 @@ const ChartsCol = styled.div`
     svg {
         box-sizing: border-box;
         border-radius: 6px;
+        width: 100%;
     }
     .highcharts-container {
         width: 100% !important;
