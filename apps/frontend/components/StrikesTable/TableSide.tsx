@@ -54,7 +54,6 @@ export function TableSide({
     const { state } = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
 
-    console.log({ data, maxStrike });
     const maxStrike =
         data && data.length > 0
             ? // @ts-ignore
