@@ -43,8 +43,6 @@ export abstract class AggregatorAbstract<TRawOption> {
             rawOptions = await this.getRawOptions();
         }
 
-        await sleep(this.rateLimit);
-
         for (const raw of rawOptions) {
             const orderBook: OrderBook | null = await this.getOrderBook(raw);
             const option: Option | null = await this.constructOptionData(raw, orderBook);
@@ -57,8 +55,6 @@ export abstract class AggregatorAbstract<TRawOption> {
                 this.normalizeOptionBase(option);
                 await this.saveResult(option);
             }
-
-            await sleep(this.rateLimit);
         }
     }
 

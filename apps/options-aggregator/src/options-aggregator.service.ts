@@ -5,7 +5,6 @@ import { HegicService } from './options/hegic/hegic.service';
 import { OkexService } from './options/okex/okex.service';
 import { AggregatorAbstract } from './options/aggregator.abstract';
 import { AuctusService } from './options/auctus/auctus.service';
-import { SirenService } from './options/siren/siren.service';
 import { OpynService } from './options/opyn/opyn.service';
 
 @Injectable()
@@ -18,7 +17,6 @@ export class OptionsAggregatorService {
         private readonly hegicService: HegicService,
         private readonly okexService: OkexService,
         private readonly auctusService: AuctusService,
-        private readonly sirenService: SirenService,
         private readonly opynService: OpynService,
     ) {}
 
@@ -28,7 +26,6 @@ export class OptionsAggregatorService {
             this.deribitService,
             this.okexService,
             this.auctusService,
-            this.sirenService,
             this.opynService,
         ].forEach(this.startOptionsSync.bind(this));
 
