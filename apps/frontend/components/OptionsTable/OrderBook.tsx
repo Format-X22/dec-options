@@ -121,6 +121,12 @@ const OrderBookTable = styled.div`
         height: 100%;
         background-color: rgba(113, 210, 152, 0.06);
     }
+    .divider {
+        background: #3d3d3d;
+        height: 72px;
+        border-top: 3px solid #303030;
+        border-bottom: 4px solid #303030;
+    }
 `;
 
 type OrderWithWeight = OrderBookOrder & { weight?: number };
@@ -153,7 +159,6 @@ export function OrderBook(): JSX.Element {
         });
 
     const marketFeesMap: Map<string, OptionFees | undefined> = new Map();
-
     for (const option of optionGroupData?.options.data || []) {
         marketFeesMap.set(option.market.name, option?.fees);
     }
@@ -193,22 +198,14 @@ export function OrderBook(): JSX.Element {
         }
     }
 
-    asks.sort((a: OrderBookOrder, b: OrderBookOrder): number => {
-        if (a.price > b.price) {
-            return 1;
-        } else {
-            return -1;
-        }
-    });
-    bids.sort((a: OrderBookOrder, b: OrderBookOrder): number => {
-        if (a.price < b.price) {
-            return 1;
-        } else {
-            return -1;
-        }
-    });
+    asks.sort((a, b): number => a.price - b.price);
+    bids.sort((a, b): number => b.price - a.price);
     const maxAsksWeight = Math.max(...asks.map(({ weight }) => weight || 0));
     const maxBidsWeight = Math.max(...bids.map(({ weight }) => weight || 0));
+
+    const asksMin = asks.length > 0 ? +asks[0].price.toFixed(2) : 0;
+    const bidsMax = bids.length > 0 ? +bids[0].price.toFixed(2) : 0;
+    const spread = asksMin - bidsMax;
 
     return (
         <OrderBookTable>
@@ -242,7 +239,7 @@ export function OrderBook(): JSX.Element {
             {!optionGroupError && !error && (
                 <SubTablesWrapper>
                     <SubTable reverse>
-                        {asks.slice().map(
+                        {asks.map(
                             ({ price, amount, marketName, fees, weight }, index): JSX.Element => (
                                 <TableRow
                                     maxHeight={53}
@@ -278,8 +275,27 @@ export function OrderBook(): JSX.Element {
                             </TableRow>
                         )}
                     </SubTable>
-                    <TableRow maxHeight={52} className='table-row'>
-                        &nbsp;
+                    <TableRow maxHeight={72} className='table-row divider'>
+                        <TableCell>
+                            {spread > 0 ? (
+                                <AsksText>{spread.toFixed(2)}</AsksText>
+                            ) : (
+                                <BidsText>{spread.toFixed(2)}</BidsText>
+                            )}
+                        </TableCell>
+                        {bidsMax > 0 && (
+                            <>
+                                <TableCell>
+                                    {spread > 0 ? (
+                                        <AsksText>{((spread / bidsMax) * 100).toFixed(2)}%</AsksText>
+                                    ) : (
+                                        <BidsText>{((spread / bidsMax) * 100).toFixed(2)}%</BidsText>
+                                    )}
+                                </TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                            </>
+                        )}
                     </TableRow>
                     <SubTable>
                         {bids.map(
