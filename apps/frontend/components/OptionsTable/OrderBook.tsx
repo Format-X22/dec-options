@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { OptionFees, OptionGQL } from '@app/shared/option.schema';
 import { useRouter } from 'next/router';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
+import { $buttonBackground, $buttonBackgroundHover } from '@dexcommas/core';
 
 const GET_OPTIONS = gql`
     query getOptions(
@@ -30,6 +31,7 @@ const GET_OPTIONS = gql`
                 strike
                 askQuote
                 bidQuote
+                marketUrl
                 market {
                     key
                     name
@@ -129,6 +131,30 @@ const OrderBookTable = styled.div`
     }
 `;
 
+const TradeButtonsRow = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 20px 0;
+
+    span,
+    a {
+        font-size: 14px;
+        line-height: 20px;
+        margin-right: 10px;
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+
+    a {
+        color: ${$buttonBackground};
+        &:hover {
+            color: ${$buttonBackgroundHover};
+        }
+    }
+`;
+
 type OrderWithWeight = OrderBookOrder & { weight?: number };
 
 export function OrderBook(): JSX.Element {
@@ -159,8 +185,10 @@ export function OrderBook(): JSX.Element {
         });
 
     const marketFeesMap: Map<string, OptionFees | undefined> = new Map();
+    const marketsUrls = {};
     for (const option of optionGroupData?.options.data || []) {
         marketFeesMap.set(option.market.name, option?.fees);
+        marketsUrls[option.market.name] = option.marketUrl;
     }
 
     const asks: Array<OrderWithWeight> = [];
@@ -208,135 +236,148 @@ export function OrderBook(): JSX.Element {
     const spread = asksMin - bidsMax;
 
     return (
-        <OrderBookTable>
-            {/* <TableRow maxHeight={52} className='table-row'>
+        <>
+            <TradeButtonsRow>
+                <span>Trade on:</span>
+                {Object.keys(marketsUrls).map((marketName) => {
+                    const marketUrl = marketsUrls[marketName];
+                    return (
+                        <a key={`trade-on-${marketName}`} href={marketUrl}>
+                            {marketName}
+                        </a>
+                    );
+                })}
+            </TradeButtonsRow>
+            <OrderBookTable>
+                {/* <TableRow maxHeight={52} className='table-row'>
                 <TableCell>ORDER BOOK</TableCell>
             </TableRow> */}
-            <TableRow maxHeight={52} className='table-row'>
-                <TableCell>
-                    <TitleText className='title-text'>Price</TitleText>
-                </TableCell>
-                <TableCell>
-                    <TitleText className='title-text'>Amount</TitleText>
-                </TableCell>
-                <TableCell>
-                    <TitleText className='title-text'>Source</TitleText>
-                </TableCell>
-                <TableCell>
-                    <TitleText className='title-text'>Fees</TitleText>
-                </TableCell>
-            </TableRow>
-            {optionGroupError && (
                 <TableRow maxHeight={52} className='table-row'>
-                    {optionGroupError.toString()}
+                    <TableCell>
+                        <TitleText className='title-text'>Price</TitleText>
+                    </TableCell>
+                    <TableCell>
+                        <TitleText className='title-text'>Amount</TitleText>
+                    </TableCell>
+                    <TableCell>
+                        <TitleText className='title-text'>Source</TitleText>
+                    </TableCell>
+                    <TableCell>
+                        <TitleText className='title-text'>Fees</TitleText>
+                    </TableCell>
                 </TableRow>
-            )}
-            {!optionGroupError && error && (
-                <TableRow maxHeight={52} className='table-row'>
-                    {error.toString()}
-                </TableRow>
-            )}
-            {!optionGroupError && !error && (
-                <SubTablesWrapper>
-                    <SubTable reverse>
-                        {asks.map(
-                            ({ price, amount, marketName, fees, weight }, index): JSX.Element => (
-                                <TableRow
-                                    maxHeight={53}
-                                    key={`asks-${index}-${price}-${amount}-${marketName}`}
-                                    className='table-row'
-                                >
-                                    {weight && (
-                                        <div
-                                            className='asks-weight'
-                                            style={{ width: `${(weight / maxAsksWeight) * 100}%` }}
-                                        />
-                                    )}
-                                    <TableCell>
-                                        <AsksText>{price.toFixed(2)}</AsksText>
-                                    </TableCell>
-                                    <TableCell>
-                                        <TitleText className='title-text'>
-                                            {amount < 0.01 ? amount.toFixed(4) : amount.toFixed(2)}
-                                        </TitleText>
-                                    </TableCell>
-                                    <TableCell>
-                                        <TitleText className='title-text'>{marketName}</TitleText>
-                                    </TableCell>
-                                    <TableCell>
-                                        <TitleText className='title-text'>{formatFees(fees)}</TitleText>
-                                    </TableCell>
-                                </TableRow>
-                            ),
-                        )}
-                        {asks.length === 0 && (
-                            <TableRow maxHeight={53} className='table-row'>
-                                <TableCell width='100%'>No asks...</TableCell>
-                            </TableRow>
-                        )}
-                    </SubTable>
-                    <TableRow maxHeight={72} className='table-row divider'>
-                        <TableCell>
-                            {spread > 0 ? (
-                                <AsksText>{spread.toFixed(2)}</AsksText>
-                            ) : (
-                                <BidsText>{spread.toFixed(2)}</BidsText>
-                            )}
-                        </TableCell>
-                        {bidsMax > 0 && (
-                            <>
-                                <TableCell>
-                                    {spread > 0 ? (
-                                        <AsksText>{((spread / bidsMax) * 100).toFixed(2)}%</AsksText>
-                                    ) : (
-                                        <BidsText>{((spread / bidsMax) * 100).toFixed(2)}%</BidsText>
-                                    )}
-                                </TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                            </>
-                        )}
+                {optionGroupError && (
+                    <TableRow maxHeight={52} className='table-row'>
+                        {optionGroupError.toString()}
                     </TableRow>
-                    <SubTable>
-                        {bids.map(
-                            ({ price, amount, marketName, fees, weight }, index): JSX.Element => (
-                                <TableRow
-                                    maxHeight={53}
-                                    key={`bids-${index}-${price}-${amount}-${marketName}`}
-                                    className='table-row'
-                                >
-                                    {weight && (
-                                        <div
-                                            className='bids-weight'
-                                            style={{ width: `${(weight / maxBidsWeight) * 100}%` }}
-                                        />
-                                    )}
-                                    <TableCell>
-                                        <BidsText>{price.toFixed(2)}</BidsText>
-                                    </TableCell>
-                                    <TableCell>
-                                        <TitleText className='title-text'>
-                                            {amount < 0.001 ? amount.toFixed(4) : amount.toFixed(2)}
-                                        </TitleText>
-                                    </TableCell>
-                                    <TableCell>
-                                        <TitleText className='title-text'>{marketName}</TitleText>
-                                    </TableCell>
-                                    <TableCell>
-                                        <TitleText className='title-text'>{formatFees(fees)}</TitleText>
-                                    </TableCell>
+                )}
+                {!optionGroupError && error && (
+                    <TableRow maxHeight={52} className='table-row'>
+                        {error.toString()}
+                    </TableRow>
+                )}
+                {!optionGroupError && !error && (
+                    <SubTablesWrapper>
+                        <SubTable reverse>
+                            {asks.map(
+                                ({ price, amount, marketName, fees, weight }, index): JSX.Element => (
+                                    <TableRow
+                                        maxHeight={53}
+                                        key={`asks-${index}-${price}-${amount}-${marketName}`}
+                                        className='table-row'
+                                    >
+                                        {weight && (
+                                            <div
+                                                className='asks-weight'
+                                                style={{ width: `${(weight / maxAsksWeight) * 100}%` }}
+                                            />
+                                        )}
+                                        <TableCell>
+                                            <AsksText>{price.toFixed(2)}</AsksText>
+                                        </TableCell>
+                                        <TableCell>
+                                            <TitleText className='title-text'>
+                                                {amount < 0.01 ? amount.toFixed(4) : amount.toFixed(2)}
+                                            </TitleText>
+                                        </TableCell>
+                                        <TableCell>
+                                            <TitleText className='title-text'>{marketName}</TitleText>
+                                        </TableCell>
+                                        <TableCell>
+                                            <TitleText className='title-text'>{formatFees(fees)}</TitleText>
+                                        </TableCell>
+                                    </TableRow>
+                                ),
+                            )}
+                            {asks.length === 0 && (
+                                <TableRow maxHeight={53} className='table-row'>
+                                    <TableCell width='100%'>No asks...</TableCell>
                                 </TableRow>
-                            ),
-                        )}
-                        {bids.length === 0 && (
-                            <TableRow maxHeight={53} className='table-row'>
-                                <TableCell width='100%'>No bids...</TableCell>
-                            </TableRow>
-                        )}
-                    </SubTable>
-                </SubTablesWrapper>
-            )}
-        </OrderBookTable>
+                            )}
+                        </SubTable>
+                        <TableRow maxHeight={72} className='table-row divider'>
+                            <TableCell>
+                                {spread > 0 ? (
+                                    <AsksText>{spread.toFixed(2)}</AsksText>
+                                ) : (
+                                    <BidsText>{spread.toFixed(2)}</BidsText>
+                                )}
+                            </TableCell>
+                            {bidsMax > 0 && (
+                                <>
+                                    <TableCell>
+                                        {spread > 0 ? (
+                                            <AsksText>{((spread / bidsMax) * 100).toFixed(2)}%</AsksText>
+                                        ) : (
+                                            <BidsText>{((spread / bidsMax) * 100).toFixed(2)}%</BidsText>
+                                        )}
+                                    </TableCell>
+                                    <TableCell></TableCell>
+                                    <TableCell></TableCell>
+                                </>
+                            )}
+                        </TableRow>
+                        <SubTable>
+                            {bids.map(
+                                ({ price, amount, marketName, fees, weight }, index): JSX.Element => (
+                                    <TableRow
+                                        maxHeight={53}
+                                        key={`bids-${index}-${price}-${amount}-${marketName}`}
+                                        className='table-row'
+                                    >
+                                        {weight && (
+                                            <div
+                                                className='bids-weight'
+                                                style={{ width: `${(weight / maxBidsWeight) * 100}%` }}
+                                            />
+                                        )}
+                                        <TableCell>
+                                            <BidsText>{price.toFixed(2)}</BidsText>
+                                        </TableCell>
+                                        <TableCell>
+                                            <TitleText className='title-text'>
+                                                {amount < 0.001 ? amount.toFixed(4) : amount.toFixed(2)}
+                                            </TitleText>
+                                        </TableCell>
+                                        <TableCell>
+                                            <TitleText className='title-text'>{marketName}</TitleText>
+                                        </TableCell>
+                                        <TableCell>
+                                            <TitleText className='title-text'>{formatFees(fees)}</TitleText>
+                                        </TableCell>
+                                    </TableRow>
+                                ),
+                            )}
+                            {bids.length === 0 && (
+                                <TableRow maxHeight={53} className='table-row'>
+                                    <TableCell width='100%'>No bids...</TableCell>
+                                </TableRow>
+                            )}
+                        </SubTable>
+                    </SubTablesWrapper>
+                )}
+            </OrderBookTable>
+        </>
     );
 }
 
