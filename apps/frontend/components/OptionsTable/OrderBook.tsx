@@ -231,8 +231,8 @@ export function OrderBook(): JSX.Element {
     const maxAsksWeight = Math.max(...asks.map(({ weight }) => weight || 0));
     const maxBidsWeight = Math.max(...bids.map(({ weight }) => weight || 0));
 
-    const asksMin = asks.length > 0 ? +asks[0].price.toFixed(2) : 0;
-    const bidsMax = bids.length > 0 ? +bids[0].price.toFixed(2) : 0;
+    const asksMin = asks.length > 0 ? +asks[0].price.toFixed(4) : 0;
+    const bidsMax = bids.length > 0 ? +bids[0].price.toFixed(4) : 0;
     const spread = asksMin - bidsMax;
 
     return (
@@ -293,7 +293,7 @@ export function OrderBook(): JSX.Element {
                                             />
                                         )}
                                         <TableCell>
-                                            <AsksText>{price.toFixed(2)}</AsksText>
+                                            <AsksText>{price.toFixed(4)}</AsksText>
                                         </TableCell>
                                         <TableCell>
                                             <TitleText className='title-text'>
@@ -318,9 +318,9 @@ export function OrderBook(): JSX.Element {
                         <TableRow maxHeight={72} className='table-row divider'>
                             <TableCell>
                                 {spread > 0 ? (
-                                    <AsksText>{spread.toFixed(2)}</AsksText>
+                                    <AsksText>{spread.toFixed(4)}</AsksText>
                                 ) : (
-                                    <BidsText>{spread.toFixed(2)}</BidsText>
+                                    <BidsText>{spread.toFixed(4)}</BidsText>
                                 )}
                             </TableCell>
                             {bidsMax > 0 && (
@@ -352,7 +352,7 @@ export function OrderBook(): JSX.Element {
                                             />
                                         )}
                                         <TableCell>
-                                            <BidsText>{price.toFixed(2)}</BidsText>
+                                            <BidsText>{price.toFixed(4)}</BidsText>
                                         </TableCell>
                                         <TableCell>
                                             <TitleText className='title-text'>

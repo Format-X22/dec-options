@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client';
+import { gql, useLazyQuery } from '@apollo/client';
 
 const GET_STATS = gql`
     query getStats($marketType: MarketType, $base: String) {
@@ -42,7 +42,7 @@ interface IProps {
 }
 
 export const useStatsData = ({ base, marketType }: IProps) => {
-    return useQuery<{ stats: StatsData[] }>(GET_STATS, {
+    return useLazyQuery<{ stats: StatsData[] }>(GET_STATS, {
         variables: {
             marketType,
             base,

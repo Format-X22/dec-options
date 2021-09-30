@@ -1,9 +1,10 @@
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Highcharts, { color as colorFunc } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useRouter } from 'next/router';
 import { ContextApp } from 'apps/frontend/pages/_app';
+import { Spinner } from '../Spinner';
 
 const options: Highcharts.Options = {
     title: {
@@ -84,27 +85,6 @@ const ChartsCol = styled.div`
     @media all and (max-width: 768px) {
         min-width: 100%;
         margin-right: 0;
-    }
-
-    .spinner {
-        z-index: 200;
-        position: absolute;
-        top: calc(50% - 20px);
-        left: calc(50% - 20px);
-        border: 4px solid #303030; /* Light grey */
-        border-top: 4px solid #71abd2; /* Blue */
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 0.9s ease-in-out infinite;
-    }
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
     }
 `;
 
@@ -293,7 +273,7 @@ const StatChart: FC<IProps> = ({ type, title, chartKey, loading, data }) => {
     const measureValue = chartKey !== 'openInterest' ? selectedBase : '$';
     return (
         <ChartsCol>
-            {loading && <div className='spinner' />}
+            {loading && <Spinner />}
             <ChartsHeader>
                 <h3>{title}</h3>
                 <div>

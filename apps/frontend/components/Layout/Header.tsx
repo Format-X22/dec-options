@@ -39,7 +39,7 @@ const Logo = styled.div`
 
 function Header({}: { children?: ReactElement | string }): JSX.Element {
     return (
-        <StyledHeader>
+        <StyledHeader id='header'>
             <Logo>
                 <img src='/opex/public/opex.svg' alt='Opex' />
                 <h1>

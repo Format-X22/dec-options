@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
 import { $backgroundLight } from '../../theme';
-import { Button } from '../Button';
+import { Button, ButtonLink } from '../Button';
 import { useRouter } from 'next/router';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
 import { CallsSvgIcon } from '../Icons/CallsSvgIcon';
@@ -66,27 +67,25 @@ const Text = styled.span`
 export function GroupInfo(): JSX.Element {
     const router = useRouter();
     const { date, strike, base, type, marketType } = router.query as unknown as ITradeQuery;
+
+    const query: { date: string; base: string; marketType?: string } = {
+        date,
+        base,
+    };
+    if (marketType) {
+        query.marketType = marketType;
+    }
+    const returnLink = `/?${Object.keys(query)
+        .map((key) => `${key}=${query[key]}`)
+        .join('&')}`;
     return (
         <StyledInfo>
             <div>
-                <Button
-                    type='primary'
-                    onClick={() => {
-                        const query: { date: string; base: string; marketType?: string } = {
-                            date,
-                            base,
-                        };
-                        if (marketType) {
-                            query.marketType = marketType;
-                        }
-                        router.push({
-                            pathname: `/`,
-                            query: query,
-                        });
-                    }}
-                >
-                    <img src='/opex/public/back.svg' alt='back' /> Go back
-                </Button>
+                <Link href={returnLink}>
+                    <Button type='primary'>
+                        <img src='/opex/public/back.svg' alt='back' /> Go back
+                    </Button>
+                </Link>
             </div>
             <div>
                 <div className='group-info'>
