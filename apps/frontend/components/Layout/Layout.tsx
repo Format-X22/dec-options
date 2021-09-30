@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 
 import Header from './Header';
@@ -17,6 +17,12 @@ interface IProps {
 }
 
 const Layout: FC<IProps> = ({ fixedScreenHeight = false, children }) => {
+    useEffect(() => {
+        const header = document.getElementById('header');
+        if (header) {
+            header.scrollIntoView();
+        }
+    }, []);
     return (
         <Container fixedScreenHeight={fixedScreenHeight}>
             <Header />

@@ -1,15 +1,17 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { getHistoryChartOptions } from './getHistoryChartOptions';
 import { getTotalValueChartOptions } from './getTotalValueChartOptions';
+import { Spinner } from '../Spinner';
 
 const ChartsCol = styled.div`
     background-color: #3d3d3d;
     min-width: 50%;
     margin-bottom: 24px;
     border-radius: 6px;
+    position: relative;
     &:last-child {
         margin-bottom: 0;
     }
@@ -47,15 +49,17 @@ interface IProps {
         impliedVolatility: number;
         date: string;
     }[];
+    loading?: boolean;
 }
 
-const TradeChart: FC<IProps> = ({ type = 'area', chartKey, data, dataTitle, base }) => {
+const TradeChart: FC<IProps> = ({ type = 'area', chartKey, data, dataTitle, base, loading }) => {
     const historyChartOptions =
         type === 'area'
             ? getHistoryChartOptions({ base, type, chartKey, dataTitle, data })
             : getTotalValueChartOptions({ base, type, chartKey, dataTitle, data });
     return (
         <ChartsCol>
+            {loading && <Spinner />}
             <HighchartsReact highcharts={Highcharts} options={historyChartOptions} />
         </ChartsCol>
     );

@@ -143,8 +143,7 @@ export function TableSide({
             </TableRow>
             {error && <TableRow>{error.toString()}</TableRow>}
             {!error &&
-                data &&
-                (dataWithGreeks || data).map((item, j) =>
+                dataWithGreeks.map((item, j) =>
                     item ? (
                         <TableRow
                             reverse={reverse}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 
@@ -24,7 +24,16 @@ const TradeComingSoon = styled.div`
 const Trade = () => {
     const router = useRouter();
     const { strike, base, type, date } = router.query as unknown as ITradeQuery;
-    const { loading: loadingStats, data: dataStats } = useStatsData({ base });
+    const [getStats, { loading: loadingStats, data: dataStats }] = useStatsData({ base });
+    useEffect(() => {
+        setTimeout(() =>
+            getStats({
+                variables: {
+                    marketType: router.query.marketType,
+                },
+            }),
+        );
+    }, []);
     const strikesHistoryData = useStrikeHistoryData(base, date, strike, type, dataStats);
     const totalValuesByExpirations = useTotalValuesByExpirations(base, strike, type, dataStats);
 
@@ -37,6 +46,7 @@ const Trade = () => {
                     chartKey='openInterest'
                     dataTitle='Open Interest History'
                     base={base}
+                    loading={loadingStats || !dataStats}
                 />
             )}
             {!loadingStats && (
@@ -46,6 +56,7 @@ const Trade = () => {
                     chartKey='volume'
                     dataTitle='Volume History'
                     base={base}
+                    loading={loadingStats || !dataStats}
                 />
             )}
             {!loadingStats && (
@@ -55,6 +66,7 @@ const Trade = () => {
                     chartKey='impliedVolatility'
                     dataTitle='Implied Volatility History'
                     base=''
+                    loading={loadingStats || !dataStats}
                 />
             )}
             {!loadingStats && (
@@ -64,6 +76,7 @@ const Trade = () => {
                     chartKey='openInterest'
                     dataTitle='Total Open Interest by Expiration Dates'
                     base={base}
+                    loading={loadingStats || !dataStats}
                 />
             )}
             {!loadingStats && (
@@ -73,6 +86,7 @@ const Trade = () => {
                     chartKey='volume'
                     dataTitle='Total Volume by Expiration Dates'
                     base={base}
+                    loading={loadingStats || !dataStats}
                 />
             )}
             {!loadingStats && (
@@ -82,6 +96,7 @@ const Trade = () => {
                     chartKey='impliedVolatility'
                     dataTitle='Total Implied Volatility by Expiration Dates'
                     base=''
+                    loading={loadingStats || !dataStats}
                 />
             )}
         </TradeComingSoon>

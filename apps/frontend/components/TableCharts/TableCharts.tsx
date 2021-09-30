@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import StatChart from './StatChart';
@@ -15,7 +15,18 @@ const ChartsRow = styled.div`
 
 const TableCharts = () => {
     const router = useRouter();
-    const { loading: loadingStats, data: dataStats } = useStatsData({ marketType: router.query.marketType as string });
+    const [getStats, { loading: loadingStats, data: dataStats }] = useStatsData({
+        marketType: router.query.marketType as string,
+    });
+    useEffect(() => {
+        setTimeout(() =>
+            getStats({
+                variables: {
+                    marketType: router.query.marketType,
+                },
+            }),
+        );
+    }, []);
     const dataByBase = useMemo(() => {
         const returnValue = {};
         if (dataStats) {
@@ -44,14 +55,14 @@ const TableCharts = () => {
                 title='Total options open interest history'
                 data={dataByBase}
                 chartKey='openInterest'
-                loading={loadingStats}
+                loading={loadingStats || !dataStats}
             />
             <StatChart
                 type='column'
                 title='Total options volume history'
                 data={dataByBase}
                 chartKey='volume'
-                loading={loadingStats}
+                loading={loadingStats || !dataStats}
             />
         </ChartsRow>
     );
