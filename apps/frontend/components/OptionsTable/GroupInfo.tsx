@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { $backgroundLight } from '../../theme';
-import { Button, ButtonLink } from '../Button';
+import { Button } from '../Button';
 import { useRouter } from 'next/router';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
 import { CallsSvgIcon } from '../Icons/CallsSvgIcon';
