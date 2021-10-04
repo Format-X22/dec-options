@@ -38,6 +38,20 @@ const ChartsCol = styled.div`
     }
 `;
 
+const NoDataMessage = styled.p`
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #929ca8;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.32px;
+    line-height: 18px;
+    z-index: 20;
+    transform: translate(-50%);
+`;
+
 interface IProps {
     type: 'area' | 'column';
     dataTitle: string;
@@ -60,6 +74,9 @@ const TradeChart: FC<IProps> = ({ type = 'area', chartKey, data, dataTitle, base
     return (
         <ChartsCol>
             {loading && <Spinner />}
+            {historyChartOptions.series[0].data.length === 0 && (
+                <NoDataMessage>No data available. Please try to reload page later.</NoDataMessage>
+            )}
             <HighchartsReact highcharts={Highcharts} options={historyChartOptions} />
         </ChartsCol>
     );
