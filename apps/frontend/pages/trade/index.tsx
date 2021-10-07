@@ -10,9 +10,21 @@ const Index = () => {
     );
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ query }) {
+    const queryString = Object.keys(query)
+        .map((key) => `${key}=${query[key]}`)
+        .join('&');
+    const metaTags = {
+        'og:title': `DeCommas Opex Trade`,
+        'og:description': `Take a look at all available options for ${query['base']} ${query['strike']} ${query['type']} strike`,
+        'og:image': 'https://decommas.io/opex/public/opex.svg',
+        'og:url': `https://decommas.io/opex/trade?${queryString}`,
+    };
     return {
-        props: {},
+        props: {
+            query,
+            metaTags,
+        },
     };
 }
 
