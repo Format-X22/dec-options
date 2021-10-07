@@ -71,21 +71,27 @@ export const GetInTouch = () => {
 
     return (
         <>
-            <Modal visible={modalIsVisible} onClose={() => setModalIsVisible(false)} title='Get in touch with updates'>
-                <Container>
-                    <Input
-                        value={success ? 'Thank you!' : email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        label='Email'
-                        labelPosition='top'
-                        disabled={success}
-                    />
-                    {error && <ErrorText>{error}</ErrorText>}
-                    <StyleButton onClick={send} type='primary' disabled={success}>
-                        Get in touch
-                    </StyleButton>
-                </Container>
-            </Modal>
+            {modalIsVisible && (
+                <Modal
+                    visible={modalIsVisible}
+                    onClose={() => setModalIsVisible(false)}
+                    title='Get in touch with updates'
+                >
+                    <Container>
+                        <Input
+                            value={success ? 'Thank you!' : email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            label='Email'
+                            labelPosition='top'
+                            disabled={success}
+                        />
+                        {error && <ErrorText>{error}</ErrorText>}
+                        <StyleButton onClick={send} type='primary' disabled={success}>
+                            Get in touch
+                        </StyleButton>
+                    </Container>
+                </Modal>
+            )}
             <Button onClick={() => setModalIsVisible(true)} type='ghost'>
                 Get in touch
             </Button>

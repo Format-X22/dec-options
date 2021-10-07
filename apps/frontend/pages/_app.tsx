@@ -77,5 +77,5 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 }
 
 export default dynamic(() => Promise.resolve(MyApp), {
-    ssr: false,
+    ssr: true,
 });
