@@ -128,6 +128,7 @@ export function Table({
         () =>
             [...callsDataByStrike, ...putsDataByStrike]
                 .filter((item) => item)
+                // @ts-ignore
                 .reduce((max, { barsWeight }) => (barsWeight > max ? barsWeight : max), 0),
         [callsDataByStrike, putsDataByStrike],
     );
