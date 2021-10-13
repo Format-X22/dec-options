@@ -2,48 +2,14 @@ import { FC } from 'react';
 import { TableRow } from '../StrikesTable/TableRow';
 import { TableCell } from '../StrikesTable/TableCell';
 import { TitleText } from '../StrikesTable/TitleText';
-import { DocumentNode, gql, useQuery } from '@apollo/client';
-import { OrderBook as OrderBookModel, OrderBookOrder } from '@app/shared/orderbook.schema';
-import { QueryResult } from '@apollo/client/react/types/types';
+import { OrderBookOrder } from '@app/shared/orderbook.schema';
 import styled from 'styled-components';
-import { OptionFees, OptionGQL } from '@app/shared/option.schema';
+import { OptionFees } from '@app/shared/option.schema';
 import { useRouter } from 'next/router';
 import { ITradeQuery } from '../../dtos/ITradeQuery';
 import { $buttonBackground, $buttonBackgroundHover } from '@dexcommas/core';
-
-const GET_OPTIONS = gql`
-    query getOptions(
-        $type: OptionType
-        $base: String!
-        $fromExpirationDate: DateTime
-        $toExpirationDate: DateTime
-        $strike: Float!
-    ) {
-        options(
-            filterByType: $type
-            filterByBase: $base
-            filterByExpirationDateFrom: $fromExpirationDate
-            filterByExpirationDateTo: $toExpirationDate
-            filterByStrike: $strike
-        ) {
-            data {
-                id
-                strike
-                askQuote
-                bidQuote
-                marketUrl
-                market {
-                    key
-                    name
-                }
-                fees {
-                    takerPercent
-                    takerTransactionUsd
-                }
-            }
-        }
-    }
-`;
+import { useOptions } from 'apps/frontend/hooks/useOptions';
+import { useOrderBook } from 'apps/frontend/hooks/useOrderBook';
 
 const AsksText: FC = styled.div`
     font-weight: 400;
@@ -173,16 +139,7 @@ export function OrderBook(): JSX.Element {
     toExpirationDate.setMinutes(59);
     toExpirationDate.setSeconds(59);
 
-    const { data: optionGroupData, error: optionGroupError }: QueryResult<{ options: { data: Array<OptionGQL> } }> =
-        useQuery(GET_OPTIONS, {
-            variables: {
-                type: type?.toUpperCase() || 'CALL',
-                base: base || '',
-                strike: +strike || 0,
-                fromExpirationDate,
-                toExpirationDate,
-            },
-        });
+    const { optionGroupData, optionGroupError } = useOptions(type, base, strike, fromExpirationDate, toExpirationDate);
 
     const marketFeesMap: Map<string, OptionFees | undefined> = new Map();
     const marketsUrls = {};
@@ -194,9 +151,7 @@ export function OrderBook(): JSX.Element {
     const asks: Array<OrderWithWeight> = [];
     const bids: Array<OrderWithWeight> = [];
 
-    const { data, error }: QueryResult<{ orderBook: OrderBookModel }> = useQuery(
-        makeOrderBookQuery(optionGroupData?.options.data),
-    );
+    const { data, error } = useOrderBook(optionGroupData?.options.data || []);
 
     if (data) {
         for (const [key, orderBook] of Object.entries(data)) {
@@ -379,34 +334,6 @@ export function OrderBook(): JSX.Element {
             </OrderBookTable>
         </>
     );
-}
-
-function makeOrderBookQuery(options: Array<OptionGQL> = []): DocumentNode {
-    let body: string = '';
-
-    options.forEach((option: OptionGQL, index: number) => {
-        body += `
-            id${index}_${option.market.name}: orderBook(optionId: "${option.id}", optionMarketKey: ${option.market.key}) {
-                optionMarketKey
-                asks {
-                    price
-                    amount
-                }
-                bids {
-                    price
-                    amount
-                }
-            }
-        `;
-    });
-
-    body = body || 'orderBook(optionId: "", optionMarketKey: DERIBIT) { optionMarketKey }';
-
-    return gql`
-        query getOrderBook {
-            ${body}
-        }
-    `;
 }
 
 function formatFees(fees?: OptionFees): string {

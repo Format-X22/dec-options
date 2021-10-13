@@ -12,6 +12,11 @@ import greeks from 'greeks';
 import iv from 'implied-volatility';
 import { ApolloError } from '@apollo/client';
 
+export type OrderBookInfo = {
+    asksCount: number;
+    bidsCount: number;
+};
+
 export type TTableData = {
     strike: number;
     markets?: { name: string }[];
@@ -19,6 +24,8 @@ export type TTableData = {
     market?: { name: string };
     minAsk?: number;
     maxBid?: number;
+    orderBookInfo: OrderBookInfo[];
+    barsWeight?: number;
     askQuote?: number;
     bidQuote?: number;
     volatility?: number;
@@ -41,6 +48,7 @@ export function TableSide({
     onRowClick,
     hideSourcesColumn,
     showMarketColumn,
+    maxBarsWeight,
 }: {
     data: (TTableData | undefined)[];
     error?: ApolloError;
@@ -50,15 +58,11 @@ export function TableSide({
     onRowClick: ({ strike, type }: { strike: number; type: string }) => void;
     hideSourcesColumn?: boolean;
     showMarketColumn?: boolean;
+    maxBarsWeight: number;
 }): JSX.Element {
     const { state } = useContext(ContextApp);
     const currentPrice: number = state.prices[state.filter.currency] || 0;
 
-    const maxStrike =
-        data && data.length > 0
-            ? // @ts-ignore
-              data.filter((item) => item).reduce((max, { strike }) => (strike > max ? strike : max), 0)
-            : 0;
     const dataWithGreeks = useMemo(() => {
         if (!data) {
             return [];
@@ -179,7 +183,11 @@ export function TableSide({
                             {item.markets && !hideSourcesColumn && (
                                 <TableCell>
                                     <TitleText active>
-                                        <Bars max={maxStrike} value={item.strike} align={reverse ? 'left' : 'right'} />
+                                        <Bars
+                                            max={maxBarsWeight}
+                                            value={item.barsWeight || 0}
+                                            align={reverse ? 'left' : 'right'}
+                                        />
                                     </TitleText>
                                 </TableCell>
                             )}

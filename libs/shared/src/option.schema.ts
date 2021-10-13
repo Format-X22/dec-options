@@ -175,18 +175,30 @@ export class ExpirationGroup {
 }
 
 @ObjectType()
+export class OrderBookInfo {
+    @Field((): typeof Float => Float)
+    asksCount: number;
+
+    @Field((): typeof Float => Float)
+    bidsCount: number;
+}
+
+@ObjectType()
 export class StrikeGroup {
     @Field((): typeof Float => Float)
     strike: Option['strike'];
+
+    @Field((): Array<typeof OrderBookInfo> => [OrderBookInfo])
+    orderBookInfo: Array<OrderBookInfo>;
 
     @Field((): Array<typeof Market> => [Market])
     markets: Array<Market>;
 
     @Field((): typeof EOptionType => EOptionType)
-    type: Option['type'];
+    type: Option['type'] | undefined;
 
     @Field((): typeof String => String)
-    base: Option['base'];
+    base: Option['base'] | undefined;
 
     @Field((): typeof Float => Float, { nullable: true })
     minAsk: number;
