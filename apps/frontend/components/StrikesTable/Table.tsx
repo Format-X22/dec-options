@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import format from 'date-fns/format';
 import { TableContainer } from './TableContainer';
@@ -7,7 +7,7 @@ import { TablePart } from './TablePart';
 import CallsIcon from '../CallsIcon';
 import { TitleText } from './TitleText';
 import PutsIcon from '../PutsIcon';
-import { TableSide } from './TableSide';
+import { OrderBookInfo, TableSide } from './TableSide';
 import { StrikeColumn } from './StrikeColumn';
 import { StrikeCell } from './StrikeCell';
 import { EMarketType } from '@app/shared/market.schema';
@@ -21,6 +21,10 @@ const GET_STRIKES = gql`
         $toDate: DateTime
     ) {
         strikes(type: $type, base: $base, marketType: $marketType, fromDate: $fromDate, toDate: $toDate) {
+            orderBookInfo {
+                asksCount
+                bidsCount
+            }
             strike
             markets {
                 name
@@ -32,6 +36,8 @@ const GET_STRIKES = gql`
 `;
 
 type Strike = {
+    orderBookInfo: OrderBookInfo[];
+    barsWeight: number;
     strike: number;
     markets: {
         name: string;
@@ -41,6 +47,14 @@ type Strike = {
 };
 type StrikeData = {
     strikes: Strike[];
+};
+
+export const calculateBarsWeight = (orderBookInfo: OrderBookInfo[]) => {
+    return (
+        orderBookInfo.reduce((acc, { asksCount, bidsCount }) => asksCount + bidsCount + acc, 0) *
+        orderBookInfo.length *
+        0.75
+    );
 };
 
 export function Table({
@@ -94,15 +108,29 @@ export function Table({
 
     const callsDataByStrike: (Strike | undefined)[] = [];
     strikes.forEach((s) => {
-        const data = (callsData?.strikes || []).find(({ strike }) => strike === s);
+        let data = (callsData?.strikes || []).find(({ strike }) => strike === s);
+        if (data) {
+            data = { ...data, barsWeight: calculateBarsWeight(data.orderBookInfo) };
+        }
         callsDataByStrike.push(data);
     });
 
     const putsDataByStrike: (Strike | undefined)[] = [];
     strikes.map((s) => {
-        const data = (putsData?.strikes || []).find(({ strike }) => strike === s);
+        let data = (putsData?.strikes || []).find(({ strike }) => strike === s);
+        if (data) {
+            data = { ...data, barsWeight: calculateBarsWeight(data.orderBookInfo) };
+        }
         putsDataByStrike.push(data);
     });
+
+    const maxBarsWeight = useMemo(
+        () =>
+            [...callsDataByStrike, ...putsDataByStrike]
+                .filter((item) => item)
+                .reduce((max, { barsWeight }) => (barsWeight > max ? barsWeight : max), 0),
+        [callsDataByStrike, putsDataByStrike],
+    );
 
     const onRowClick = useCallback(
         ({ strike, type }: { strike: number; type: string }): void => {
@@ -141,6 +169,7 @@ export function Table({
                     error={callsError}
                     type='call'
                     date={fromDate}
+                    maxBarsWeight={maxBarsWeight}
                 />
             </TablePart>
             <StrikeColumn>
@@ -160,6 +189,7 @@ export function Table({
                     reverse
                     type='put'
                     date={fromDate}
+                    maxBarsWeight={maxBarsWeight}
                 />
             </TablePart>
         </TableContainer>

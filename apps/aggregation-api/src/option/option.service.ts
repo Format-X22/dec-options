@@ -40,6 +40,7 @@ type TRawExpirationGroup = {
 
 type TRawStrikeGroup = {
     strike: number;
+    optionIds: string[];
     marketKeys: Array<EMarketKey>;
     minAsk: number;
     maxBid: number;
@@ -211,6 +212,7 @@ export class OptionService {
                     maxBid: {
                         $max: '$bidQuote',
                     },
+                    optionIds: { $addToSet: '$id' },
                 },
             },
             {
@@ -222,6 +224,7 @@ export class OptionService {
                 $project: {
                     _id: 0,
                     strike: '$_id',
+                    optionIds: 1,
                     marketKeys: 1,
                     minAsk: 1,
                     maxBid: 1,
@@ -229,9 +232,20 @@ export class OptionService {
             },
         ]);
 
+        const optionIdsList = data.reduce((acc, { optionIds }) => [...acc, ...optionIds], []);
+        const orderBookList = await this.orderBookModel.find({ optionId: { $in: optionIdsList } });
+        const orderBooksById = orderBookList.reduce(
+            (acc, orderBook) => ({ ...acc, [orderBook.optionId]: orderBook }),
+            {},
+        );
+
         return data.map(
             (raw: TRawStrikeGroup): StrikeGroup => ({
                 strike: raw.strike,
+                orderBookInfo: raw.optionIds.map((optionId) => ({
+                    asksCount: orderBooksById[optionId].asks.length,
+                    bidsCount: orderBooksById[optionId].bids.length,
+                })),
                 markets: this.mapMarketKeys(raw.marketKeys),
                 type: args.type,
                 base: args.base,
@@ -249,7 +263,7 @@ export class OptionService {
             if (symbol) {
                 if (pricesRequired) {
                     const usdPrice = (await this.priceService.getPrice(symbol)) || 0;
-                    
+
                     result.push({ symbol, usdPrice });
                 } else {
                     result.push({ symbol, usdPrice: 0 });
