@@ -3,7 +3,7 @@ import { Stats, StatsDocument } from '@app/shared/stats.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StatsArgs } from './stats.args';
-import { marketKeysByMarketType } from '@app/shared/market.schema';
+import { EMarketType, marketKeysByMarketType } from '@app/shared/market.schema';
 
 @Injectable()
 export class StatsService {
@@ -44,6 +44,12 @@ export class StatsService {
         ];
 
         if (args.marketType) {
+            
+            // TODO Only CEX stats available
+            if (args.marketType === EMarketType.DEX) {
+                args.marketType = EMarketType.CEX;
+            }
+
             pipeline.unshift({
                 $match: {
                     marketKey: { $in: marketKeysByMarketType(args.marketType) },
