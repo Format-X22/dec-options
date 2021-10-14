@@ -36,6 +36,9 @@ type TRawOrders = {
             makerAmount: string;
             takerAmount: string;
         };
+        metaData: {
+            remainingFillableTakerAmount: string;
+        };
     }>;
 };
 type TRawOrderBook = {
@@ -108,14 +111,22 @@ export class OpynService extends AggregatorAbstract<TRawOption> {
         const optionDecimalsMul: BigNumber = new BigNumber(10).pow(rawOption.decimals);
         const strikeDecimalsMul: BigNumber = new BigNumber(10).pow(rawOption.strikeAsset.decimals);
 
-        for (const { order } of rawOrderBook.asks.records) {
+        for (const { order, metaData } of rawOrderBook.asks.records) {
+            if (Number(metaData.remainingFillableTakerAmount) === 0) {
+                continue;
+            }
+
             const amount = new BigNumber(order.makerAmount).div(optionDecimalsMul).toNumber();
             const price = new BigNumber(order.takerAmount).div(strikeDecimalsMul).div(amount).toNumber();
 
             orderBook.asks.push({ price, amount });
         }
 
-        for (const { order } of rawOrderBook.bids.records) {
+        for (const { order, metaData } of rawOrderBook.bids.records) {
+            if (Number(metaData.remainingFillableTakerAmount) === 0) {
+                continue;
+            }
+
             const amount = new BigNumber(order.takerAmount).div(optionDecimalsMul).toNumber();
             const price = new BigNumber(order.makerAmount).div(strikeDecimalsMul).div(amount).toNumber();
 
