@@ -44,11 +44,11 @@ export const StatsDetailsSchema: mongoose.Schema<StatsDetailsDocument> = SchemaF
 @Schema({ versionKey: false })
 export class Stats {
     @Field()
-    @Prop()
+    @Prop({ index: true })
     base: string;
 
     @Field((): typeof EMarketKey => EMarketKey)
-    @Prop({ enum: EMarketKey, type: String })
+    @Prop({ enum: EMarketKey, type: String, index: true })
     marketKey: EMarketKey;
 
     @Field()

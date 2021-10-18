@@ -4,12 +4,29 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StatsArgs } from './stats.args';
 import { EMarketType, marketKeysByMarketType } from '@app/shared/market.schema';
+import { ConfigService } from '@nestjs/config';
+
+const DEFAULT_STATS_CACHE_EXPIRE = 30_000;
 
 @Injectable()
 export class StatsService {
-    constructor(@InjectModel(Stats.name) private statsModel: Model<StatsDocument>) {}
+    private readonly cache: Map<string, Array<Stats>> = new Map();
+    private readonly cacheExpire: number;
+
+    constructor(
+        @InjectModel(Stats.name) private statsModel: Model<StatsDocument>,
+        private configService: ConfigService,
+    ) {
+        this.cacheExpire = Number(this.configService.get('OA_STATS_CACHE_EXPIRE')) || DEFAULT_STATS_CACHE_EXPIRE;
+    }
 
     async getStats(args: StatsArgs): Promise<Array<Stats>> {
+        const cacheKey = JSON.stringify([args.marketType, args.base]);
+
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
         const pipeline: Parameters<Model<StatsDocument>['aggregate']>[0] = [
             {
                 $project: {
@@ -44,7 +61,6 @@ export class StatsService {
         ];
 
         if (args.marketType) {
-            
             // TODO Only CEX stats available
             if (args.marketType === EMarketType.DEX) {
                 args.marketType = EMarketType.CEX;
@@ -65,6 +81,12 @@ export class StatsService {
             });
         }
 
-        return this.statsModel.aggregate(pipeline).exec();
+        const data = await this.statsModel.aggregate(pipeline).exec();
+
+        this.cache.set(cacheKey, data);
+
+        setTimeout(() => this.cache.delete(cacheKey), this.cacheExpire);
+
+        return data;
     }
 }
