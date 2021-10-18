@@ -11,13 +11,19 @@ type TRaw3CommasPrice = {
     last: string;
 };
 
+type TGasApiResponse = {
+    fast: number;
+    safeLow: number;
+    average: number;
+}
+
 enum EApiMarkets {
     FTX = 'ftx',
     BINANCE = 'binance',
 }
 
 const COMMAS_API_POINT: string = 'https://api.3commas.io/public/api/ver1';
-const GAS_API_POINT: string = 'https://www.gasnow.org/api/v3/gas/price';
+const GAS_API_POINT: string = 'https://ethgasstation.info/api/ethgasAPI.json';
 const GWEI_SIZE = 1_000_000_000;
 
 @Injectable()
@@ -141,24 +147,24 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
     }
 
     private async syncGwei(): Promise<void> {
-        let gweiResponse: AxiosResponse<{ data: GweiPrice }>;
+        let gweiResponse: AxiosResponse<TGasApiResponse>;
 
         try {
-            gweiResponse = await this.httpService.get<{ data: GweiPrice }>(GAS_API_POINT).toPromise();
+            gweiResponse = await this.httpService.get<TGasApiResponse>(GAS_API_POINT).toPromise();
         } catch (error) {
             Logger.error(`Gwei sync FATAL error - ${error}`);
             return;
         }
 
-        const absoluteWei: GweiPrice = gweiResponse.data.data;
+        const absoluteWei: TGasApiResponse = gweiResponse.data;
 
         await this.gweiPriceModel.updateOne(
             {},
             {
                 $set: {
-                    slow: absoluteWei.slow / GWEI_SIZE / GWEI_SIZE,
-                    standard: absoluteWei.standard / GWEI_SIZE / GWEI_SIZE,
-                    fast: absoluteWei.fast / GWEI_SIZE / GWEI_SIZE,
+                    slow: absoluteWei.safeLow / GWEI_SIZE,
+                    standard: absoluteWei.average / GWEI_SIZE,
+                    fast: absoluteWei.fast / GWEI_SIZE,
                 },
             },
             { upsert: true },
