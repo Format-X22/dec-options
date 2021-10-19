@@ -9,9 +9,11 @@ import { PriceModule } from './price/price.module';
 import { StatsModule } from './stats/stats.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
     imports: [
+        ScheduleModule.forRoot(),
         ServeStaticModule.forRoot({
             rootPath: join(process.cwd(), './apps/frontend/public'),
             serveRoot: '/opex/public',
