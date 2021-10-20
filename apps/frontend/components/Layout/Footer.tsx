@@ -100,7 +100,7 @@ const Footer = () => {
     const socialLinks = [
         { link: 'https://twitter.com/decommas', image: 'twitter.svg', text: 'Twitter' },
         { link: 'https://t.me/decommas', image: 'telegram.svg', text: 'Telegram' },
-        { link: 'https://discord.gg/FyENCJt8nY', image: 'discord.svg', text: 'Discord' },
+        { link: 'https://discord.gg/c5Wmmyyj2w', image: 'discord.svg', text: 'Discord' },
         { link: 'https://medium.com/@DeCommas/', image: 'medium.svg', text: 'Medium' },
     ];
     return (
